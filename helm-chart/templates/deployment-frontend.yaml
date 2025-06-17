@@ -1,0 +1,70 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-frontend
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+    {{- if .Values.frontend.labels }}
+    {{- toYaml .Values.frontend.labels | nindent 4 }}
+    {{- end }}
+    {{- if .Values.frontend.annotations }}
+  annotations:
+    {{- toYaml .Values.frontend.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  strategy:
+    {{ toYaml .Values.frontend.updateStrategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      app.kubernetes.io/component: frontend
+  template:
+    metadata:
+      labels:
+        {{- include "c4genaisuite.commonLabels" . | nindent 8 }}
+        app.kubernetes.io/component: frontend
+        {{- if .Values.frontend.podLabels }}
+        {{- toYaml .Values.frontend.podLabels | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- if .Values.frontend.podAnnotations }}
+        {{- toYaml .Values.frontend.podAnnotations | nindent 8 }}
+        {{- end }}
+    spec:
+      securityContext: {{ .Values.frontend.podSecurityContext | toYaml | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-frontend
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          securityContext: {{ .Values.frontend.containerSecurityContext | toYaml | nindent 12 }}
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 2019
+              name: admin-api
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+          resources: {{ .Values.frontend.resources | toYaml | nindent 12 }}
+          {{- with .Values.frontend.extraEnvVars }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.frontend.extraVolumeMounts }}
+          volumeMounts:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.frontend.extraVolumes }}
+      volumes:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{ end }}

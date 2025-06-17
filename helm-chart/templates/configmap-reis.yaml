@@ -1,0 +1,42 @@
+{{- if .Values.reis.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-reis-config
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: reis
+data:
+  BATCH_SIZE: {{ .Values.reis.batchSize | quote }}
+  EMBEDDINGS_TYPE: {{ .Values.reis.embeddings.type | quote }}
+  {{- if eq .Values.reis.embeddings.type "azure-openai" }}
+  EMBEDDINGS_AZURE_OPENAI_API_VERSION: {{ .Values.reis.embeddings.azureOpenAi.apiVersion | quote }}
+  EMBEDDINGS_AZURE_OPENAI_DEPLOYMENT_NAME: {{ .Values.reis.embeddings.azureOpenAi.deploymentName | quote }}
+  EMBEDDINGS_AZURE_OPENAI_ENDPOINT: {{ .Values.reis.embeddings.azureOpenAi.endpoint | quote }}
+  EMBEDDINGS_AZURE_OPENAI_MODEL_NAME: {{ .Values.reis.embeddings.azureOpenAi.modelName | quote }}
+  {{- else if eq .Values.reis.embeddings.type "openai" }}
+  EMBEDDINGS_OPENAI_ENDPOINT: {{ .Values.reis.embeddings.openAi.endpoint | quote }}
+  EMBEDDINGS_OPENAI_MODEL_NAME: {{ .Values.reis.embeddings.openAi.modelName | quote }}
+  {{- else }}
+  {{ fail "Invalid embedding type. Must be one of openai, azure-openai." }}
+  {{- end }}
+  HOST: {{ .Values.reis.host | quote }}
+  METRICS_PORT: {{ .Values.reis.metrics.port | quote }}
+  STORE_TYPE: {{ .Values.reis.vectorDatabase.type | quote }}
+  {{- if eq .Values.reis.vectorDatabase.type "azure-ai-search" }}
+  STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT: {{ .Values.reis.vectorDatabase.azureAiSearch.endpoint | quote }}
+  STORE_AZURE_AI_SEARCH_SERVICE_INDEX_NAME: {{ .Values.reis.vectorDatabase.azureAiSearch.indexName | quote }}
+  {{- else if eq .Values.reis.vectorDatabase.type "pgvector" }}
+  STORE_PGVECTOR_INDEX_NAME: {{ .Values.reis.vectorDatabase.pgVector.indexName | quote }}
+  {{- else }}
+  {{ fail "Invalid vector database type. Must be one of azure-ai-search, pgvector." }}
+  {{- end }}
+  STT_TYPE: {{ .Values.reis.speechToText.type | quote }}
+  {{- if eq .Values.reis.speechToText.type "azure-openai-whisper"}}
+  STT_AZURE_OPENAI_WHISPER_API_VERSION: {{ .Values.reis.speechToText.azureOpenAiWhisper.apiVersion | quote }}
+  STT_AZURE_OPENAI_WHISPER_DEPLOYMENT_NAME: {{ .Values.reis.speechToText.azureOpenAiWhisper.deploymentName | quote }}
+  STT_AZURE_OPENAI_WHISPER_ENDPOINT: {{ .Values.reis.speechToText.azureOpenAiWhisper.endpoint | quote }}
+  {{- end }}
+  TMP_FILES_ROOT: {{ .Values.reis.tmpFilesRoot | quote }}
+  WORKERS: {{ .Values.reis.workers | quote }}
+{{- end }}

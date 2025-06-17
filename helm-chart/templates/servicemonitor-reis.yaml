@@ -1,0 +1,21 @@
+{{- if and .Values.reis.enabled .Values.reis.metrics.enabled .Values.reis.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-reis
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: reis-metrics
+    {{- if .Values.reis.metrics.serviceMonitor.labels }}
+    {{- toYaml .Values.reis.metrics.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      app.kubernetes.io/component: reis-metrics
+  endpoints:
+      - port: metrics
+        interval: {{ .Values.reis.metrics.serviceMonitor.interval }}
+        scrapeTimeout: {{ .Values.reis.metrics.serviceMonitor.scrapeTimeout }}
+{{- end }}

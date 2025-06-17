@@ -1,0 +1,195 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+
+suite: Deployment Backend
+templates:
+  - configmap-backend.yaml # required because it is included in deployment-backend.yaml
+  - deployment-backend.yaml
+  - secret-backend.yaml # required because it is included in deployment-backend.yaml
+tests:
+  - it: is of kind Deployment
+    template: deployment-backend.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+
+  - it: uses default name pattern when no overrides are specified
+    template: deployment-backend.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-c4-genai-suite-backend
+
+  - it: name should use fullnameOverride when provided
+    template: deployment-backend.yaml
+    set:
+      fullnameOverride: my-custom-fullname
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-fullname-backend
+
+  - it: should incorporate nameOverride when provided
+    template: deployment-backend.yaml
+    set:
+      nameOverride: my-custom-name
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-my-custom-name-backend
+
+  - it: has update strategy Rolling Update by default
+    template: deployment-backend.yaml
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+
+  - it: supports custom update strategies
+    template: deployment-backend.yaml
+    set:
+      backend.updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 42%
+          maxUnavailable: 63%
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+      - equal:
+          path: spec.strategy.rollingUpdate.maxSurge
+          value: 42%
+      - equal:
+          path: spec.strategy.rollingUpdate.maxUnavailable
+          value: 63%
+
+  - it: sets custom deployment labels if provided
+    template: deployment-backend.yaml
+    set:
+      backend.labels:
+        one: hello
+        two: there
+    asserts:
+      - equal:
+          path: metadata.labels.one
+          value: hello
+      - equal:
+          path: metadata.labels.two
+          value: there
+
+  - it: sets custom pod labels if provided
+    template: deployment-backend.yaml
+    set:
+      backend.podLabels:
+        ding: bing
+        dong: bong
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels.ding
+          value: bing
+      - equal:
+          path: spec.template.metadata.labels.dong
+          value: bong
+
+  - it: sets custom deployment annotations
+    template: deployment-backend.yaml
+    set:
+      backend.annotations:
+        piff: paff
+        smack: whack
+    asserts:
+      - equal:
+          path: metadata.annotations.piff
+          value: paff
+      - equal:
+          path: metadata.annotations.smack
+          value: whack
+
+  - it: sets custom pod annotations if provided
+    template: deployment-backend.yaml
+    set:
+      backend.podAnnotations:
+        beep: boop
+        zeep: zoop
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.beep
+          value: boop
+      - equal:
+          path: spec.template.metadata.annotations.zeep
+          value: zoop
+
+  - it: defines a named port called `web` for container port 3000
+    template: deployment-backend.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 3000
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].name
+          value: web
+
+  - it: has consistent container port configuration
+    template: deployment-backend.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 3000
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.httpGet.port
+          value: 3000
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.port
+          value: 3000
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.port
+          value: 3000
+
+  - it: mounts PostgreSQL connection string from existing secret if set
+    template: deployment-backend.yaml
+    set:
+      backend.postgresql.existingConnectionStringSecret: my-connection-string-secret
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_URL
+            valueFrom:
+              secretKeyRef:
+                name: my-connection-string-secret
+                key: connectionString
+          count: 1
+
+  - it: has extra environment variables set
+    template: deployment-backend.yaml
+    set:
+      backend.extraEnvVars:
+        - name: HELLO_TEST
+          value: hello-world
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: HELLO_TEST
+            value: hello-world
+
+  - it: has extra volumes and volumeMounts set
+    template: deployment-backend.yaml
+    set:
+      backend.extraVolumeMounts:
+        - name: test
+          mountPath: /tmp
+      backend.extraVolumes:
+        - name: test
+          emptyDir: {}
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: test
+            mountPath: /tmp
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: test
+            emptyDir: {}

@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "isolatedModules": true,
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2020",
+    "types": ["vitest/jsdom"],
+    "useDefineForClassFields": true,
+    "paths": {
+      "src*": [
+        "src*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "node_modules/@vitest/expect/dist/chai.d.cts",
+    "./vitest.setup.ts"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

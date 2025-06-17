@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+
+suite: ConfigMap grafana-dashboards
+set:
+  grafanaDashboards:
+    enabled: true
+templates:
+  - configmap-grafana-dashboards.yaml
+tests:
+  - it: is of kind ConfigMap
+    asserts:
+      - isKind:
+          of: ConfigMap
+
+  - it: has the label required for discovery by the prometheus operator
+    asserts:
+      - equal:
+          path: metadata.labels.grafana_dashboard
+          value: "1"
+
+  - it: contains the C4 & REIS dashboard
+    asserts:
+      - exists:
+          path: data["c4-and-reis.json"]

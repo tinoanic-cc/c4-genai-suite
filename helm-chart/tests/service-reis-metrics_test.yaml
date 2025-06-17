@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+
+suite: Service reis-metrics
+templates:
+  - service-reis-metrics.yaml
+set:
+  reis.enabled: true
+  reis.metrics.enabled: true
+
+tests:
+  - it: is of kind Service
+    asserts:
+      - isKind:
+          of: Service
+      - hasDocuments:
+          count: 1
+
+  - it: uses default name pattern when no overrides are specified
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-c4-genai-suite-reis-metrics
+
+  - it: name should use fullnameOverride when provided
+    set:
+      fullnameOverride: my-custom-fullname
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-fullname-reis-metrics
+
+  - it: should incorporate nameOverride when provided
+    set:
+      nameOverride: my-custom-name
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-my-custom-name-reis-metrics
+
+  - it: has the correct port name
+    set:
+      reis.metrics.enabled: true
+    asserts:
+      - equal:
+          path: spec.ports[0].name
+          value: metrics
+
+  - it: uses correct target port
+    set:
+      reis.metrics.enabled: true
+    asserts:
+      - equal:
+          path: spec.ports[0].targetPort
+          value: metrics
+
+  - it: uses metric port value as service port
+    set:
+      reis.metrics.enabled: true
+      reis.metrics.port: 1234
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 1234

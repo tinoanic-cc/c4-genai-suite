@@ -1,0 +1,54 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { CqrsModule } from '@nestjs/cqrs';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BucketEntity, ConfigurationEntity, ExtensionEntity, UserGroupEntity } from 'src/domain/database';
+import { ConfigurationUserEntity } from '../database/entities/configuration-user';
+import { ExplorerService } from './services';
+import {
+  CreateConfigurationHandler,
+  CreateExtensionHandler,
+  DeleteConfigurationHandler,
+  DeleteExtensionHandler,
+  DuplicateConfigurationHandler,
+  GetBucketAvailabilityHandler,
+  GetConfigurationHandler,
+  GetConfigurationsHandler,
+  GetExtensionHandler,
+  GetExtensionsHandler,
+  RebuildExtensionHandler,
+  TestExtensionHandler,
+  UpdateConfigurationHandler,
+  UpdateExtensionHandler,
+} from './use-cases';
+import { GetConfigurationUserValuesHandler } from './use-cases/get-configuration-user-values';
+import { UpdateConfigurationUserValuesHandler } from './use-cases/update-configuration-user-values';
+
+@Module({
+  imports: [
+    ConfigModule,
+    CqrsModule,
+    TypeOrmModule.forFeature([BucketEntity, ConfigurationEntity, ConfigurationUserEntity, ExtensionEntity, UserGroupEntity]),
+  ],
+  providers: [
+    CreateConfigurationHandler,
+    CreateExtensionHandler,
+    GetConfigurationHandler,
+    DeleteConfigurationHandler,
+    DeleteExtensionHandler,
+    ExplorerService,
+    GetBucketAvailabilityHandler,
+    GetConfigurationsHandler,
+    GetExtensionHandler,
+    GetExtensionsHandler,
+    TestExtensionHandler,
+    RebuildExtensionHandler,
+    UpdateConfigurationHandler,
+    UpdateExtensionHandler,
+    DuplicateConfigurationHandler,
+    GetConfigurationUserValuesHandler,
+    UpdateConfigurationUserValuesHandler,
+  ],
+  exports: [ExplorerService],
+})
+export class ExtensionModule {}

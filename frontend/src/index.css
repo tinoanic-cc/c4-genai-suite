@@ -1,0 +1,149 @@
+@import 'tailwindcss';
+
+@plugin "daisyui" {
+  themes: light --default, light --prefersdark;
+}
+@plugin "@tailwindcss/typography";
+@theme {
+  --color-google: #db4437;
+  --color-google-hover: rgb(209, 51, 38);
+  --color-microsoft: #00a4ef;
+  --color-microsoft-hover: rgb(0, 148, 215);
+  --color-cc: rgb(27, 195, 139);
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+.overflow-anchor-none {
+  overflow-anchor: none;
+}
+
+@keyframes loading-dot {
+  50% {
+    opacity: 0.5;
+    scale: 0.5;
+  }
+
+}
+.animate-loading-dot {
+  animation: loading-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.white-shadow {
+  box-shadow: 0 -20px 16px 4px white;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #000; /* Make the scrollbar black for contrast */
+}
+
+::-webkit-scrollbar-track {
+  background-color: #fff; /* Make the track white */
+}
+/* Hide small arrows in number inputs */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+div.markdown > pre {
+  display: grid;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+  transition: opacity 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Hide small arrows in number inputs */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.btn-google {
+  @apply border-google bg-google hover:border-google-hover hover:bg-google-hover text-white;
+}
+
+.btn-microsoft {
+  @apply border-microsoft bg-microsoft hover:border-microsoft-hover hover:bg-microsoft-hover;
+}
+
+.nav-menu li {
+  @apply px-4 py-2 hover:font-semibold hover:text-black;
+}
+
+.nav-menu li a.active {
+  @apply font-semibold text-black;
+}
+
+.form-row {
+  @apply mb-6;
+}
+
+.form-row:last-child {
+  @apply mb-0;
+}
+
+.nav-menu li:hover {
+  @apply font-normal;
+}
+
+.nav-menu-bordered li {
+  @apply mb-2 border-l-[5px] border-transparent py-1;
+}
+
+.nav-menu-bordered li:has(.active) {
+  @apply border-primary;
+}
+
+.nav-menu-dotted li {
+  @apply relative;
+}
+
+.nav-menu-dotted li:hover::before {
+  @apply bg-primary absolute -left-3 h-1 w-1 rounded-full content-[''];
+}

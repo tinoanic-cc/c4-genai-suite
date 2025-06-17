@@ -1,0 +1,119 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - v*
+      - test-workflow* # TODO remove after testing this workflow has concluded
+
+jobs:
+  backend:
+    uses: ./.github/workflows/backend.yaml
+  e2e:
+    uses: ./.github/workflows/e2e-complete.yaml
+    secrets: inherit
+  frontend:
+    uses: ./.github/workflows/frontend.yaml
+  helm-chart:
+    uses: ./.github/workflows/helm-chart.yaml
+  reis:
+    uses: ./.github/workflows/reis.yaml
+    secrets: inherit
+
+  upstream-workflows:
+    name: Upstream Workflows
+    runs-on: ubuntu-latest
+    needs:
+      - backend
+      - e2e
+      - frontend
+      - helm-chart
+      - reis
+    steps:
+      - run: echo "all done"
+
+  verify-version-strings:
+    name: Verify version strings match tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: extract_ref
+        run: echo "version=$(echo ${GITHUB_REF#refs/tags/v})" >> $GITHUB_OUTPUT
+
+      - name: Verify that chart version is correct
+        run: |
+          if [ $(yq '.version' helm-chart/Chart.yaml) != "${{ steps.extract_ref.outputs.version }}" ] \
+          || [ $(yq '.appVersion' helm-chart/Chart.yaml) != "${{ steps.extract_ref.outputs.version }}" ]
+          then
+            echo "Version mismatch detected"
+            exit 1
+          fi
+
+      - name: Verify that container image tags are correct
+        run: |
+          if [ $(yq '.backend.image.tag' helm-chart/values.yaml) != "v${{ steps.extract_ref.outputs.version }}" ] \
+          || [ $(yq '.frontend.image.tag' helm-chart/values.yaml) != "v${{ steps.extract_ref.outputs.version }}" ] \
+          || [ $(yq '.reis.image.tag' helm-chart/values.yaml) != "v${{ steps.extract_ref.outputs.version }}" ]
+          then
+            echo "Version mismatch detected"
+            exit 1
+          fi
+
+
+  promote-images:
+    name: Container Image Promotion
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          - frontend
+          - backend
+          - reis
+    needs:
+      - upstream-workflows
+      - verify-version-strings
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract tag name
+        id: extract_ref
+        run: echo "ref_name=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_OUTPUT
+
+      - name: Promote Image
+        run: |
+          docker pull ghcr.io/${{ github.repository }}/${{ matrix.image }}:commit-${{ github.sha }}
+          docker tag ghcr.io/${{ github.repository }}/${{ matrix.image }}:commit-${{ github.sha }} ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ steps.extract_ref.outputs.ref_name }}
+          docker tag ghcr.io/${{ github.repository }}/${{ matrix.image }}:commit-${{ github.sha }} ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
+          docker push ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ steps.extract_ref.outputs.ref_name }}
+          docker push ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
+
+  publish-helm-chart:
+    name: Publish Helm Chart
+    runs-on: ubuntu-latest
+    needs:
+      - upstream-workflows
+      - verify-version-strings
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package and Push Helm Chart
+        run: |
+          helm package helm-chart/
+          helm push cccc-*.tgz oci://ghcr.io/${{ github.repository }}/charts/

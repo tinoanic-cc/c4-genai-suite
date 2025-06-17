@@ -1,0 +1,825 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "fullnameOverride": {
+            "type": "string",
+            "description": "Overrides the name of the resources",
+            "default": ""
+        },
+        "nameOverride": {
+            "type": "string",
+            "description": "Overrides the name of the chart",
+            "default": ""
+        },
+        "networkPolicy": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Specifies whether NetworkPolicies should be created",
+                    "default": false
+                }
+            }
+        },
+        "grafanaDashboards": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Specifies whether a ConfigMap containing Grafana dashboards should be created",
+                    "default": false
+                }
+            }
+        },
+        "ingress": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Specifies whether an Ingress resource should be created.",
+                    "default": false
+                },
+                "ingressClassName": {
+                    "type": "string",
+                    "description": "The name of the ingressClass. One of: public-traefik, internal-traefik",
+                    "default": "\"\""
+                },
+                "clusterIssuer": {
+                    "type": "string",
+                    "description": "The cluster issuer for Let's Encrypt. Should be `letsencrypt-<ENVIRONMENT>`",
+                    "default": "\"\""
+                },
+                "host": {
+                    "type": "string",
+                    "description": "The host for ingress",
+                    "default": "\"\""
+                },
+                "tlsSecretName": {
+                    "type": "string",
+                    "description": "The TLS secret name. Should be c4-tls-cert",
+                    "default": "\"\""
+                }
+            }
+        },
+        "backend": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Specifies whether c4 should be deployed",
+                    "default": true
+                },
+                "baseUrl": {
+                    "type": "string",
+                    "description": "Base URL should match `https://{{ingress.host}}`. Required for OpenID Connect or assistants using Dall-E image generation.",
+                    "default": "\"\""
+                },
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "enablePassword": {
+                            "type": "boolean",
+                            "description": "Specifies if the build in Username & Password auth is used",
+                            "default": false
+                        },
+                        "initialAdminUsername": {
+                            "type": "string",
+                            "description": "The initial admin user Username saved in DB",
+                            "default": "\"\""
+                        },
+                        "initialAdminPassword": {
+                            "type": "string",
+                            "description": "The initial admin user Password hashed and saved in DB",
+                            "default": "\"\""
+                        },
+                        "existingAdminSecret": {
+                            "type": "string",
+                            "description": "The name of the existing k8s secret. `c4.auth.initialAdminUsername` and `c4.auth.initialAdminPassword` will be ignored. The keys must be `adminUsername` and `adminPassword`.",
+                            "default": "\"\""
+                        },
+                        "authorizationUrl": {
+                            "type": "string",
+                            "description": "The OpenID Connect authorizationUrl",
+                            "default": "\"\""
+                        },
+                        "tokenUrl": {
+                            "type": "string",
+                            "description": "The OpenID Connect tokenUrl",
+                            "default": "\"\""
+                        },
+                        "userInfoUrl": {
+                            "type": "string",
+                            "description": "The OpenID Connect userInfoUrl",
+                            "default": "\"\""
+                        },
+                        "clientId": {
+                            "type": "string",
+                            "description": "The OpenID Connect clientId",
+                            "default": "\"\""
+                        },
+                        "clientSecret": {
+                            "type": "string",
+                            "description": "The OpenID Connect clientSecret",
+                            "default": "\"\""
+                        },
+                        "existingClientId": {
+                            "type": "string",
+                            "description": "The name of the existing k8s secret. `c4.auth.clientId` will be ignored. The key must be `clientId`",
+                            "default": "\"\""
+                        },
+                        "existingClientSecret": {
+                            "type": "string",
+                            "description": "The name of the existing k8s secret. `c4.auth.clientSecret` will be ignored. The key must be `clientSecret`",
+                            "default": "\"\""
+                        },
+                        "microsoftClientId": {
+                            "type": "string",
+                            "description": "The Microsoft Entra ID clientId",
+                            "default": "\"\""
+                        },
+                        "microsoftClientSecret": {
+                            "type": "string",
+                            "description": "The Microsoft Entra ID clientSecret",
+                            "default": "\"\""
+                        },
+                        "microsoftTenant": {
+                            "type": "string",
+                            "description": "The Microsoft Entra ID tenant",
+                            "default": "\"\""
+                        },
+                        "existingMicrosoftClientId": {
+                            "type": "string",
+                            "description": "The name of the existing k8s secret. `c4.auth.microsoftClientId` will be ignored. The key must be `microsoftClientId`",
+                            "default": "\"\""
+                        },
+                        "existingMicrosoftClientSecret": {
+                            "type": "string",
+                            "description": "The name of the existing k8s secret. `c4.auth.microsoftClientSecret` will be ignored. The key must be `microsoftClientSecret`",
+                            "default": "\"\""
+                        },
+                        "existingMicrosoftTenant": {
+                            "type": "string",
+                            "description": "The name of the existing k8s secret. `c4.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "postgresql": {
+                    "type": "object",
+                    "properties": {
+                        "connectionString": {
+                            "type": "string",
+                            "description": "Connection string of an external Postgres. Will be ignored when `postgresql.enabled` is `true`.",
+                            "default": "\"\""
+                        },
+                        "existingConnectionStringSecret": {
+                            "type": "string",
+                            "description": "The name of the existing k8s secret. `postgresql.connectionString` will be ignored. The key must be `connectionString` Will be ignored when `postgresql.enabled` is `true`.",
+                            "default": "\"\""
+                        },
+                        "ssl": {
+                            "type": "object",
+                            "properties": {
+                                "rootCertificateConfigMapName": {
+                                    "type": "string",
+                                    "description": "Name of the ConfigMap containing the root certificate for the external PostgreSQL database.",
+                                    "default": ""
+                                },
+                                "rootCertificateConfigMapKey": {
+                                    "type": "string",
+                                    "description": "Key in the ConfigMap that holds the root certificate for the external PostgreSQL database.  Make sure that the connection string contains `sslmode=verify-ca&sslrootcert=/etc/ssl/certs/<rootCertificateConfigMapKey>`.",
+                                    "default": "ca.crt"
+                                },
+                                "clientCertificateSecretName": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the client certificate for the external PostgreSQL database.",
+                                    "default": ""
+                                },
+                                "clientCertificateSecretKey": {
+                                    "type": "string",
+                                    "description": "Key in the Secret that holds the client certificate for the external PostgreSQL database. Make sure that the connection string contains `sslcert=/etc/ssl/certs/<clientCertificateSecretKey>`.",
+                                    "default": "client.crt"
+                                },
+                                "clientKeySecretKey": {
+                                    "type": "string",
+                                    "description": "Key in the Secret that holds the client key for the external PostgreSQL database. Make sure that the connection string contains `sslkey=/etc/ssl/certs/<clientKeySecretKey>`.",
+                                    "default": "client.key"
+                                }
+                            }
+                        }
+                    }
+                },
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "repository": {
+                            "type": "string",
+                            "description": "The image repository including host, port, repo",
+                            "default": "ghcr.io/codecentric/c4-genai-suite/backend"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "The image tag",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "description": "An extra list of environment variables to add to the deployment.",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "description": "An extra list of volumes to add to the deployment.",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "description": "An extra list of volume mounts to add to the deployment.",
+                    "default": [],
+                    "items": {}
+                },
+                "replicaCount": {
+                    "type": "number",
+                    "description": "The number of replicas to create.",
+                    "default": 1
+                },
+                "updateStrategy": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "c4 deployment strategy type.",
+                            "default": "RollingUpdate"
+                        }
+                    }
+                },
+                "sessionSecret": {
+                    "type": "string",
+                    "description": "The secret used to sign the session cookie",
+                    "default": "\"\""
+                },
+                "existingSessionSecret": {
+                    "type": "string",
+                    "description": "The name of the existing k8s secret. `sessionSecret` will be ignored. The key must be `sessionSecret`",
+                    "default": "\"\""
+                },
+                "metrics": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Specifies whether a service for c4 metrics should be created",
+                            "default": false
+                        },
+                        "port": {
+                            "type": "number",
+                            "description": "The c4 metrics port",
+                            "default": 9100
+                        },
+                        "prometheusRule": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Specifies whether a PrometheusRule for c4 should be created",
+                                    "default": false
+                                },
+                                "ruleGroupLabels": {
+                                    "type": "object",
+                                    "description": "Labels to add to the c4 rule group",
+                                    "default": {}
+                                }
+                            }
+                        },
+                        "serviceMonitor": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Specifies whether a c4 ServiceMonitor should be created",
+                                    "default": false
+                                },
+                                "interval": {
+                                    "type": "string",
+                                    "description": "Interval at which Prometheus scrapes the metrics from the target. If empty, Prometheus uses the global scrape interval.",
+                                    "default": ""
+                                },
+                                "scrapeTimeout": {
+                                    "type": "string",
+                                    "description": "Timeout after which Prometheus considers the scrape to be failed. If empty, Prometheus uses the global scrape timeout.",
+                                    "default": ""
+                                },
+                                "labels": {
+                                    "type": "object",
+                                    "description": "Map of labels to add to the c4 ServiceMonitor",
+                                    "default": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                "service": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "The service type to use, one of: ClusterIP, NodePort, LoadBalancer",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Map of labels to add to the c4 deployment",
+                    "default": {}
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Map of annotations to add to the c4 deployment",
+                    "default": {}
+                },
+                "podLabels": {
+                    "type": "object",
+                    "description": "Map of labels to add to the c4 pods",
+                    "default": {}
+                },
+                "podAnnotations": {
+                    "type": "object",
+                    "description": "Map of annotations to add to the c4 pods",
+                    "default": {}
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "description": "Configure the Security Context for the Pod",
+                    "default": {}
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "description": "Configure the Security Context for the Container",
+                    "default": {}
+                }
+            }
+        },
+        "frontend": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Specifies whether the frontend should be deployed",
+                    "default": true
+                },
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "repository": {
+                            "type": "string",
+                            "description": "The image repository including host, port, repo",
+                            "default": "ghcr.io/codecentric/c4-genai-suite/frontend"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "The image tag",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "replicaCount": {
+                    "type": "number",
+                    "description": "The number of replicas to create",
+                    "default": 1
+                },
+                "updateStrategy": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Frontend deployment strategy type",
+                            "default": "RollingUpdate"
+                        }
+                    }
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "description": "An extra list of environment variables to add to the deployment",
+                    "default": [],
+                    "items": {}
+                },
+                "metrics": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Specifies whether a service for REIS metrics should be created.",
+                            "default": false
+                        },
+                        "serviceMonitor": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Specifies whether a ServiceMonitor should be created for the frontend.",
+                                    "default": false
+                                },
+                                "interval": {
+                                    "type": "string",
+                                    "description": "Interval at which Prometheus scrapes the metrics from the target. If empty, Prometheus uses the global scrape interval.",
+                                    "default": ""
+                                },
+                                "scrapeTimeout": {
+                                    "type": "string",
+                                    "description": "Timeout after which Prometheus considers the scrape to be failed. If empty, Prometheus uses the global scrape timeout.",
+                                    "default": ""
+                                },
+                                "labels": {
+                                    "type": "object",
+                                    "description": "Map of labels to add to the Frontend ServiceMonitor.",
+                                    "default": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "description": "An extra list of volumes to add to the deployment",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "description": "An extra list of volume mounts to add to the deployment",
+                    "default": [],
+                    "items": {}
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Map of labels to add to the frontend deployment",
+                    "default": {}
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Map of annotations to add to the frontend deployment",
+                    "default": {}
+                },
+                "podLabels": {
+                    "type": "object",
+                    "description": "Map of labels to add to the frontend pods",
+                    "default": {}
+                },
+                "podAnnotations": {
+                    "type": "object",
+                    "description": "Map of annotations to add to the frontend pods",
+                    "default": {}
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "description": "Configure the Security Context for the Pod",
+                    "default": {}
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "description": "Configure the Security Context for the Container",
+                    "default": {}
+                }
+            }
+        },
+        "reis": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Specifies whether the REIS microservice should be deployed",
+                    "default": false
+                },
+                "replicaCount": {
+                    "type": "number",
+                    "description": "The number of replicas to create.",
+                    "default": 1
+                },
+                "updateStrategy": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "REIS deployment strategy type.",
+                            "default": "RollingUpdate"
+                        }
+                    }
+                },
+                "host": {
+                    "type": "string",
+                    "description": "The REIS container host to bind to",
+                    "default": "0.0.0.0"
+                },
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "repository": {
+                            "type": "string",
+                            "description": "The image repository including host, port, repo",
+                            "default": "ghcr.io/codecentric/c4-genai-suite/reis"
+                        },
+                        "tag": {
+                            "type": "string",
+                            "description": "The image tag",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "metrics": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Specifies whether a service for REIS metrics should be created",
+                            "default": false
+                        },
+                        "port": {
+                            "type": "number",
+                            "description": "The REIS metrics port",
+                            "default": 9200
+                        },
+                        "prometheusRule": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Specifies whether a PrometheusRule for REIS should be created",
+                                    "default": false
+                                },
+                                "ruleGroupLabels": {
+                                    "type": "object",
+                                    "description": "Labels to add to the c4 rule group",
+                                    "default": {}
+                                }
+                            }
+                        },
+                        "serviceMonitor": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "description": "Specifies whether a REIS ServiceMonitor should be created",
+                                    "default": false
+                                },
+                                "interval": {
+                                    "type": "string",
+                                    "description": "Interval at which Prometheus scrapes the metrics from the target. If empty, Prometheus uses the global scrape interval.",
+                                    "default": ""
+                                },
+                                "scrapeTimeout": {
+                                    "type": "string",
+                                    "description": "Timeout after which Prometheus considers the scrape to be failed. If empty, Prometheus uses the global scrape timeout.",
+                                    "default": ""
+                                },
+                                "labels": {
+                                    "type": "object",
+                                    "description": "Map of labels to add to the REIS ServiceMonitor",
+                                    "default": {}
+                                }
+                            }
+                        }
+                    }
+                },
+                "embeddings": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "The embedding api type to use, one of: azure-openai, openai",
+                            "default": "\"\""
+                        },
+                        "azureOpenAi": {
+                            "type": "object",
+                            "properties": {
+                                "apiKey": {
+                                    "type": "string",
+                                    "description": "API key for Azure OpenAI.",
+                                    "default": "\"\""
+                                },
+                                "existingApiKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the Azure OpenAI API Key. The key must be `azureOpenAiApiKey`.",
+                                    "default": "\"\""
+                                },
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "The Azure OpenAI endpoint.",
+                                    "default": "\"\""
+                                },
+                                "deploymentName": {
+                                    "type": "string",
+                                    "description": "The Azure OpenAI deployment name.",
+                                    "default": "\"\""
+                                },
+                                "apiVersion": {
+                                    "type": "string",
+                                    "description": "The Azure OpenAI API version.",
+                                    "default": "\"\""
+                                },
+                                "modelName": {
+                                    "type": "string",
+                                    "description": "The Azure OpenAI model name.",
+                                    "default": "\"\""
+                                }
+                            }
+                        },
+                        "openAi": {
+                            "type": "object",
+                            "properties": {
+                                "apiKey": {
+                                    "type": "string",
+                                    "description": "API key for OpenAI.",
+                                    "default": "\"\""
+                                },
+                                "existingApiKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the OpenAI API Key. The key must be `openAiApiKey`.",
+                                    "default": "\"\""
+                                },
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "The OpenAI endpoint.",
+                                    "default": "\"\""
+                                },
+                                "deploymentName": {
+                                    "type": "string",
+                                    "description": "The OpenAI deployment name.",
+                                    "default": "\"\""
+                                },
+                                "modelName": {
+                                    "type": "string",
+                                    "description": "The OpenAI model name.",
+                                    "default": "\"\""
+                                }
+                            }
+                        }
+                    }
+                },
+                "speechToText": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "The speech-to-text api type to use, one of: azure-openai-whisper. Leave empty to disable.",
+                            "default": "\"\""
+                        },
+                        "azureOpenAiWhisper": {
+                            "type": "object",
+                            "properties": {
+                                "apiKey": {
+                                    "type": "string",
+                                    "description": "API key for Azure OpenAI Whisper.",
+                                    "default": "\"\""
+                                },
+                                "existingApiKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the Azure OpenAI Whisper API Key. The key must be `azureOpenAiWhisperApiKey`.",
+                                    "default": "\"\""
+                                },
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "The Azure OpenAI Whisper endpoint.",
+                                    "default": "\"\""
+                                },
+                                "deploymentName": {
+                                    "type": "string",
+                                    "description": "The Azure OpenAI Whisper deployment name.",
+                                    "default": "\"\""
+                                },
+                                "apiVersion": {
+                                    "type": "string",
+                                    "description": "The Azure OpenAI Whisper API version.",
+                                    "default": "\"\""
+                                }
+                            }
+                        }
+                    }
+                },
+                "extraEnvVars": {
+                    "type": "array",
+                    "description": "An extra list of environment variables to add to the deployment.",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumes": {
+                    "type": "array",
+                    "description": "An extra list of volumes to add to the deployment.",
+                    "default": [],
+                    "items": {}
+                },
+                "extraVolumeMounts": {
+                    "type": "array",
+                    "description": "An extra list of volume mounts to add to the deployment.",
+                    "default": [],
+                    "items": {}
+                },
+                "vectorDatabase": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "The search api type to use, one of: azure-ai-search, pgvector",
+                            "default": "\"\""
+                        },
+                        "azureAiSearch": {
+                            "type": "object",
+                            "properties": {
+                                "apiKey": {
+                                    "type": "string",
+                                    "description": "API Key for Azure AI Search.",
+                                    "default": "\"\""
+                                },
+                                "existingApiKeySecret": {
+                                    "type": "string",
+                                    "description": "Name of the Kubernetes Secret containing the Azure AI Search API Key. The key must be `azureAiSearchApiKey`.",
+                                    "default": "\"\""
+                                },
+                                "endpoint": {
+                                    "type": "string",
+                                    "description": "The Azure AI Search endpoint.",
+                                    "default": "\"\""
+                                },
+                                "indexName": {
+                                    "type": "string",
+                                    "description": "The Azure AI Search index.",
+                                    "default": "\"\""
+                                }
+                            }
+                        },
+                        "pgVector": {
+                            "type": "object",
+                            "properties": {
+                                "connectionString": {
+                                    "type": "string",
+                                    "description": "PostgreSQL connection string for a PGVector database. Must use protocol `postgresql+psycopg://`.",
+                                    "default": "\"\""
+                                },
+                                "existingConnectionStringSecret": {
+                                    "type": "string",
+                                    "description": "The name of an existing k8s secret. `reis.search.connectionString` will be ignored. The key must be `connectionString`.",
+                                    "default": "\"\""
+                                },
+                                "indexName": {
+                                    "type": "string",
+                                    "description": "Name of the collection used for the PGVector store (this is a logical distinction in the same table).",
+                                    "default": "\"\""
+                                }
+                            }
+                        }
+                    }
+                },
+                "workers": {
+                    "type": "number",
+                    "description": "Number of concurrent threads to process the uploaded files",
+                    "default": 2
+                },
+                "batchSize": {
+                    "type": "number",
+                    "description": "Number of chunks uploaded to the vectorstore at once",
+                    "default": 100
+                },
+                "tmpFilesRoot": {
+                    "type": "string",
+                    "description": "The root directory for temporary files",
+                    "default": "\"\""
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Map of labels to add to the REI-S deployment",
+                    "default": {}
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Map of annotations to add to the REI-S deployment",
+                    "default": {}
+                },
+                "podLabels": {
+                    "type": "object",
+                    "description": "Map of labels to add to the REI-S pods",
+                    "default": {}
+                },
+                "podAnnotations": {
+                    "type": "object",
+                    "description": "Map of annotations to add to the REI-S pods",
+                    "default": {}
+                },
+                "podSecurityContext": {
+                    "type": "object",
+                    "description": "Configure the Security Context for the Pod",
+                    "default": {}
+                },
+                "containerSecurityContext": {
+                    "type": "object",
+                    "description": "Configure the Security Context for the Container",
+                    "default": {}
+                }
+            }
+        }
+    }
+}

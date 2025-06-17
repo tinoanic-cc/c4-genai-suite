@@ -1,0 +1,15 @@
+{
+  "ducks": [
+    {
+      "name": "Dagobert Duck",
+      "birthdate": "1867-03-19"
+    },
+    {
+      "name": "Donald Duck",
+      "birthdate": "1934-06-09"
+    }
+  ],
+  "additional_info": {
+    "creator": "Walt Disney"
+  }
+}

@@ -1,0 +1,59 @@
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { ConfigurationEntity } from './configuration';
+import { FileEntity } from './file';
+import { MessageEntity } from './message';
+import { UserEntity } from './user';
+
+export type ConversationContext = Record<string, string>;
+
+export type ExtensionUserArguments = Record<string, Record<string, any>>;
+
+export type ConversationRating = 'good' | 'bad' | 'unrated';
+
+@Entity({ name: 'conversations' })
+export class ConversationEntity {
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Column({ nullable: true })
+  name!: string;
+
+  @Column({ default: false })
+  isNameSetManually!: boolean;
+
+  @Column({ nullable: true })
+  llm?: string;
+
+  @Column({ nullable: true })
+  rating?: ConversationRating;
+
+  @ManyToOne(() => ConfigurationEntity, (configuration) => configuration.conversations, { onDelete: 'SET NULL' })
+  configuration!: ConfigurationEntity;
+
+  @Column()
+  configurationId!: number;
+
+  @ManyToOne(() => UserEntity, (user) => user.conversations, { onDelete: 'CASCADE' })
+  user!: UserEntity;
+
+  @Column()
+  userId!: string;
+
+  @OneToMany(() => MessageEntity, (message) => message.conversation, { onDelete: 'CASCADE', cascade: true })
+  messages!: MessageEntity[];
+
+  @Column('json', { nullable: true })
+  context?: ConversationContext;
+
+  @Column('json', { nullable: true })
+  extensionUserArguments?: ExtensionUserArguments;
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt!: Date;
+
+  @OneToMany(() => FileEntity, (file) => file.conversation, { cascade: true })
+  files?: FileEntity[];
+}

@@ -1,0 +1,179 @@
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-backend
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+    {{- if .Values.backend.labels }}
+    {{- toYaml .Values.backend.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.backend.annotations }}
+  annotations:
+    {{- toYaml .Values.backend.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  strategy:
+    {{ toYaml .Values.backend.updateStrategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        {{- include "c4genaisuite.commonLabels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+        {{- if .Values.backend.podLabels }}
+        {{- toYaml .Values.backend.podLabels | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap-backend.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret-backend.yaml") . | sha256sum }}
+        {{- if .Values.backend.podAnnotations }}
+        {{- toYaml .Values.backend.podAnnotations | nindent 8 }}
+        {{- end }}
+    spec:
+      securityContext: {{ .Values.backend.podSecurityContext | toYaml | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          securityContext: {{ .Values.backend.containerSecurityContext | toYaml | nindent 12 }}
+          ports:
+            - containerPort: 3000
+              name: web
+              protocol: TCP
+            - containerPort: {{ .Values.backend.metrics.port }}
+              name: metrics
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources: {{ .Values.backend.resources | toYaml | nindent 12 }}
+          env:
+            {{- if .Values.backend.existingSessionSecret }}
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSessionSecret }}
+                  key: sessionSecret
+            {{- end }}
+            {{- if .Values.backend.auth.existingAdminSecret }}
+            - name: AUTH_INITIAL_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.auth.existingAdminSecret }}
+                  key: adminUsername
+            {{- end }}
+            {{- if .Values.backend.auth.existingAdminSecret }}
+            - name: AUTH_INITIAL_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.auth.existingAdminSecret }}
+                  key: adminPassword
+            {{- end }}
+            {{- if .Values.backend.auth.existingClientId }}
+            - name: AUTH_OAUTH_CLIENTID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.auth.existingClientId }}
+                  key: clientId
+            {{- end }}
+            {{- if .Values.backend.auth.existingClientSecret }}
+            - name: AUTH_OAUTH_CLIENTSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.auth.existingClientSecret }}
+                  key: clientSecret
+            {{- end }}
+            {{- if .Values.backend.auth.existingMicrosoftClientId }}
+            - name: AUTH_MICROSOFT_CLIENTID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.auth.existingMicrosoftClientId }}
+                  key: microsoftClientId
+            {{- end }}
+            {{- if .Values.backend.auth.existingMicrosoftClientSecret }}
+            - name: AUTH_MICROSOFT_CLIENTSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.auth.existingMicrosoftClientSecret }}
+                  key: microsoftClientSecret
+            {{- end }}
+            {{- if .Values.backend.auth.existingMicrosoftTenant }}
+            - name: AUTH_MICROSOFT_TENANT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.auth.existingMicrosoftTenant }}
+                  key: microsoftTenant
+            {{- end }}
+            {{- if .Values.backend.postgresql.existingConnectionStringSecret }}
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.postgresql.existingConnectionStringSecret }}
+                  key: connectionString
+            {{- end }}
+            {{- with .Values.backend.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "c4genaisuite.fullname" . }}-backend
+            - secretRef:
+                name: {{ include "c4genaisuite.fullname" . }}-backend
+          volumeMounts:
+          {{- if or .Values.backend.postgresql.ssl.rootCertificateConfigMapName .Values.backend.postgresql.ssl.clientCertificateSecretName }}
+            {{- if .Values.backend.postgresql.ssl.rootCertificateConfigMapKey }}
+            - mountPath: /etc/ssl/certs/{{ .Values.backend.postgresql.ssl.rootCertificateConfigMapKey }}
+              name: postgresql-root-certificate
+              subPath: {{ .Values.backend.postgresql.ssl.rootCertificateConfigMapKey }}
+              readOnly: true
+            {{- end }}
+            {{- if .Values.backend.postgresql.ssl.clientCertificateSecretName }}
+            - mountPath: /etc/ssl/certs/{{ .Values.backend.postgresql.ssl.clientCertificateSecretKey }}
+              name: postgresql-client-certificate
+              subPath: {{ .Values.backend.postgresql.ssl.clientCertificateSecretKey }}
+              readOnly: true
+            - mountPath: /etc/ssl/certs/{{ .Values.backend.postgresql.ssl.clientKeySecretKey }}
+              name: postgresql-client-certificate
+              subPath: {{ .Values.backend.postgresql.ssl.clientKeySecretKey }}
+              readOnly: true
+            {{- end }}
+          {{- end }}
+          {{- with .Values.backend.extraVolumeMounts }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+      {{- if or .Values.backend.postgresql.ssl.rootCertificateConfigMapName .Values.backend.postgresql.ssl.clientCertificateSecretName }}
+        {{- if .Values.backend.postgresql.ssl.rootCertificateConfigMapName }}
+        - name: postgresql-root-certificate
+          configMap:
+            name: {{ .Values.backend.postgresql.ssl.rootCertificateConfigMapName }}
+        {{- end }}
+        {{- if .Values.backend.postgresql.ssl.clientCertificateSecretName }}
+        - name: postgresql-client-certificate
+          secret:
+            secretName: {{ .Values.backend.postgresql.ssl.clientCertificateSecretName }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.backend.extraVolumes }}
+      {{- toYaml . | nindent 10 }}
+      {{- end }}
+{{ end }}

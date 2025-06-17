@@ -1,0 +1,43 @@
+default_install_hook_types: ["pre-commit","post-checkout","post-merge"]
+exclude: '^.*\.(csv|xls|xlsx)$'
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+    -   id: check-yaml
+        args: [--unsafe]
+        files: ^services/reis/
+        # do syntax-only yaml check, because the gitlab tag !reference could not be
+        # resolved. See https://github.com/pre-commit/pre-commit-hooks/issues/701
+    -   id: end-of-file-fixer
+        files: ^services/reis/
+    -   id: trailing-whitespace
+        files: ^services/reis/
+    # -   id: check-added-large-files
+    -   id: check-merge-conflict
+        files: ^services/reis/
+    -   id: check-toml
+        files: ^services/reis/
+
+-   repo: local
+    hooks:
+        - id: ruff
+          name: ruff_check
+          entry: bash -c 'cd services/reis && poetry run ruff check --fix --exit-non-zero-on-fix'
+          language: python
+          types_or: [ python, pyi ]
+          require_serial: true
+          files: ^services/reis/
+        - id: ruff
+          name: ruff_format
+          entry: bash -c 'cd services/reis && poetry run ruff format'
+          language: python
+          types_or: [ python, pyi ]
+          require_serial: true
+          files: ^services/reis/
+        - id: mypy
+          name: mypy
+          entry: bash -c 'cd services/reis && poetry run mypy .'
+          language: python
+          types: [ python ]
+          files: ^services/reis/

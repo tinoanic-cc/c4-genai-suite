@@ -1,0 +1,331 @@
+## @section General
+## @param fullnameOverride Overrides the name of the resources
+fullnameOverride: ""
+## @param nameOverride Overrides the name of the chart
+nameOverride: ""
+
+networkPolicy:
+  ## @param networkPolicy.enabled Specifies whether NetworkPolicies should be created
+  enabled: false
+
+grafanaDashboards:
+  ## @param grafanaDashboards.enabled Specifies whether a ConfigMap containing Grafana dashboards should be created
+  enabled: false
+
+## @section Ingress
+ingress:
+  ## @param ingress.enabled Specifies whether an Ingress resource should be created.
+  enabled: false
+  ## @param ingress.ingressClassName [string] The name of the ingressClass. One of: public-traefik, internal-traefik
+  ingressClassName: ""
+  ## @param ingress.clusterIssuer [string] The cluster issuer for Let's Encrypt. Should be `letsencrypt-<ENVIRONMENT>`
+  clusterIssuer: ""
+  ## @param ingress.host [string] The host for ingress
+  host: ""
+  ## @param ingress.tlsSecretName [string] The TLS secret name. Should be c4-tls-cert
+  tlsSecretName: ""
+
+## @section Backend
+backend:
+  ## @param backend.enabled Specifies whether c4 should be deployed
+  enabled: true
+  ## @param backend.baseUrl [string] Base URL should match `https://{{ingress.host}}`. Required for OpenID Connect or assistants using Dall-E image generation.
+  baseUrl: ""
+  auth:
+    ## @param backend.auth.enablePassword Specifies if the build in Username & Password auth is used
+    enablePassword: false
+    ## @param backend.auth.initialAdminUsername [string] The initial admin user Username saved in DB
+    initialAdminUsername: ""
+    ## @param backend.auth.initialAdminPassword [string] The initial admin user Password hashed and saved in DB
+    initialAdminPassword: ""
+    ## @param backend.auth.existingAdminSecret [string] The name of the existing k8s secret. `c4.auth.initialAdminUsername` and `c4.auth.initialAdminPassword` will be ignored. The keys must be `adminUsername` and `adminPassword`.
+    existingAdminSecret: ""
+    ## @param backend.auth.authorizationUrl [string] The OpenID Connect authorizationUrl
+    authorizationUrl: ""
+    ## @param backend.auth.tokenUrl [string] The OpenID Connect tokenUrl
+    tokenUrl: ""
+    ## @param backend.auth.userInfoUrl [string] The OpenID Connect userInfoUrl
+    userInfoUrl: ""
+    ## @param backend.auth.clientId [string] The OpenID Connect clientId
+    clientId: ""
+    ## @param backend.auth.clientSecret [string] The OpenID Connect clientSecret
+    clientSecret: ""
+    ## @param backend.auth.existingClientId [string] The name of the existing k8s secret. `c4.auth.clientId` will be ignored. The key must be `clientId`
+    existingClientId: ""
+    ## @param backend.auth.existingClientSecret [string] The name of the existing k8s secret. `c4.auth.clientSecret` will be ignored. The key must be `clientSecret`
+    existingClientSecret: ""
+    ## @param backend.auth.microsoftClientId [string] The Microsoft Entra ID clientId
+    microsoftClientId: ""
+    ## @param backend.auth.microsoftClientSecret [string] The Microsoft Entra ID clientSecret
+    microsoftClientSecret: ""
+    ## @param backend.auth.microsoftTenant [string] The Microsoft Entra ID tenant
+    microsoftTenant: ""
+    ## @param backend.auth.existingMicrosoftClientId [string] The name of the existing k8s secret. `c4.auth.microsoftClientId` will be ignored. The key must be `microsoftClientId`
+    existingMicrosoftClientId: ""
+    ## @param backend.auth.existingMicrosoftClientSecret [string] The name of the existing k8s secret. `c4.auth.microsoftClientSecret` will be ignored. The key must be `microsoftClientSecret`
+    existingMicrosoftClientSecret: ""
+    ## @param backend.auth.existingMicrosoftTenant [string] The name of the existing k8s secret. `c4.auth.microsoftTenant` will be ignored. The key must be `microsoftTenant`
+    existingMicrosoftTenant: ""
+  postgresql:
+    ## @param backend.postgresql.connectionString [string] Connection string of an external Postgres. Will be ignored when `postgresql.enabled` is `true`.
+    connectionString: ""
+    ## @param backend.postgresql.existingConnectionStringSecret [string] The name of the existing k8s secret. `postgresql.connectionString` will be ignored. The key must be `connectionString` Will be ignored when `postgresql.enabled` is `true`.
+    existingConnectionStringSecret: ""
+    ssl:
+      ## @param backend.postgresql.ssl.rootCertificateConfigMapName Name of the ConfigMap containing the root certificate for the external PostgreSQL database.
+      rootCertificateConfigMapName: ""
+      ## @param backend.postgresql.ssl.rootCertificateConfigMapKey Key in the ConfigMap that holds the root certificate for the external PostgreSQL database.  Make sure that the connection string contains `sslmode=verify-ca&sslrootcert=/etc/ssl/certs/<rootCertificateConfigMapKey>`.
+      rootCertificateConfigMapKey: ca.crt
+      ## @param backend.postgresql.ssl.clientCertificateSecretName Name of the Kubernetes Secret containing the client certificate for the external PostgreSQL database.
+      clientCertificateSecretName: ""
+      ## @param backend.postgresql.ssl.clientCertificateSecretKey Key in the Secret that holds the client certificate for the external PostgreSQL database. Make sure that the connection string contains `sslcert=/etc/ssl/certs/<clientCertificateSecretKey>`.
+      clientCertificateSecretKey: client.crt
+      ## @param backend.postgresql.ssl.clientKeySecretKey Key in the Secret that holds the client key for the external PostgreSQL database. Make sure that the connection string contains `sslkey=/etc/ssl/certs/<clientKeySecretKey>`.
+      clientKeySecretKey: client.key
+  image:
+    ## @param backend.image.repository The image repository including host, port, repo
+    repository: "ghcr.io/codecentric/c4-genai-suite/backend"
+    ## @param backend.image.tag [string] The image tag
+    tag: "v7.0.1"
+  ## @param backend.extraEnvVars An extra list of environment variables to add to the deployment.
+  extraEnvVars: []
+  ## @param backend.extraVolumes An extra list of volumes to add to the deployment.
+  extraVolumes: []
+  ## @param backend.extraVolumeMounts An extra list of volume mounts to add to the deployment.
+  extraVolumeMounts: []
+  ## @param backend.replicaCount The number of replicas to create.
+  replicaCount: 1
+  ## @param backend.updateStrategy.type c4 deployment strategy type.
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## Example:
+  ## updateStrategy:
+  ##  type: RollingUpdate
+  ##  rollingUpdate:
+  ##    maxSurge: 25%
+  ##    maxUnavailable: 25%
+  updateStrategy:
+    type: RollingUpdate
+  ## @param backend.resources [object] Set container requests and limits for different resources like CPU or memory
+  resources: {}
+  ## @param backend.sessionSecret [string] The secret used to sign the session cookie
+  sessionSecret: ""
+  ## @param backend.existingSessionSecret [string] The name of the existing k8s secret. `sessionSecret` will be ignored. The key must be `sessionSecret`
+  existingSessionSecret: ""
+  metrics:
+    ## @param backend.metrics.enabled Specifies whether a service for c4 metrics should be created
+    enabled: false
+    ## @param backend.metrics.port The c4 metrics port
+    port: 9100
+    prometheusRule:
+      ## @param backend.metrics.prometheusRule.enabled Specifies whether a PrometheusRule for c4 should be created
+      enabled: false
+      ## @param backend.metrics.prometheusRule.ruleGroupLabels Labels to add to the c4 rule group
+      ruleGroupLabels: {}
+    serviceMonitor:
+      ## @param backend.metrics.serviceMonitor.enabled Specifies whether a c4 ServiceMonitor should be created
+      enabled: false
+      ## @param backend.metrics.serviceMonitor.interval Interval at which Prometheus scrapes the metrics from the target. If empty, Prometheus uses the global scrape interval.
+      interval: ""
+      ## @param backend.metrics.serviceMonitor.scrapeTimeout Timeout after which Prometheus considers the scrape to be failed. If empty, Prometheus uses the global scrape timeout.
+      scrapeTimeout: ""
+      ## @param backend.metrics.serviceMonitor.labels Map of labels to add to the c4 ServiceMonitor
+      labels: {}
+  service:
+    ## @param backend.service.type [string] The service type to use, one of: ClusterIP, NodePort, LoadBalancer
+    type: "ClusterIP"
+  ## @param backend.labels Map of labels to add to the c4 deployment
+  labels: {}
+  ## @param backend.annotations Map of annotations to add to the c4 deployment
+  annotations: {}
+  ## @param backend.podLabels Map of labels to add to the c4 pods
+  podLabels: {}
+  ## @param backend.podAnnotations Map of annotations to add to the c4 pods
+  podAnnotations: {}
+  ## @param backend.podSecurityContext Configure the Security Context for the Pod
+  podSecurityContext: {}
+  ## @param backend.containerSecurityContext Configure the Security Context for the Container
+  containerSecurityContext: {}
+
+## @section Frontend
+frontend:
+  ## @param frontend.enabled Specifies whether the frontend should be deployed
+  enabled: true
+  image:
+    ## @param frontend.image.repository The image repository including host, port, repo
+    repository: "ghcr.io/codecentric/c4-genai-suite/frontend"
+    ## @param frontend.image.tag [string] The image tag
+    tag: "v7.0.1"
+  ## @param frontend.replicaCount The number of replicas to create
+  replicaCount: 1
+  ## @param frontend.updateStrategy.type Frontend deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## Example:
+  ## updateStrategy:
+  ##  type: RollingUpdate
+  ##  rollingUpdate:
+  ##    maxSurge: 25%
+  ##    maxUnavailable: 25%
+  updateStrategy:
+    type: RollingUpdate
+  ## @param frontend.resources [object] Set container requests and limits for different resources like CPU or memory
+  resources: {}
+  ## @param frontend.extraEnvVars An extra list of environment variables to add to the deployment
+  metrics:
+    ## @param frontend.metrics.enabled Specifies whether a service for REIS metrics should be created.
+    enabled: false
+    serviceMonitor:
+      ## @param frontend.metrics.serviceMonitor.enabled Specifies whether a ServiceMonitor should be created for the frontend.
+      enabled: false
+      ## @param frontend.metrics.serviceMonitor.interval Interval at which Prometheus scrapes the metrics from the target. If empty, Prometheus uses the global scrape interval.
+      interval: ""
+      ## @param frontend.metrics.serviceMonitor.scrapeTimeout Timeout after which Prometheus considers the scrape to be failed. If empty, Prometheus uses the global scrape timeout.
+      scrapeTimeout: ""
+      ## @param frontend.metrics.serviceMonitor.labels Map of labels to add to the Frontend ServiceMonitor.
+      labels: {}
+  extraEnvVars: []
+  ## @param frontend.extraVolumes An extra list of volumes to add to the deployment
+  extraVolumes: []
+  ## @param frontend.extraVolumeMounts An extra list of volume mounts to add to the deployment
+  extraVolumeMounts: []
+  ## @param frontend.labels Map of labels to add to the frontend deployment
+  labels: {}
+  ## @param frontend.annotations Map of annotations to add to the frontend deployment
+  annotations: {}
+  ## @param frontend.podLabels Map of labels to add to the frontend pods
+  podLabels: {}
+  ## @param frontend.podAnnotations Map of annotations to add to the frontend pods
+  podAnnotations: {}
+  ## @param frontend.podSecurityContext Configure the Security Context for the Pod
+  podSecurityContext: {}
+  ## @param frontend.containerSecurityContext Configure the Security Context for the Container
+  containerSecurityContext: {}
+
+
+## @section REIS
+reis:
+  ## @param reis.enabled Specifies whether the REIS microservice should be deployed
+  enabled: false
+  ## @param reis.replicaCount The number of replicas to create.
+  replicaCount: 1
+  ## @param reis.updateStrategy.type REIS deployment strategy type.
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## Example:
+  ## updateStrategy:
+  ##  type: RollingUpdate
+  ##  rollingUpdate:
+  ##    maxSurge: 25%
+  ##    maxUnavailable: 25%
+  updateStrategy:
+    type: RollingUpdate
+  ## @param reis.host The REIS container host to bind to
+  host: "0.0.0.0"
+  image:
+    ## @param reis.image.repository The image repository including host, port, repo
+    repository: "ghcr.io/codecentric/c4-genai-suite/reis"
+    ## @param reis.image.tag [string] The image tag
+    tag: "v7.0.1"
+  metrics:
+    ## @param reis.metrics.enabled Specifies whether a service for REIS metrics should be created
+    enabled: false
+    ## @param reis.metrics.port The REIS metrics port
+    port: 9200
+    prometheusRule:
+      ## @param reis.metrics.prometheusRule.enabled Specifies whether a PrometheusRule for REIS should be created
+      enabled: false
+      ## @param reis.metrics.prometheusRule.ruleGroupLabels Labels to add to the c4 rule group
+      ruleGroupLabels: {}
+    serviceMonitor:
+      ## @param reis.metrics.serviceMonitor.enabled Specifies whether a REIS ServiceMonitor should be created
+      enabled: false
+      ## @param reis.metrics.serviceMonitor.interval Interval at which Prometheus scrapes the metrics from the target. If empty, Prometheus uses the global scrape interval.
+      interval: ""
+      ## @param reis.metrics.serviceMonitor.scrapeTimeout Timeout after which Prometheus considers the scrape to be failed. If empty, Prometheus uses the global scrape timeout.
+      scrapeTimeout: ""
+      ## @param reis.metrics.serviceMonitor.labels Map of labels to add to the REIS ServiceMonitor
+      labels: {}
+  embeddings:
+    ## @param reis.embeddings.type [string] The embedding api type to use, one of: azure-openai, openai
+    type: ""
+    azureOpenAi:
+      ## @param reis.embeddings.azureOpenAi.apiKey [string] API key for Azure OpenAI.
+      apiKey: ""
+      ## @param reis.embeddings.azureOpenAi.existingApiKeySecret [string] Name of the Kubernetes Secret containing the Azure OpenAI API Key. The key must be `azureOpenAiApiKey`.
+      existingApiKeySecret: ""
+      ## @param reis.embeddings.azureOpenAi.endpoint [string] The Azure OpenAI endpoint.
+      endpoint: ""
+      ## @param reis.embeddings.azureOpenAi.deploymentName [string] The Azure OpenAI deployment name.
+      deploymentName: ""
+      ## @param reis.embeddings.azureOpenAi.apiVersion [string] The Azure OpenAI API version.
+      apiVersion: ""
+      ## @param reis.embeddings.azureOpenAi.modelName [string] The Azure OpenAI model name.
+      modelName: ""
+    openAi:
+      ## @param reis.embeddings.openAi.apiKey [string] API key for OpenAI.
+      apiKey: ""
+      ## @param reis.embeddings.openAi.existingApiKeySecret [string] Name of the Kubernetes Secret containing the OpenAI API Key. The key must be `openAiApiKey`.
+      existingApiKeySecret: ""
+      ## @param reis.embeddings.openAi.endpoint [string] The OpenAI endpoint.
+      endpoint: ""
+      ## @param reis.embeddings.openAi.deploymentName [string] The OpenAI deployment name.
+      deploymentName: ""
+      ## @param reis.embeddings.openAi.modelName [string] The OpenAI model name.
+      modelName: ""
+  speechToText:
+    ## @param reis.speechToText.type [string] The speech-to-text api type to use, one of: azure-openai-whisper. Leave empty to disable.
+    type: ""
+    azureOpenAiWhisper:
+      ## @param reis.speechToText.azureOpenAiWhisper.apiKey [string] API key for Azure OpenAI Whisper.
+      apiKey: ""
+      ## @param reis.speechToText.azureOpenAiWhisper.existingApiKeySecret [string] Name of the Kubernetes Secret containing the Azure OpenAI Whisper API Key. The key must be `azureOpenAiWhisperApiKey`.
+      existingApiKeySecret: ""
+      ## @param reis.speechToText.azureOpenAiWhisper.endpoint [string] The Azure OpenAI Whisper endpoint.
+      endpoint: ""
+      ## @param reis.speechToText.azureOpenAiWhisper.deploymentName [string] The Azure OpenAI Whisper deployment name.
+      deploymentName: ""
+      ## @param reis.speechToText.azureOpenAiWhisper.apiVersion [string] The Azure OpenAI Whisper API version.
+      apiVersion: ""
+  ## @param reis.extraEnvVars An extra list of environment variables to add to the deployment.
+  extraEnvVars: []
+  ## @param reis.extraVolumes An extra list of volumes to add to the deployment.
+  extraVolumes: []
+  ## @param reis.extraVolumeMounts An extra list of volume mounts to add to the deployment.
+  extraVolumeMounts: []
+  ## @param reis.resources [object] Set container requests and limits for different resources like CPU or memory
+  resources: {}
+  vectorDatabase:
+    ## @param reis.vectorDatabase.type [string] The search api type to use, one of: azure-ai-search, pgvector
+    type: ""
+    azureAiSearch:
+      ## @param reis.vectorDatabase.azureAiSearch.apiKey [string] API Key for Azure AI Search.
+      apiKey: ""
+      ## @param reis.vectorDatabase.azureAiSearch.existingApiKeySecret [string] Name of the Kubernetes Secret containing the Azure AI Search API Key. The key must be `azureAiSearchApiKey`.
+      existingApiKeySecret: ""
+      ## @param reis.vectorDatabase.azureAiSearch.endpoint [string] The Azure AI Search endpoint.
+      endpoint: ""
+      ## @param reis.vectorDatabase.azureAiSearch.indexName [string] The Azure AI Search index.
+      indexName: ""
+    pgVector:
+      ## @param reis.vectorDatabase.pgVector.connectionString [string] PostgreSQL connection string for a PGVector database. Must use protocol `postgresql+psycopg://`.
+      connectionString: ""
+      ## @param reis.vectorDatabase.pgVector.existingConnectionStringSecret [string] The name of an existing k8s secret. `reis.search.connectionString` will be ignored. The key must be `connectionString`.
+      existingConnectionStringSecret: ""
+      ## @param reis.vectorDatabase.pgVector.indexName [string] Name of the collection used for the PGVector store (this is a logical distinction in the same table).
+      indexName: ""
+  ## @param reis.workers Number of concurrent threads to process the uploaded files
+  workers: 2
+  ## @param reis.batchSize Number of chunks uploaded to the vectorstore at once
+  batchSize: 100
+  ## @param reis.tmpFilesRoot [string] The root directory for temporary files
+  tmpFilesRoot: "/tmp"
+  ## @param reis.labels Map of labels to add to the REI-S deployment
+  labels: {}
+  ## @param reis.annotations Map of annotations to add to the REI-S deployment
+  annotations: {}
+  ## @param reis.podLabels Map of labels to add to the REI-S pods
+  podLabels: {}
+  ## @param reis.podAnnotations Map of annotations to add to the REI-S pods
+  podAnnotations: {}
+  ## @param reis.podSecurityContext Configure the Security Context for the Pod
+  podSecurityContext: {}
+  ## @param reis.containerSecurityContext Configure the Security Context for the Container
+  containerSecurityContext: {}

@@ -1,0 +1,20 @@
+node_modules
+dist
+bin
+
+.idea
+.env
+.env.bak.*
+.DS_Store
+.gitlab-ci-local
+
+dist
+
+docker-compose-local.yml
+
+backend/dev/local-dev-key.pem
+backend/dev/local-dev.pem
+
+# Outputs of `npm run test` and `npm run dev` etc.
+output/*.log
+/reports/

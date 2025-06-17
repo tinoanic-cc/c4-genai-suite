@@ -1,0 +1,97 @@
+@startuml
+class ChatContext {
+    tools: StructuredTool[]
+    llm: ChatContext
+    prompt: ChatPromptTemplate
+    result: Subject<StreamEvent>
+    callbacks: BaseCallbackHandlerMethods
+    ui: ChatUIImpl
+}
+
+class Subject<StreamEvent> {
+    next(event: StreamEvent)
+    error(error: Error)
+}
+
+class StructuredTool<T> {
+    schema: Schema<T>
+    description: string
+    name: string
+    call(t: T)
+}
+
+class BaseChatModel<T> {
+    invoke()
+}
+
+class ChatPromptTemplate {
+    format()
+}
+
+class BaseCallbackHandlerMethods {
+}
+
+class BaseListChatMessageHistory {
+    addMessage(message: Message): void
+    addMessages(messages: Message[]): void
+    getMessages(): Message[]
+}
+
+class ChatUIImpl {
+}
+
+class CallbackService {
+    confirm(): CallbackResult<boolean>
+    input(): CallbackResult<string>
+    complete(id: string, result: string | boolean)
+}
+
+class CallbackResult<T> {
+    id: string;
+    result: Promise<T>
+}
+
+class ConversationsController {
+    confirm(id: string, result: boolean | string)
+    postMessage(id: string, message: string)
+}
+
+class SendMessageHandler {
+    execute(query: SentMessage)
+}
+
+class Middleware {
+    invoke(context: ChatContext)
+}
+
+class AgentExecutor {
+    execute(llm, tools, prompt)
+}
+
+
+Subject "1" - "1"  ChatContext : result
+"StructuredTool" "1" -- "0..*" ChatContext : tools
+"BaseChatModel" "1" --- "1" ChatContext : llm
+"ChatPromptTemplate" "1" -- "1" ChatContext : prompt
+"BaseCallbackHandlerMethods" "1" -- "1..*" ChatContext : callbacks
+"BaseListChatMessageHistory" "1" -- "1" ChatContext : history
+"ChatUIImpl" "1" -- "1" ChatContext : ui
+"ChatUIImpl" --> CallbackService : uses
+ConversationsController --> CallbackService: completes
+ConversationsController --> SendMessageHandler : executes
+SendMessageHandler ----> ChatContext: creates
+Middleware --> ChatContext: manipulates
+AgentExecutor ---> ChatContext: uses
+AgentExecutor ---> StructuredTool: calls
+AgentExecutor ---> BaseChatModel: calls
+AgentExecutor ---> ChatPromptTemplate: calls
+AgentExecutor ---> BaseCallbackHandlerMethods: uses
+
+BaseListChatMessageHistory <|-- InternalChatHistory
+BaseCallbackHandlerMethods <|-- CallbackHandler
+BaseChatModel <|-- ChatOpenAI: extends
+BaseChatModel <|-- ChatMistralAI: extends
+BaseChatModel <|-- ChatVertexAI: extends
+
+
+@enduml

@@ -1,0 +1,694 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/files/types": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Get File Types",
+        "description": "Get the file types which can be processed.",
+        "operationId": "getFileTypes",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileTypesResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Get Files",
+        "description": "Get the files matching the query.",
+        "operationId": "getFiles",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The query from the internal tool",
+              "title": "Query"
+            },
+            "description": "The query from the internal tool"
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "The number of results to return",
+              "title": "Take"
+            },
+            "description": "The number of results to return"
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The ID of the bucket",
+              "title": "Bucket"
+            },
+            "description": "The ID of the bucket"
+          },
+          {
+            "name": "indexName",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The name of the index",
+              "title": "Indexname"
+            },
+            "description": "The name of the index"
+          },
+          {
+            "name": "files",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma separated list of file IDs to restrict the query. Can be ignored if empty",
+              "title": "Files"
+            },
+            "description": "Comma separated list of file IDs to restrict the query. Can be ignored if empty"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Post Files",
+        "description": "Processes the file into chunks and stores them in the vector store.",
+        "operationId": "uploadFile",
+        "parameters": [
+          {
+            "name": "fileName",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          },
+          {
+            "name": "fileMimeType",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filemimetype"
+            }
+          },
+          {
+            "name": "bucket",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Bucket"
+            }
+          },
+          {
+            "name": "id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The ID of the file",
+              "title": "Id"
+            },
+            "description": "The ID of the file"
+          },
+          {
+            "name": "indexName",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The name of the index",
+              "title": "Indexname"
+            },
+            "description": "The name of the index"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Processing failed"
+          },
+          "413": {
+            "description": "File too large"
+          },
+          "415": {
+            "description": "File format not supported"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/documents/content": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Get Documents Content",
+        "description": "Get the documents content by their IDs.",
+        "operationId": "getDocumentsContent",
+        "parameters": [
+          {
+            "name": "chunk_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The IDs of the chunks to retrieve",
+              "title": "Chunk Ids"
+            },
+            "description": "The IDs of the chunks to retrieve"
+          },
+          {
+            "name": "indexName",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The name of the index",
+              "title": "Indexname"
+            },
+            "description": "The name of the index"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Getdocumentscontent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/process": {
+      "post": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Post Files Only Processing",
+        "description": "Processes the file into chunks and directly returns the chunks.\n\nIn contrast to the POST /files endpoint, this one does not store the chunks in the vectorstore",
+        "operationId": "processFile",
+        "parameters": [
+          {
+            "name": "fileName",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          },
+          {
+            "name": "fileMimeType",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filemimetype"
+            }
+          },
+          {
+            "name": "chunkSize",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Chunksize"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileProcessResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Processing failed"
+          },
+          "413": {
+            "description": "File too large"
+          },
+          "415": {
+            "description": "File format not supported"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{file_id}": {
+      "delete": {
+        "tags": [
+          "files"
+        ],
+        "summary": "Delete Files",
+        "description": "Deletes all chunks belonging to the specified file in the vector store.",
+        "operationId": "deleteFile",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "File Id"
+            }
+          },
+          {
+            "name": "indexName",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The name of the index",
+              "title": "Indexname"
+            },
+            "description": "The name of the index"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FileProcessResult": {
+        "properties": {
+          "chunks": {
+            "items": {
+              "$ref": "#/components/schemas/ResultDocument"
+            },
+            "type": "array",
+            "title": "Chunks",
+            "description": "The chunks which constitute the processed file"
+          }
+        },
+        "type": "object",
+        "required": [
+          "chunks"
+        ],
+        "title": "FileProcessResult"
+      },
+      "FileResult": {
+        "properties": {
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/ResultDocument"
+            },
+            "type": "array",
+            "title": "Files",
+            "description": "The Chunks which were found for the given query"
+          },
+          "debug": {
+            "type": "string",
+            "title": "Debug",
+            "description": "Through this filed you can return Markdown which will be rendered in the frontend. You can  return sources through that"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceDto"
+            },
+            "type": "array",
+            "title": "Sources",
+            "description": "Additional information about the sources."
+          }
+        },
+        "type": "object",
+        "required": [
+          "files",
+          "debug",
+          "sources"
+        ],
+        "title": "FileResult"
+      },
+      "FileType": {
+        "properties": {
+          "file_name_extension": {
+            "type": "string",
+            "title": "File Name Extension",
+            "description": "The file name extension."
+          }
+        },
+        "type": "object",
+        "required": [
+          "file_name_extension"
+        ],
+        "title": "FileType"
+      },
+      "FileTypesResult": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FileType"
+            },
+            "type": "array",
+            "title": "Items",
+            "description": "The files types."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "FileTypesResult"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Identity": {
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "title": "Filename",
+            "description": "The name of the file."
+          },
+          "sourceSystem": {
+            "type": "string",
+            "title": "Sourcesystem",
+            "description": "The system that provided the source."
+          },
+          "uniquePathOrId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uniquepathorid",
+            "description": "The unique path or ID of the source."
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link",
+            "description": "A link to the source."
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version",
+            "description": "The version of the source."
+          },
+          "mimeType": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mimetype",
+            "description": "The MIME type of the source."
+          }
+        },
+        "type": "object",
+        "required": [
+          "fileName",
+          "sourceSystem"
+        ],
+        "title": "Identity"
+      },
+      "ResultDocument": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "the text content of the chunk"
+          },
+          "vector": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vector",
+            "description": "the vector of the chunk"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata",
+            "description": "the metadata of the chunk"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "metadata"
+        ],
+        "title": "ResultDocument"
+      },
+      "SourceDto": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "The title of the source."
+          },
+          "identity": {
+            "$ref": "#/components/schemas/Identity",
+            "description": "The identity of the source."
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata",
+            "description": "Additional metadata about the source."
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "identity"
+        ],
+        "title": "SourceDto"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

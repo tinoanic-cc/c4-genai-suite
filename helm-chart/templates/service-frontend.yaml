@@ -1,0 +1,19 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-frontend
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    {{- include "c4genaisuite.commonSelectors" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+{{- end }}

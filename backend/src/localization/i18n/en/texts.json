@@ -1,0 +1,238 @@
+{
+  "extensions": {
+    "common": {
+      "apiKey": "API Key",
+      "description": "Description",
+      "deploymentName": "Deployment Name",
+      "instanceName": "Instance Name",
+      "apiVersion": "API Version",
+      "temperature": "Temperature",
+      "seed": "Seed",
+      "presencePenalty": "Presence Penalty",
+      "frequencyPenalty": "Frequency Penalty",
+      "modelName": "Model Name",
+      "endpoint": "Endpoint",
+      "index": "Index",
+      "vectorColumn": "Vector Column",
+      "select": "Select",
+      "instructions": "Instructions",
+      "topK": "Top K",
+      "topP": "Top P",
+      "text": "Text",
+      "prompt": "Prompt",
+      "historySize": "History Size",
+      "headers": "Headers",
+      "name": "Name",
+      "date": "Date",
+      "string": "String",
+      "multiSelect": "Multi Select",
+      "singleSelect": "Single Select",
+      "dateRange": "Date Range",
+      "dateFrom": "Date (from)",
+      "dateUntil": "Date (until)",
+      "style": "Style",
+      "quality": "Quality",
+      "size": "Size",
+      "bucket": "Bucket",
+      "take": "Take",
+      "fileIds": "File IDs",
+      "temperatureHint": "Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
+      "seedHint": "This feature is in Beta. If specified, OpenAI will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result.",
+      "presencePenaltyHint": "Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
+      "frequencyPenaltyHint": "Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim."
+    },
+    "azure": {
+      "title": "Azure OpenAI",
+      "description": "Open AI LLM integration"
+    },
+    "azure-o": {
+      "title": "Azure OpenAI Reasoning",
+      "description": "Open AI LLM integration for reasoning Models"
+    },
+    "mistral": {
+      "title": "Mistral",
+      "description": "Mistral LLM integration"
+    },
+    "ollama": {
+      "title": "DEV: Ollama",
+      "description": "Ollama LLM integration"
+    },
+    "openai": {
+      "title": "OpenAI",
+      "description": "Open AI LLM integration",
+      "endpointHint": "Base url of open ai endpoint"
+    },
+    "openaiCompatible": {
+      "title": "DEV: OpenAI compatible",
+      "description": "Open AI compatible LLM integration"
+    },
+    "vertexai": {
+      "title": "VertexAI",
+      "description": "Vertex AI LLM integration"
+    },
+    "customPrompt": {
+      "title": "Prompt",
+      "description": "Uses a free prompt text as system message."
+    },
+    "hubPrompt": {
+      "title": "Hub Prompt",
+      "description": "Uses a prompt from the free langchain hub."
+    },
+    "summaryPrompt": {
+      "title": "Summary Prompt",
+      "description": "Defines the summary prompt that is used for conversation label.",
+      "promptHint": "Use the {content} placeholder for the actual history."
+    },
+    "always42": {
+      "title": "DEV: Add 42",
+      "description": "Always adds 42 to the sum of two numbers"
+    },
+    "azureSearch": {
+      "title": "Azure AI Search",
+      "description": "Performs a search using Azure AI Search",
+      "apiKeyHint": "The API Key",
+      "indexHint": "Name of the index",
+      "vectorColumnHint": "Name of the vector column/field. Defaults to: text_vector",
+      "selectHint": "Fields to select. Comma separated.",
+      "instructionsHint": "A description of the tool including instructions for the model on how to use it.",
+      "topKHint": "The number of results to return. Defaults to 10.",
+      "endpointHint": "The endpoint. https://<deployment>.search.windows.net"
+    },
+    "bing": {
+      "title": "Bing Web Search",
+      "description": "Performs a web search using Bing",
+      "apiKeyHint": "The Bing Search Subscription Key"
+    },
+    "confirm": {
+      "title": "DEV: Confirm",
+      "description": "Asks for confirmation"
+    },
+    "azureDalle": {
+      "title": "Azure Dall-E",
+      "description": "Generates images with the Azure DALL-E image generator."
+    },
+    "dalle": {
+      "title": "Dall-E",
+      "description": "Generates images with the DALL-E image generator.",
+      "apiKeyHint": "The API Key",
+      "styleHint": "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images.",
+      "qualityHint": "The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image.",
+      "sizeHint": "The size of the generated image. Must be one of 256x256, 512x512, or 1024x1024 for DALL·E-2 models. Must be one of 1024x1024, 1792x1024, or 1024x1792 for DALL·E-3 models."
+    },
+    "calculator": {
+      "title": "Calculator",
+      "description": "Evaluators mathematical expressions based on text input"
+    },
+    "files": {
+      "title": "Search Files",
+      "description": "Enables the LLM to  search files in a general bucket or uploaded by the user via the right side panel.",
+      "descriptionHint": "Describes the tool and the data in the index.",
+      "bucketHint": "The bucket to use.",
+      "takeHint": "The number of results to return.",
+      "filesInChat": "Files in Chat",
+      "filesInChatHint": "Upload files into a conversation. Files will be available only in the conversation where they were uploaded. 'Take' value will be ignored",
+      "errorFileTooLarge": "The file is larger than allowed for this file type.",
+      "errorNotAllowedFileType": "File type not allowed.",
+      "errorNotSupportedFileType": "File type not supported.",
+      "errorNotSupportedFileTypeImage": "Uploading images (.jpeg, .png) is not yet supported, but is planned.",
+      "errorOutdatedFileType": "Outdated format. Please save the document in {format}-format and upload it again.",
+      "errorREISConfiguration": "Technical error. Apparantly there is a configuration error. Please inform an administrator.",
+      "errorSearchingFile": "Technical error. Please inform an administrator.",
+      "errorUploadingFile": "Technical error. Please inform an administrator.",
+      "errorUploadingFileDamaged": "Technical error. The file seems to be damaged.",
+      "errorUploadingREISConfiguration": "The uploaded file could not be processed due to a faulty configuration. Please inform an administrator."
+    },
+    "whole-files": {
+      "title": "Complete Files",
+      "description": "Adds the complete content of files uploaded via the paperclip to a conversation to the LLM context.",
+      "endpointHint": "Endpoint of REIS as URL.",
+      "fileContentHint": "Content of the uploaded files.",
+      "fileSizeLimit": "File size limit in MB",
+      "fileSizeLimitHint": "Files larger than this will be rejected before uploading."
+    },
+    "openapi": {
+      "title": "Open API",
+      "description": "Connects an external, standardized API as tool.",
+      "endpointHint": "Endpoint as URL.",
+      "headersHint": "One header per line as Key=Value"
+    },
+    "context": {
+      "title": "DEV: Contexts",
+      "description": "Shows the current context"
+    },
+    "simpleInput": {
+      "title": "DEV: Simple Input",
+      "description": "Asks for input from the user"
+    },
+    "userArgs": {
+      "title": "DEV: User Args",
+      "description": "Shows the current user args"
+    },
+    "filesInConversation": {
+      "title": "Search Files in Chat",
+      "description": "Enables the LLM to search files uploaded via the paperclip to a conversation.",
+      "bucket": "Bucket",
+      "bucketHint": "Bucket to use for files",
+      "storeInBucket": "Persist files",
+      "storeInBucketHint": "Persist the files in bucket",
+      "maxFiles": "Max. Files",
+      "maxFilesHint": "Maximum number of files to upload in a conversation",
+      "showSources": "Show sources",
+      "showSourcesHint": "Show sources of the files"
+    },
+    "filesVision": {
+      "title": "Files Vision",
+      "description": "Enabled the interaction with images",
+      "fileTypes": "Supported file types",
+      "maxFiles": "Max. Images",
+      "maxFilesHint": "Maximum number of images to upload in a conversation"
+    },
+    "googleGenai": {
+      "title": "Google GenAI",
+      "description": "Google GenAI LLM Integration",
+      "topKHint": "A top-k of 1 means the selected token is the most probable among all tokens in the model’s vocabulary (also called greedy decoding), while a top-k of 3 means that the next token is selected from among the 3 most probable tokens (using temperature).",
+      "topPHint": "Tokens are selected from most probable to least until the sum of their probabilities equals the top-p value.\nFor example, if tokens A, B, and C have a probability of .3, .2, and .1 and the top-p value is .5, then the model will select either A or B as the next token (using temperature)."
+    },
+    "bedrock": {
+      "title": "Amazon Bedrock",
+      "description": "Amazon Bedrock LLM Integration",
+      "region": "Region",
+      "accessKeyId": "Access Key ID",
+      "secretAccessKey": "Secret Access Key",
+      "topP": "Top-p",
+      "topPHint": "Tokens are selected from the most probable to the least probable until the sum of their probabilities equals the Top-p value.\nExample: If tokens A, B, and C have probabilities of 0.3, 0.2, and 0.1, and the Top-p value is 0.5, then the model will choose either A or B as the next token (using temperature)."
+    },
+    "mcpTools": {
+      "title": "MCP Tools",
+      "description": "MCP Server Integration",
+      "serverName": "Server Name",
+      "serverNameHint": "Name of the server used for display in the chat.",
+      "transport": "Transport Protocol",
+      "transportHint": "Transport protocol used for communication with the server.",
+      "endpoint": "Endpoint",
+      "endpointHint": "Endpoint of the MCP server as URL.",
+      "enabled": "Enabled",
+      "enabledHint": "When enabled, the tool can be called via prompt.",
+      "toolDescription": "Description",
+      "toolDescriptionHint": "Description of this tool.",
+      "source": "Source",
+      "sourceHint": "Where should the value be defined.",
+      "value": "Value",
+      "valueHint": "Fixed value that is used when selected source is admin."
+    }
+  },
+  "chat": {
+    "errorConfigurationUsed": "Assistant is used by at least one conversation.",
+    "errorContentFilter": "The question was rejected by the system due to its content and is therefore not answered.",
+    "errorContextLengthExceeded": "The context of the current chat is too long for the used LLM. Either there is too much text in this chat or you uploaded a too large file with the \"Complete File\" extension.",
+    "errorStringAboveMaxLength": "The request to the LLM is too long. Either there is too much text in this chat or you uploaded a too large file with the \"Complete File\" extension.",
+    "errorFailedToolUse": "The LLM did not use the tool correctly. This might be solved by using a better LLM.",
+    "errorInternal": "Internal error",
+    "errorMissingLLM": "No llm has been configured yet. Please configure an extension",
+    "errorMissingPrompt": "No prompt has been configured yet. Please configure an extension",
+    "noSummary": "No Summary"
+  },
+  "conversation": {
+    "copySuffix": "COPY"
+  }
+}

@@ -1,0 +1,24 @@
+@startuml
+actor Service
+
+participant Service
+entity "Context" as Context
+participant Middleware1
+participant Middleware2
+participant Middleware3
+
+
+Service -> Context: new()
+Service -> Middleware1 : invoke(context)
+Middleware1 -> Middleware1: doSomething(context)
+Middleware1 -> Middleware2 : invoke(context)
+Middleware2 -> Middleware2: doSomething(context)
+Middleware2 -> Middleware3 : invoke(context)
+Middleware3 -> Middleware3: doSomething(context)
+Middleware3 -> Middleware2 : return
+Middleware2 -> Middleware2: doSomethingElse(context)
+Middleware2 -> Middleware1 : return
+Middleware1 -> Middleware1: doSomethingElse(context)
+Middleware1 -> Service : return
+
+@enduml

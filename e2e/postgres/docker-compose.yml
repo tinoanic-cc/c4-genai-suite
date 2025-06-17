@@ -1,0 +1,16 @@
+networks:
+  e2eNet:
+    name: c4-e2e-net
+
+services:
+  e2ePostgres:
+    image: pgvector/pgvector:pg16
+    container_name: c4-e2e-postgres
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=cccc
+    networks:
+      - e2eNet

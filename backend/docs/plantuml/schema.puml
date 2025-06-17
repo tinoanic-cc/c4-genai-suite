@@ -1,0 +1,148 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class blobs {
+   type: varchar
+   buffer: text
+   id: varchar
+}
+class bucket {
+   name: varchar
+   endpoint: varchar
+   headers: varchar
+   isDefault: boolean
+   createdAt: timestamp
+   updatedAt: timestamp
+   perUserQuota: integer
+   indexName: varchar
+   id: integer
+}
+class cache {
+   value: text
+   expires: timestamp
+   key: varchar
+}
+class conversations {
+   name: varchar
+   llm: varchar
+   rating: varchar
+   deploymentId: integer
+   userId: varchar
+   context: json
+   createdAt: timestamp
+   updatedAt: timestamp
+   id: integer
+}
+class deployments {
+   name: varchar
+   enabled: boolean
+   agentName: text
+   chatFooter: text
+   chatSuggestions: json
+   executorEndpoint: text
+   executorHeaders: text
+   createdAt: timestamp
+   updatedAt: timestamp
+   id: integer
+}
+class node8 as "deployments_user_groups_user-groups" {
+   deploymentsId: integer
+   userGroupsId: varchar
+}
+class extensions {
+   name: varchar
+   enabled: boolean
+   values: text
+   deploymentId: integer
+   createdAt: timestamp
+   updatedAt: timestamp
+   id: integer
+}
+class files {
+   mimeType: varchar
+   fileSize: integer
+   fileName: varchar
+   userId: varchar
+   bucketId: integer
+   createdAt: timestamp
+   updatedAt: timestamp
+   id: integer
+}
+class messages {
+   type: varchar
+   data: text
+   rating: varchar
+   error: varchar
+   tools: text
+   debug: text
+   conversationId: integer
+   createdAt: timestamp
+   updatedAt: timestamp
+   id: integer
+}
+class migrations {
+   timestamp: bigint
+   name: varchar
+   id: integer
+}
+class sessions {
+   value: text
+   id: varchar
+}
+class settings {
+   name: varchar(30)
+   primaryColor: varchar(20)
+   primaryContentColor: varchar(20)
+   welcomeText: text
+   customCss: text
+   agentName: text
+   chatFooter: text
+   chatSuggestions: json
+   createdAt: timestamp
+   updatedAt: timestamp
+   id: integer
+}
+class usages {
+   count: integer
+   date: timestamp
+   userId: varchar
+   userGroup: varchar
+   counter: varchar
+   key: varchar
+   subKey: varchar
+}
+class node11 as "user-groups" {
+   name: varchar(100)
+   isAdmin: boolean
+   isBuiltIn: boolean
+   monthlyTokens: integer
+   monthlyUserTokens: integer
+   createdAt: timestamp
+   updatedAt: timestamp
+   id: varchar
+}
+class users {
+   name: varchar(100)
+   email: varchar(100)
+   apiKey: varchar(100)
+   roles: text
+   passwordHash: varchar
+   userGroupId: varchar
+   createdAt: timestamp
+   updatedAt: timestamp
+   id: varchar
+}
+
+conversations  -[#595959,plain]-^  deployments   : "deploymentId:id"
+conversations  -[#595959,plain]-^  users         : "userId:id"
+node8          -[#595959,plain]-^  deployments   : "deploymentsId:id"
+node8          -[#595959,plain]-^  node11        : "userGroupsId:id"
+extensions     -[#595959,plain]-^  deployments   : "deploymentId:id"
+files          -[#595959,plain]-^  bucket        : "bucketId:id"
+files          -[#595959,plain]-^  users         : "userId:id"
+messages       -[#595959,plain]-^  conversations : "conversationId:id"
+users          -[#595959,plain]-^  node11        : "userGroupId:id"
+@enduml

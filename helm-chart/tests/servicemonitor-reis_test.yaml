@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+
+suite: Service Monitor reis
+set:
+  reis.enabled: true
+  reis.metrics.enabled: true
+  reis.metrics.serviceMonitor.enabled: true
+templates:
+  - servicemonitor-reis.yaml
+
+tests:
+  - it: is of kind ServiceMonitor
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+
+
+  - it: targets the metrics port
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: metrics
+
+  - it: uses Prometheus global interval and scrape timeout by default
+    asserts:
+      - isNullOrEmpty:
+          path: spec.endpoints[0].interval
+      - isNullOrEmpty:
+          path: spec.endpoints[0].scrapeTimeout
+
+  - it: sets custom labels if provided
+    set:
+      reis.metrics.serviceMonitor.labels:
+        starship: Enterprise
+        registry: NCC-1701-D
+    asserts:
+      - equal:
+          path: metadata.labels.starship
+          value: Enterprise
+      - equal:
+          path: metadata.labels.registry
+          value: NCC-1701-D
+
+  - it: allows custom interval
+    set:
+      reis.metrics.serviceMonitor.interval: 45s
+    asserts:
+      - equal:
+          path: spec.endpoints[0].interval
+          value: 45s
+
+  - it: allows custom scape timeout
+    set:
+      reis.metrics.serviceMonitor.scrapeTimeout: 20s
+    asserts:
+      - equal:
+          path: spec.endpoints[0].scrapeTimeout
+          value: 20s

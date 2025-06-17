@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+
+suite: ConfigMap REI-S
+set:
+  reis.enabled: true
+  reis.embeddings.type: openai
+  reis.vectorDatabase.type: pgvector
+templates:
+  - configmap-reis.yaml
+tests:
+  - it: is of kind ConfigMap
+    asserts:
+      - isKind:
+          of: ConfigMap
+
+  - it: uses default name pattern when no overrides are specified
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-c4-genai-suite-reis-config
+
+  - it: name should use fullnameOverride when provided
+    set:
+      fullnameOverride: my-custom-fullname
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-fullname-reis-config
+
+  - it: should incorporate nameOverride when provided
+    set:
+      nameOverride: my-custom-name
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-my-custom-name-reis-config
+
+  - it: sets Azure AI Search endpoint and index name if the vector database type is Azure AI Search
+    set:
+      reis.vectorDatabase.type: azure-ai-search
+      reis.vectorDatabase.azureAiSearch.endpoint: https://example.com
+      reis.vectorDatabase.azureAiSearch.indexName: my-aisearch-index
+    asserts:
+      - equal:
+          path: data.STORE_TYPE
+          value: azure-ai-search
+      - equal:
+          path: data.STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT
+          value: https://example.com
+      - equal:
+          path: data.STORE_AZURE_AI_SEARCH_SERVICE_INDEX_NAME
+          value: my-aisearch-index
+      - notExists:
+          path: data.STORE_PGVECTOR_INDEX_NAME
+
+  - it: sets PGVector index name if vector database type is pgvector
+    set:
+      reis.vectorDatabase.type: pgvector
+      reis.vectorDatabase.pgVector.indexName: my-pgvector-index
+    asserts:
+      - equal:
+          path: data.STORE_PGVECTOR_INDEX_NAME
+          value: my-pgvector-index
+      - notExists:
+          path: data.STORE_AZURE_AI_SEARCH_SERVICE_ENDPOINT
+      - notExists:
+          path: data.STORE_AZURE_AI_SEARCH_SERVICE_INDEX_NAME
+
+  - it: has embeddings.type set openai
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_TYPE
+          value: openai
+
+  - it: has embeddings.type set azure-openai
+    set:
+      reis.embeddings.type: azure-openai
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_TYPE
+          value: azure-openai
+
+  - it: sets OpenAI values if embeddings type is openai
+    set:
+      reis.embeddings.type: openai
+      reis.embeddings.openAi.endpoint: https://openai.endpoint.test
+      reis.embeddings.openAi.modelName: unittest/modelname
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_OPENAI_ENDPOINT
+          value: "https://openai.endpoint.test"
+      - equal:
+          path: data.EMBEDDINGS_OPENAI_MODEL_NAME
+          value: "unittest/modelname"
+
+  - it: sets Azure OpenAI values if type if azure-openai
+    set:
+      reis.embeddings.type: azure-openai
+      reis.embeddings.azureOpenAi.endpoint: https://azure-openai.endpoint.test
+      reis.embeddings.azureOpenAi.modelName: unittest/modelname
+      reis.embeddings.azureOpenAi.deploymentName: unittest/deploymentname
+      reis.embeddings.azureOpenAi.apiVersion: v0.0.0
+    asserts:
+      - equal:
+          path: data.EMBEDDINGS_AZURE_OPENAI_ENDPOINT
+          value: "https://azure-openai.endpoint.test"
+      - equal:
+          path: data.EMBEDDINGS_AZURE_OPENAI_MODEL_NAME
+          value: "unittest/modelname"
+      - equal:
+          path: data.EMBEDDINGS_AZURE_OPENAI_DEPLOYMENT_NAME
+          value: "unittest/deploymentname"
+      - equal:
+          path: data.EMBEDDINGS_AZURE_OPENAI_API_VERSION
+          value: "v0.0.0"

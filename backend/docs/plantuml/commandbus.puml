@@ -1,0 +1,18 @@
+@startuml
+actor Service
+
+participant "Service" as Service
+participant "CommandBus" as CommandBus
+participant "CommandHandler" as CommandHandler
+entity "Command" as Command
+entity "Result" as Result
+Service -> Command : new()
+Service -> CommandBus : execute(command)
+CommandBus -> CommandHandler : execute(command)
+
+CommandHandler -> CommandHandler : execute()
+CommandHandler -> Result : new()
+CommandHandler -> CommandBus : return result
+CommandBus -> Service : return result
+
+@enduml

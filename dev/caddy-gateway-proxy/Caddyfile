@@ -1,0 +1,27 @@
+:80 {
+	encode
+
+	handle /api/* {
+		reverse_proxy backend:3000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote}
+
+			# Important for SSE - disable response buffering
+			flush_interval -1
+		}
+	}
+
+	handle {
+		rewrite /auth/*/callback /api{uri}
+		redir /auth/* /api{uri} permanent
+		redir /blobs/* /api{uri} permanent
+	}
+
+	reverse_proxy frontend:80 {
+		header_up Host {host}
+		header_up X-Real-IP {remote}
+
+		# Important for SSE - disable response buffering
+		flush_interval -1
+	}
+}

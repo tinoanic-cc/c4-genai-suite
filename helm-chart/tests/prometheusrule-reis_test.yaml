@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+
+suite: PrometheusRule REIS
+set:
+  reis.enabled: true
+  reis.metrics.prometheusRule.enabled: true
+templates:
+  - prometheusrule-reis.yaml
+tests:
+  - it: is of kind PrometheusRule
+    asserts:
+      - isKind:
+          of: PrometheusRule
+
+  - it: uses default name pattern when no overrides are specified
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-c4-genai-suite-reis
+
+  - it: name should use fullnameOverride when provided
+    set:
+      fullnameOverride: my-custom-fullname
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-fullname-reis
+
+  - it: should incorporate nameOverride when provided
+    set:
+      nameOverride: my-custom-name
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-my-custom-name-reis
+
+  - it: adds group labels to rule group if provided
+    set:
+      reis.metrics.prometheusRule.ruleGroupLabels:
+        beep: boop
+        ding: dong
+    asserts:
+      - equal:
+          path: spec.groups[0].labels.beep
+          value: boop
+      - equal:
+          path: spec.groups[0].labels.ding
+          value: dong

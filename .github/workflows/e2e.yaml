@@ -1,0 +1,55 @@
+name: E2E Tests
+
+on:
+  push:
+    paths:
+      - .github/workflows/e2e.yaml
+      - .github/workflows/e2e-template.yaml
+      - e2e/**
+      - frontend/**
+      - backend/**
+      - services/reis/**
+      - dev/caddy-gateway-proxy/**
+    branches:
+      - '**'
+    tags-ignore:
+      - "**"
+  workflow_call:
+
+defaults:
+  run:
+    working-directory: e2e
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-container-images.yaml
+
+  e2e:
+    needs:
+      - build
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chromium
+          - firefox
+        testdir:
+          - extension-tests
+          - tests
+    uses: ./.github/workflows/e2e-template.yaml
+    with:
+      browser: ${{ matrix.browser }}
+      testdir: ${{ matrix.testdir }}
+    secrets: inherit
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+          cache-dependency-path: e2e/package-lock.json
+      - run: npm install
+      - run: npm run lint

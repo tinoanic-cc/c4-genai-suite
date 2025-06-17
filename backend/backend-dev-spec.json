@@ -1,0 +1,2362 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/settings": {
+      "get": {
+        "description": "The settings.",
+        "operationId": "getAuthSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthSettingsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["auth"]
+      }
+    },
+    "/api/auth/profile": {
+      "get": {
+        "description": "Provides the profile.",
+        "operationId": "getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProfileDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["auth"]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "description": "Login completed.",
+        "operationId": "login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginDto" } } }
+        },
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["auth"]
+      }
+    },
+    "/api/conversations": {
+      "get": {
+        "description": "Gets the list of recent conversations",
+        "operationId": "getConversations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConversationsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      },
+      "post": {
+        "description": "Starts the conversation.",
+        "operationId": "postConversation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateConversationDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConversationDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      },
+      "delete": {
+        "description": "Deletes all conversations of a user.",
+        "operationId": "deleteConversations",
+        "parameters": [],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
+    "/api/conversations/{id}": {
+      "get": {
+        "description": "Get the conversation by ID.",
+        "operationId": "getConversation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConversationDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      },
+      "patch": {
+        "description": "Update the conversation.",
+        "operationId": "patchConversation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateConversationDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConversationDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      },
+      "delete": {
+        "description": "Deletes the conversation.",
+        "operationId": "deleteConversation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
+    "/api/conversations/{id}/duplicate": {
+      "post": {
+        "description": "Duplicates the conversation.",
+        "operationId": "duplicateConversation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConversationDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
+    "/api/conversations/{id}/messages": {
+      "get": {
+        "description": "Gets the messages of the current conversation.",
+        "operationId": "getMessages",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MessagesDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
+    "/api/conversations/{id}/messages/{messageId}/sse": {
+      "put": {
+        "description": "Updates an existing message message of the converation and handles it.",
+        "operationId": "putMessage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "messageId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the message.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SendMessageDto" } } }
+        },
+        "responses": { "200": { "description": "" } },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
+    "/api/conversations/{id}/messages/sse": {
+      "post": {
+        "description": "Adds a message to the converation and handles it.",
+        "operationId": "postMessage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SendMessageDto" } } }
+        },
+        "responses": { "201": { "description": "" } },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
+    "/api/conversations/{id}/messages/{messageId}": {
+      "patch": {
+        "description": "Updates the rating of a message of the conversation.",
+        "operationId": "rateMessage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the conversation.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "messageId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the message.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RateMessageDto" } } }
+        },
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
+    "/api/conversations/confirm/{id}": {
+      "delete": {
+        "operationId": "confirm",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the confirmation request.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfirmDto" } } }
+        },
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["conversation"]
+      }
+    },
+    "/api/configurations": {
+      "get": {
+        "description": "Gets the configured and available extensions.",
+        "operationId": "getConfigurations",
+        "parameters": [
+          {
+            "name": "enabled",
+            "required": false,
+            "in": "query",
+            "description": "Indicates if only enabled configurations should be returned.",
+            "schema": { "type": "boolean" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigurationsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      },
+      "post": {
+        "description": "Creates a configuration.",
+        "operationId": "postConfiguration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpsertConfigurationDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigurationDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/configurations/{id}": {
+      "put": {
+        "description": "Updates an extension.",
+        "operationId": "putConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpsertConfigurationDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigurationDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      },
+      "delete": {
+        "description": "Deletes a configuration.",
+        "operationId": "deleteConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/configurations/{id}/user-values": {
+      "get": {
+        "description": "Gets the user configured values.",
+        "operationId": "getConfigurationUserValues",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigurationUserValuesDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      },
+      "put": {
+        "description": "Updates the user configured values.",
+        "operationId": "updateConfigurationUserValues",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigurationUserValuesDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigurationUserValuesDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/configurations/{id}/extensions": {
+      "get": {
+        "description": "Gets the configured and available extensions.",
+        "operationId": "getExtensions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExtensionsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      },
+      "post": {
+        "description": "Creates an extension.",
+        "operationId": "postExtension",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateExtensionDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExtensionDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/configurations/{id}/extensions/{extensionId}": {
+      "put": {
+        "description": "Updates an extension.",
+        "operationId": "putExtension",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "extensionId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the extension.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateExtensionDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExtensionDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      },
+      "delete": {
+        "description": "Deletes an extension.",
+        "operationId": "deleteExtension",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "extensionId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the extension.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/configurations/{id}/checkBucketAvailability/{type}": {
+      "get": {
+        "description": "Checks if this configuration has a user or conversation bucket and if yes by which extension it is provided.",
+        "operationId": "getBucketAvailability",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "description": "The type of bucket (user or conversation).",
+            "schema": { "enum": ["user", "conversation"], "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BucketAvailabilityDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/configurations/duplicate/{id}": {
+      "post": {
+        "description": "Duplicate a configuration.",
+        "operationId": "duplicateConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration to duplicate.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ConfigurationDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/extensions/test": {
+      "post": {
+        "description": "Tests an extension.",
+        "operationId": "testExtension",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestExtensionDto" } } }
+        },
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/extensions/rebuild": {
+      "post": {
+        "description": "Rebuilds an extension.",
+        "operationId": "rebuildExtension",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestExtensionDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExtensionDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["extensions"]
+      }
+    },
+    "/api/buckets/test": {
+      "post": {
+        "description": "Tests the bucket.",
+        "operationId": "testBucket",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestBucketDto" } } }
+        },
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/buckets/fileTypes": {
+      "get": {
+        "description": "Gets the file types.",
+        "operationId": "getFileTypes",
+        "parameters": [
+          {
+            "name": "endpoint",
+            "required": true,
+            "in": "query",
+            "description": "The rag endpoint.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "headers",
+            "required": false,
+            "in": "query",
+            "description": "The rag headers.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FileTypesDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/buckets": {
+      "get": {
+        "description": "Gets the buckets.",
+        "operationId": "getBuckets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BucketsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      },
+      "post": {
+        "operationId": "postBucket",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpsertBucketDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Creates a bucket.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BucketDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/buckets/{id}": {
+      "get": {
+        "description": "Gets the bucket with the given id.",
+        "operationId": "getBucket",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "description": "The ID of the bucket.", "schema": { "type": "number" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BucketDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      },
+      "put": {
+        "description": "Updates a bucket.",
+        "operationId": "putBucket",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "description": "The ID of the bucket.", "schema": { "type": "number" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpsertBucketDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BucketDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      },
+      "delete": {
+        "description": "Deletes an bucket.",
+        "operationId": "deleteBucket",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "description": "The ID of the bucket.", "schema": { "type": "number" } }
+        ],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/buckets/{id}/files": {
+      "get": {
+        "description": "Gets the files for the bucket.",
+        "operationId": "getFiles",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the configuration.",
+            "schema": { "type": "number" }
+          },
+          { "name": "page", "required": false, "in": "query", "description": "The page count.", "schema": { "type": "number" } },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "The page size.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "The query to search by file name.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FilesDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      },
+      "post": {
+        "description": "Creates a file.",
+        "operationId": "postFile",
+        "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "type": "object", "properties": { "file": { "type": "string", "format": "binary" } } }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FileDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/buckets/{id}/files/{fileId}": {
+      "delete": {
+        "description": "Deletes a file.",
+        "operationId": "deleteFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the bucket.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "fileId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the file.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/buckets/documents/{docId}/content": {
+      "get": {
+        "description": "Get an array of document content by chunk ids.",
+        "operationId": "getDocumentContent",
+        "parameters": [
+          {
+            "name": "docId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the document known to REIS.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "chunkIds",
+            "required": true,
+            "in": "query",
+            "description": "The IDs of the chunks.",
+            "schema": { "type": "array", "items": { "type": "string" } }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "type": "string" } } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/settings/{imageType}": {
+      "get": {
+        "description": "Gets the logo.",
+        "operationId": "getImage",
+        "parameters": [{ "name": "imageType", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "Stream a file",
+            "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["settings"]
+      },
+      "post": {
+        "operationId": "postImage",
+        "parameters": [{ "name": "imageType", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "type": "object", "properties": { "file": { "type": "string", "format": "binary" } } }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "summary": "",
+        "tags": ["settings"]
+      },
+      "delete": {
+        "description": "Deletes the logo.",
+        "operationId": "deleteLogo",
+        "parameters": [{ "name": "imageType", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["settings"]
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "description": "Gets settings.",
+        "operationId": "getSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SettingsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["settings"]
+      },
+      "post": {
+        "description": "Update settings.",
+        "operationId": "postSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SettingsDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SettingsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["settings"]
+      }
+    },
+    "/api/usages/tokens": {
+      "get": {
+        "description": "Gets the token usage.",
+        "operationId": "getTokenUsage",
+        "parameters": [
+          {
+            "name": "since",
+            "required": false,
+            "in": "query",
+            "description": "Since when should the results be shown",
+            "schema": { "format": "date-time", "type": "string" }
+          },
+          {
+            "name": "groupBy",
+            "required": false,
+            "in": "query",
+            "description": "Group the results by day, week, or month",
+            "schema": { "enum": ["day", "week", "month"], "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsagesDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["usages"]
+      }
+    },
+    "/api/usages/ratings": {
+      "get": {
+        "description": "Gets the ratings over time.",
+        "operationId": "getRatings",
+        "parameters": [
+          {
+            "name": "since",
+            "required": false,
+            "in": "query",
+            "description": "Since when should the results be shown",
+            "schema": { "format": "date-time", "type": "string" }
+          },
+          {
+            "name": "groupBy",
+            "required": false,
+            "in": "query",
+            "description": "Group the results by day, week, or month",
+            "schema": { "enum": ["day", "week", "month"], "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RatingsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["usages"]
+      }
+    },
+    "/api/usages/messages-count": {
+      "get": {
+        "description": "Retrieve the total count of messages",
+        "operationId": "getMessagesCount",
+        "parameters": [
+          {
+            "name": "since",
+            "required": false,
+            "in": "query",
+            "description": "Since when should the results be shown",
+            "schema": { "format": "date-time", "type": "string" }
+          },
+          {
+            "name": "groupBy",
+            "required": false,
+            "in": "query",
+            "description": "Group the results by day, week, or month",
+            "schema": { "enum": ["day", "week", "month"], "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MessagesCountsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["usages"]
+      }
+    },
+    "/api/usages/users-count": {
+      "get": {
+        "description": "Retrieve the total count of users per day, week or month",
+        "operationId": "getUsersCount",
+        "parameters": [
+          {
+            "name": "since",
+            "required": false,
+            "in": "query",
+            "description": "Since when should the results be shown",
+            "schema": { "format": "date-time", "type": "string" }
+          },
+          {
+            "name": "groupBy",
+            "required": false,
+            "in": "query",
+            "description": "Group the results by day, week, or month",
+            "schema": { "enum": ["day", "week", "month"], "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsersCountsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["usages"]
+      }
+    },
+    "/api/user-files": {
+      "get": {
+        "description": "Gets the files for the user bucket.",
+        "operationId": "getUserFiles",
+        "parameters": [
+          { "name": "page", "required": false, "in": "query", "description": "The page count.", "schema": { "type": "number" } },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "The page size.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "The query to search by file name.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "conversationId",
+            "required": false,
+            "in": "query",
+            "description": "The conversation ID.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FilesDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      },
+      "post": {
+        "description": "Creates an file.",
+        "operationId": "postUserFile",
+        "parameters": [
+          { "name": "extensionId", "required": true, "in": "query", "schema": { "type": "number" } },
+          { "name": "conversationId", "required": false, "in": "query", "schema": { "type": "number" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "type": "object", "properties": { "file": { "type": "string", "format": "binary" } } }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FileDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/user-files/{fileId}": {
+      "delete": {
+        "description": "Deletes a file.",
+        "operationId": "deleteUserFile",
+        "parameters": [
+          {
+            "name": "fileId",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the file.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["files"]
+      }
+    },
+    "/api/user-groups": {
+      "get": {
+        "description": "Gets the user groups.",
+        "operationId": "getUserGroups",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserGroupsDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["users"]
+      },
+      "post": {
+        "description": "Creates a user group.",
+        "operationId": "postUserGroup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpsertUserGroupDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserGroupDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["users"]
+      }
+    },
+    "/api/user-groups/{id}": {
+      "put": {
+        "description": "Updates the user group.",
+        "operationId": "putUserGroup",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the user group.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpsertUserGroupDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserGroupDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["users"]
+      },
+      "delete": {
+        "description": "Deletes an user group.",
+        "operationId": "deleteUserGroup",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "description": "The ID of the user.", "schema": { "type": "string" } }
+        ],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["users"]
+      }
+    },
+    "/api/users": {
+      "get": {
+        "description": "Gets the users.",
+        "operationId": "getUsers",
+        "parameters": [
+          { "name": "page", "required": false, "in": "query", "description": "The page count.", "schema": { "type": "number" } },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "The page size.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "The query to search by email address.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsersDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["users"]
+      },
+      "post": {
+        "description": "Creates a user.",
+        "operationId": "postUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpsertUserDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["users"]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "description": "Get the user.",
+        "operationId": "getUser",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "description": "The ID of the user.", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["users"]
+      },
+      "put": {
+        "description": "Updates the user.",
+        "operationId": "putUser",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "description": "The ID of the user.", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpsertUserDto" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserDto" } } }
+          }
+        },
+        "summary": "",
+        "tags": ["users"]
+      },
+      "delete": {
+        "description": "Deletes an user.",
+        "operationId": "deleteUser",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "description": "The ID of the user.", "schema": { "type": "string" } }
+        ],
+        "responses": { "204": { "description": "" } },
+        "summary": "",
+        "tags": ["users"]
+      }
+    }
+  },
+  "info": { "title": "c4 GenAI Suite", "description": "c4 GenAI Suite", "version": "1.0", "contact": {} },
+  "tags": [{ "name": "chat", "description": "" }],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "AuthProviderDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The unique name." },
+          "displayName": { "type": "string", "description": "The display name." },
+          "color": { "type": "string", "description": "The color." }
+        },
+        "required": ["name", "displayName", "color"]
+      },
+      "AuthSettingsDto": {
+        "type": "object",
+        "properties": {
+          "providers": {
+            "description": "Indicates which auth providers are enabled.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AuthProviderDto" }
+          },
+          "enablePasswordAuth": { "type": "boolean", "description": "Indicates if password authentication is enabled." }
+        },
+        "required": ["providers", "enablePasswordAuth"]
+      },
+      "ProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "The user ID from the auth provider." },
+          "name": { "type": "string", "description": "The display name." },
+          "email": { "type": "string", "description": "The email address." },
+          "picture": { "type": "string", "description": "The URL to an external picture." },
+          "isAdmin": { "type": "boolean", "description": "Indicates if the user is an admin." }
+        },
+        "required": ["id", "name", "email", "isAdmin"]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "description": "The email address." },
+          "password": { "type": "string", "description": "The password." }
+        },
+        "required": ["email", "password"]
+      },
+      "StreamMetadataDto": {
+        "type": "object",
+        "properties": { "tokenCount": { "type": "number", "description": "The total token count." } },
+        "required": ["tokenCount"]
+      },
+      "StreamCompletedEventDto": {
+        "type": "object",
+        "properties": {
+          "metadata": {
+            "description": "The metadata about the request.",
+            "allOf": [{ "$ref": "#/components/schemas/StreamMetadataDto" }]
+          },
+          "type": { "type": "string", "enum": ["completed"] }
+        },
+        "required": ["metadata", "type"]
+      },
+      "StreamDebugEvent": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "string", "description": "The debug information." },
+          "type": { "type": "string", "enum": ["debug"] }
+        },
+        "required": ["content", "type"]
+      },
+      "SourceDto": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "description": "The title of the source." },
+          "identity": {
+            "type": "object",
+            "description": "The identity of the source.",
+            "properties": {
+              "fileName": { "type": "string", "nullable": false },
+              "sourceSystem": { "type": "string", "nullable": false },
+              "uniquePathOrId": { "type": "string", "nullable": true },
+              "link": { "type": "string", "nullable": true },
+              "version": { "type": "string", "nullable": true },
+              "mimeType": { "type": "string", "nullable": true },
+              "fileSize": { "type": "number", "nullable": true }
+            }
+          },
+          "metadata": { "type": "object", "description": "Additional metadata about the source.", "additionalProperties": true }
+        },
+        "required": ["title", "identity"]
+      },
+      "StreamSourcesEvent": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "description": "The sources information.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SourceDto" }
+          },
+          "type": { "type": "string", "enum": ["sources"] }
+        },
+        "required": ["content", "type"]
+      },
+      "StreamLoggingEvent": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "string", "description": "The logging information." },
+          "type": { "type": "string", "enum": ["logging"] }
+        },
+        "required": ["content", "type"]
+      },
+      "StreamErrorEventDto": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string", "description": "The error message." },
+          "type": { "type": "string", "enum": ["error"] }
+        },
+        "required": ["message", "type"]
+      },
+      "StreamMessageSavedDto": {
+        "type": "object",
+        "properties": {
+          "messageId": { "type": "number", "description": "The message ID." },
+          "messageType": { "type": "string", "description": "The type.", "enum": ["ai", "human"] },
+          "type": { "type": "string", "enum": ["saved"] }
+        },
+        "required": ["messageId", "messageType", "type"]
+      },
+      "StreamTokenEventDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "description": "The content.",
+            "items": {
+              "title": "MessageContentDto",
+              "oneOf": [
+                { "$ref": "#/components/schemas/MessageContentTextDto" },
+                { "$ref": "#/components/schemas/MessageContentImageUrlDto" }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "text": "#/components/schemas/MessageContentTextDto",
+                  "image_url": "#/components/schemas/MessageContentImageUrlDto"
+                }
+              }
+            }
+          },
+          "type": { "type": "string", "enum": ["chunk"] }
+        },
+        "required": ["content", "type"]
+      },
+      "StreamToolInfoDto": {
+        "type": "object",
+        "properties": { "name": { "type": "string", "description": "The name of the tool." } },
+        "required": ["name"]
+      },
+      "StreamToolEndEventDto": {
+        "type": "object",
+        "properties": {
+          "tool": { "description": "The tool info.", "allOf": [{ "$ref": "#/components/schemas/StreamToolInfoDto" }] },
+          "type": { "type": "string", "enum": ["tool_end"] }
+        },
+        "required": ["tool", "type"]
+      },
+      "StreamToolStartEventDto": {
+        "type": "object",
+        "properties": {
+          "tool": { "description": "The tool info.", "allOf": [{ "$ref": "#/components/schemas/StreamToolInfoDto" }] },
+          "type": { "type": "string", "enum": ["tool_start"] }
+        },
+        "required": ["tool", "type"]
+      },
+      "StreamUIRequestDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "The ID to confirm the request." },
+          "text": { "type": "string", "description": "The text for the confirm dialog." },
+          "type": { "type": "string", "description": "The type of the request", "enum": ["boolean", "string"] }
+        },
+        "required": ["id", "text", "type"]
+      },
+      "StreamUIEventDto": {
+        "type": "object",
+        "properties": {
+          "request": { "description": "The request.", "allOf": [{ "$ref": "#/components/schemas/StreamUIRequestDto" }] },
+          "type": { "type": "string", "enum": ["ui"] }
+        },
+        "required": ["request", "type"]
+      },
+      "StreamSummaryDto": {
+        "type": "object",
+        "properties": {
+          "content": { "type": "string", "description": "The summary ." },
+          "type": { "type": "string", "enum": ["summary"] }
+        },
+        "required": ["content", "type"]
+      },
+      "StreamEventHolderDto": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "title": "StreamEventDto",
+            "oneOf": [
+              { "$ref": "#/components/schemas/StreamCompletedEventDto" },
+              { "$ref": "#/components/schemas/StreamDebugEvent" },
+              { "$ref": "#/components/schemas/StreamSourcesEvent" },
+              { "$ref": "#/components/schemas/StreamLoggingEvent" },
+              { "$ref": "#/components/schemas/StreamErrorEventDto" },
+              { "$ref": "#/components/schemas/StreamMessageSavedDto" },
+              { "$ref": "#/components/schemas/StreamSummaryDto" },
+              { "$ref": "#/components/schemas/StreamTokenEventDto" },
+              { "$ref": "#/components/schemas/StreamToolEndEventDto" },
+              { "$ref": "#/components/schemas/StreamToolStartEventDto" },
+              { "$ref": "#/components/schemas/StreamUIEventDto" }
+            ],
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "completed": "#/components/schemas/StreamCompletedEventDto",
+                "debug": "#/components/schemas/StreamDebugEvent",
+                "sources": "#/components/schemas/StreamSourcesEvent",
+                "logging": "#/components/schemas/StreamLoggingEvent",
+                "error": "#/components/schemas/StreamErrorEventDto",
+                "saved": "#/components/schemas/StreamMessageSavedDto",
+                "summary": "#/components/schemas/StreamSummaryDto",
+                "chunk": "#/components/schemas/StreamTokenEventDto",
+                "tool_end": "#/components/schemas/StreamToolEndEventDto",
+                "tool_start": "#/components/schemas/StreamToolStartEventDto",
+                "ui": "#/components/schemas/StreamUIEventDto"
+              }
+            }
+          }
+        },
+        "required": ["event"]
+      },
+      "ConversationDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "The ID of the conversation." },
+          "name": { "type": "string", "description": "The name, which is usually a summary of the conversation." },
+          "configurationId": { "type": "number", "description": "The ID of the configuration." },
+          "rating": {
+            "type": "string",
+            "description": "The optional rating for the whole conversation.",
+            "enum": ["good", "bad", "unrated"]
+          },
+          "createdAt": { "type": "string", "description": "The creation time.", "format": "date" },
+          "context": { "type": "object", "description": "The context values." },
+          "extensionUserArguments": { "type": "object", "description": "The argument values." }
+        },
+        "required": ["id", "configurationId", "createdAt"]
+      },
+      "ConversationsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The conversations.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ConversationDto" }
+          }
+        },
+        "required": ["items"]
+      },
+      "CreateConversationDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the conversation." },
+          "configurationId": { "type": "number", "description": "The ID of the configuration." },
+          "context": { "type": "object", "description": "The context values." },
+          "extensionUserArguments": { "type": "object", "description": "The user argument values." }
+        }
+      },
+      "UpdateConversationDto": {
+        "type": "object",
+        "properties": {
+          "configurationId": { "type": "number", "description": "The ID of the configuration." },
+          "name": { "type": "string", "description": "The name of the conversation." },
+          "isNameSetManually": {
+            "type": "boolean",
+            "description": "Indicates whether the name of the conversation has been set manually by the user."
+          },
+          "context": { "type": "object", "description": "The context values." },
+          "extensionUserArguments": { "type": "object", "description": "The argument values." },
+          "rating": {
+            "type": "string",
+            "description": "The optional rating for the whole conversation.",
+            "enum": ["good", "bad", "unrated"]
+          }
+        }
+      },
+      "MessageContentTextDto": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string", "description": "The content as text." },
+          "type": { "type": "string", "enum": ["text"] }
+        },
+        "required": ["text", "type"]
+      },
+      "ImageUrlDto": {
+        "type": "object",
+        "properties": { "url": { "type": "string", "description": "The image URL. Usually a base64 encoded image." } },
+        "required": ["url"]
+      },
+      "MessageContentImageUrlDto": {
+        "type": "object",
+        "properties": {
+          "image": { "description": "The content as image.", "allOf": [{ "$ref": "#/components/schemas/ImageUrlDto" }] },
+          "type": { "type": "string", "enum": ["image_url"] }
+        },
+        "required": ["image", "type"]
+      },
+      "MessageDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "The ID of the message." },
+          "content": {
+            "type": "array",
+            "description": "The content.",
+            "items": {
+              "title": "MessageContentDto",
+              "oneOf": [
+                { "$ref": "#/components/schemas/MessageContentTextDto" },
+                { "$ref": "#/components/schemas/MessageContentImageUrlDto" }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "text": "#/components/schemas/MessageContentTextDto",
+                  "image_url": "#/components/schemas/MessageContentImageUrlDto"
+                }
+              }
+            }
+          },
+          "type": { "type": "string", "description": "The type.", "enum": ["ai", "human"] },
+          "rating": {
+            "type": "string",
+            "description": "The rating.",
+            "enum": ["lazy", "insufficient_style", "incorrect", "instructions_not_followed", "refused", "other"]
+          },
+          "tools": { "description": "The executed tools.", "type": "array", "items": { "type": "string" } },
+          "debug": { "description": "The debug records.", "type": "array", "items": { "type": "string" } },
+          "sources": {
+            "description": "The source records.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SourceDto" }
+          },
+          "logging": { "description": "The logging information.", "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["id", "content", "type"]
+      },
+      "MessagesDto": {
+        "type": "object",
+        "properties": {
+          "items": { "description": "The mesages.", "type": "array", "items": { "$ref": "#/components/schemas/MessageDto" } }
+        },
+        "required": ["items"]
+      },
+      "FileDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "The ID of the file." },
+          "fileName": { "type": "string", "description": "The name of the file." },
+          "fileSize": { "type": "number", "description": "The size of the file in bytes." },
+          "mimeType": { "type": "string", "description": "The mime type." },
+          "uploadedAt": { "format": "date-time", "type": "string", "description": "The time when the file has been created" },
+          "uploadStatus": {
+            "type": "string",
+            "description": "The status of the file upload to the RAG-Service",
+            "enum": ["successful", "inProgress"]
+          },
+          "docId": { "type": "number", "description": "The doc ID of the file." }
+        },
+        "required": ["id", "fileName", "fileSize", "mimeType", "uploadedAt", "docId"]
+      },
+      "SendMessageDto": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "files": { "description": "The files.", "type": "array", "items": { "$ref": "#/components/schemas/FileDto" } }
+        },
+        "required": ["query"]
+      },
+      "RateMessageDto": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "string",
+            "description": "The rating.",
+            "enum": ["lazy", "insufficient_style", "incorrect", "instructions_not_followed", "refused", "other"]
+          }
+        },
+        "required": ["rating"]
+      },
+      "ConfirmDto": {
+        "type": "object",
+        "properties": { "result": { "type": "object", "description": "The result." } },
+        "required": ["result"]
+      },
+      "ChatSuggestionDto": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "description": "The title." },
+          "subtitle": { "type": "string", "description": "The subtitle." },
+          "text": { "type": "string", "description": "The text to copy." }
+        },
+        "required": ["title", "subtitle", "text"]
+      },
+      "ExtensionArgumentSpecDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the argument.",
+            "enum": ["string", "number", "boolean", "object", "array"]
+          },
+          "title": { "type": "string", "description": "The label of the argument." },
+          "description": { "type": "string", "description": "True, if required." },
+          "required": { "type": "boolean", "description": "True, if required." },
+          "showInList": { "type": "boolean", "description": "True to show this property in lists." },
+          "documentationUrl": { "type": "string", "description": "URL to the documentation." }
+        },
+        "required": ["type", "title"]
+      },
+      "ExtensionArgumentObjectSpecDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the argument.",
+            "enum": ["string", "number", "boolean", "object", "array"]
+          },
+          "title": { "type": "string", "description": "The label of the argument." },
+          "description": { "type": "string", "description": "True, if required." },
+          "required": { "type": "boolean", "description": "True, if required." },
+          "showInList": { "type": "boolean", "description": "True to show this property in lists." },
+          "documentationUrl": { "type": "string", "description": "URL to the documentation." },
+          "properties": {
+            "type": "object",
+            "description": "The properties.",
+            "additionalProperties": {
+              "oneOf": [
+                { "$ref": "#/components/schemas/ExtensionArgumentStringSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentNumberSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentBooleanSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentArraySpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "string": "#/components/schemas/ExtensionArgumentStringSpecDto",
+                  "number": "#/components/schemas/ExtensionArgumentNumberSpecDto",
+                  "boolean": "#/components/schemas/ExtensionArgumentBooleanSpecDto",
+                  "object": "#/components/schemas/ExtensionArgumentObjectSpecDto",
+                  "array": "#/components/schemas/ExtensionArgumentArraySpecDto"
+                }
+              }
+            }
+          }
+        },
+        "required": ["type", "title", "properties"]
+      },
+      "ExtensionUserInfoDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the extension." },
+          "id": { "type": "number", "description": "The ID of the extension within the configuration." },
+          "title": { "type": "string", "description": "The display title." },
+          "description": { "type": "string", "description": "The optional description." },
+          "logo": { "type": "string", "description": "The logo as SVG." },
+          "type": { "type": "string", "description": "The type of the extension.", "enum": ["tool", "llm", "other"] },
+          "userArguments": {
+            "type": "object",
+            "description": "The user arguments.",
+            "additionalProperties": {
+              "oneOf": [
+                { "$ref": "#/components/schemas/ExtensionArgumentStringSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentNumberSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentBooleanSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentArraySpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "string": "#/components/schemas/ExtensionArgumentStringSpecDto",
+                  "number": "#/components/schemas/ExtensionArgumentNumberSpecDto",
+                  "boolean": "#/components/schemas/ExtensionArgumentBooleanSpecDto",
+                  "object": "#/components/schemas/ExtensionArgumentObjectSpecDto",
+                  "array": "#/components/schemas/ExtensionArgumentArraySpecDto"
+                }
+              }
+            }
+          },
+          "configurableArguments": {
+            "description": "The arguments.",
+            "allOf": [{ "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }]
+          }
+        },
+        "required": ["name", "id", "title", "type", "userArguments"]
+      },
+      "ConfigurationDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "The ID of the configuration." },
+          "name": { "type": "string", "description": "The name of the configuration." },
+          "description": { "type": "string", "description": "The description of the configuration." },
+          "enabled": { "type": "boolean", "description": "Indicates whether the configuration is enabled." },
+          "agentName": { "type": "string", "description": "The name of the agent." },
+          "chatFooter": { "type": "string", "description": "The footer text to be shown below the chat." },
+          "chatSuggestions": {
+            "description": "The suggestions to be shown for the chat.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ChatSuggestionDto" }
+          },
+          "executorEndpoint": { "type": "string", "description": "The optional executor endpoint." },
+          "executorHeaders": { "type": "string", "description": "The optional executor headers." },
+          "userGroupsIds": { "description": "The allowed user groups.", "type": "array", "items": { "type": "string" } },
+          "extensions": {
+            "description": "Extension information.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ExtensionUserInfoDto" }
+          },
+          "configurableArguments": {
+            "description": "Configurable arguments.",
+            "allOf": [{ "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }]
+          }
+        },
+        "required": ["id", "name", "description", "enabled"]
+      },
+      "ConfigurationsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The defined configurations.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ConfigurationDto" }
+          }
+        },
+        "required": ["items"]
+      },
+      "UpsertConfigurationDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the configuration." },
+          "description": { "type": "string", "description": "The description of the configuration." },
+          "enabled": { "type": "boolean", "description": "Indicates whether the configuration is enabled." },
+          "agentName": { "type": "string", "description": "The name of the agent." },
+          "chatFooter": { "type": "string", "description": "The footer text to be shown below the chat." },
+          "executorEndpoint": { "type": "string", "description": "The optional executor endpoint." },
+          "executorHeaders": { "type": "string", "description": "The optional executor headers." },
+          "userGroupsIds": { "description": "The allowed user groups.", "type": "array", "items": { "type": "string" } },
+          "chatSuggestions": {
+            "description": "The suggestions to be shown for the chat.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ChatSuggestionDto" }
+          }
+        },
+        "required": ["name", "description", "enabled"]
+      },
+      "ConfigurationUserValuesDto": {
+        "type": "object",
+        "properties": { "values": { "type": "object", "description": "The values.", "additionalProperties": true } },
+        "required": ["values"]
+      },
+      "ExtensionArgumentStringSpecDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the argument.",
+            "enum": ["string", "number", "boolean", "object", "array"]
+          },
+          "title": { "type": "string", "description": "The label of the argument." },
+          "description": { "type": "string", "description": "True, if required." },
+          "required": { "type": "boolean", "description": "True, if required." },
+          "showInList": { "type": "boolean", "description": "True to show this property in lists." },
+          "documentationUrl": { "type": "string", "description": "URL to the documentation." },
+          "format": {
+            "type": "string",
+            "description": "The editor.",
+            "enum": ["input", "textarea", "password", "select", "date", "c4-ui"]
+          },
+          "enum": { "description": "The allowed values.", "type": "array", "items": { "type": "string" } },
+          "default": { "type": "string", "description": "The selected value." }
+        },
+        "required": ["type", "title"]
+      },
+      "ExtensionArgumentNumberSpecDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the argument.",
+            "enum": ["string", "number", "boolean", "object", "array"]
+          },
+          "title": { "type": "string", "description": "The label of the argument." },
+          "description": { "type": "string", "description": "True, if required." },
+          "required": { "type": "boolean", "description": "True, if required." },
+          "showInList": { "type": "boolean", "description": "True to show this property in lists." },
+          "documentationUrl": { "type": "string", "description": "URL to the documentation." },
+          "format": { "type": "string", "description": "The editor.", "enum": ["input", "slider", "bucket"] },
+          "minimum": { "type": "number", "description": "The minimum allowed value for numbers." },
+          "maximum": { "type": "number", "description": "The maximum allowed value for numbers." },
+          "multipleOf": { "type": "number", "description": "The multipleOf value for numbers." },
+          "default": { "type": "number", "description": "The selected value." }
+        },
+        "required": ["type", "title"]
+      },
+      "ExtensionArgumentBooleanSpecDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the argument.",
+            "enum": ["string", "number", "boolean", "object", "array"]
+          },
+          "title": { "type": "string", "description": "The label of the argument." },
+          "description": { "type": "string", "description": "True, if required." },
+          "required": { "type": "boolean", "description": "True, if required." },
+          "showInList": { "type": "boolean", "description": "True to show this property in lists." },
+          "documentationUrl": { "type": "string", "description": "URL to the documentation." },
+          "format": { "type": "string", "description": "The editor.", "enum": ["toggle"] },
+          "default": { "type": "boolean", "description": "The selected value." }
+        },
+        "required": ["type", "title"]
+      },
+      "ExtensionArgumentArraySpecDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the argument.",
+            "enum": ["string", "number", "boolean", "object", "array"]
+          },
+          "title": { "type": "string", "description": "The label of the argument." },
+          "description": { "type": "string", "description": "True, if required." },
+          "required": { "type": "boolean", "description": "True, if required." },
+          "showInList": { "type": "boolean", "description": "True to show this property in lists." },
+          "documentationUrl": { "type": "string", "description": "URL to the documentation." },
+          "items": {
+            "description": "The properties.",
+            "oneOf": [
+              { "$ref": "#/components/schemas/ExtensionArgumentStringSpecDto" },
+              { "$ref": "#/components/schemas/ExtensionArgumentNumberSpecDto" },
+              { "$ref": "#/components/schemas/ExtensionArgumentBooleanSpecDto" },
+              { "$ref": "#/components/schemas/ExtensionArgumentArraySpecDto" },
+              { "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }
+            ],
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "string": "#/components/schemas/ExtensionArgumentStringSpecDto",
+                "number": "#/components/schemas/ExtensionArgumentNumberSpecDto",
+                "boolean": "#/components/schemas/ExtensionArgumentBooleanSpecDto",
+                "object": "#/components/schemas/ExtensionArgumentObjectSpecDto",
+                "array": "#/components/schemas/ExtensionArgumentArraySpecDto"
+              }
+            }
+          },
+          "uniqueItems": { "type": "boolean", "description": "True, if items should be unique." },
+          "default": { "description": "The selected value.", "type": "array", "items": { "type": "object" } }
+        },
+        "required": ["type", "title", "items"]
+      },
+      "ExtensionSpecDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the extension." },
+          "group": { "type": "string", "description": "The group of pairwise incompatible tools." },
+          "groupWhitelist": {
+            "description": "Whitelist of compatible tools within the group.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "title": { "type": "string", "description": "The display title." },
+          "description": { "type": "string", "description": "The optional description." },
+          "logo": { "type": "string", "description": "The optional logo as SVG." },
+          "testable": { "type": "boolean", "description": "Indicates if the extension can be tested." },
+          "triggers": {
+            "description": "When spec is dynamic, triggers is used to rebuild the spec.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "type": { "type": "string", "description": "The type of the extension.", "enum": ["tool", "llm", "other"] },
+          "arguments": {
+            "type": "object",
+            "description": "The arguments.",
+            "additionalProperties": {
+              "oneOf": [
+                { "$ref": "#/components/schemas/ExtensionArgumentStringSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentNumberSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentBooleanSpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentArraySpecDto" },
+                { "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "string": "#/components/schemas/ExtensionArgumentStringSpecDto",
+                  "number": "#/components/schemas/ExtensionArgumentNumberSpecDto",
+                  "boolean": "#/components/schemas/ExtensionArgumentBooleanSpecDto",
+                  "object": "#/components/schemas/ExtensionArgumentObjectSpecDto",
+                  "array": "#/components/schemas/ExtensionArgumentArraySpecDto"
+                }
+              }
+            }
+          }
+        },
+        "required": ["name", "title", "testable", "type", "arguments"]
+      },
+      "ExtensionDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "The ID of the extension." },
+          "name": { "type": "string", "description": "The name of the extension." },
+          "values": { "type": "object", "description": "The values.", "additionalProperties": true },
+          "configurableArguments": {
+            "description": "The arguments.",
+            "allOf": [{ "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }]
+          },
+          "enabled": { "type": "boolean", "description": "Indicates whether the extension is enabled." },
+          "changed": { "type": "boolean", "description": "Indicates whether the extension was changed." },
+          "spec": { "description": "The extension specs.", "allOf": [{ "$ref": "#/components/schemas/ExtensionSpecDto" }] }
+        },
+        "required": ["id", "name", "values", "enabled", "changed", "spec"]
+      },
+      "ExtensionsDto": {
+        "type": "object",
+        "properties": {
+          "configured": {
+            "description": "The configured extensions.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ExtensionDto" }
+          },
+          "specs": {
+            "description": "The extension specs.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ExtensionSpecDto" }
+          }
+        },
+        "required": ["configured", "specs"]
+      },
+      "CreateExtensionDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the extension." },
+          "values": { "type": "object", "description": "The values.", "additionalProperties": true },
+          "configurableArguments": {
+            "description": "The arguments.",
+            "allOf": [{ "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }]
+          },
+          "enabled": { "type": "boolean", "description": "Indicates whether the extension is enabled." }
+        },
+        "required": ["name", "values", "enabled"]
+      },
+      "UpdateExtensionDto": {
+        "type": "object",
+        "properties": {
+          "values": { "type": "object", "description": "The values.", "additionalProperties": true },
+          "configurableArguments": {
+            "description": "The arguments.",
+            "allOf": [{ "$ref": "#/components/schemas/ExtensionArgumentObjectSpecDto" }]
+          },
+          "enabled": { "type": "boolean", "description": "Indicates whether the extension is enabled." }
+        },
+        "required": ["values"]
+      },
+      "ExtensionBucketSettingsDto": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "description": "The extension name" },
+          "extensionId": { "type": "number", "description": "The extension id" },
+          "maxFiles": { "type": "number", "description": "The max files that are allowed for the whole conversation" },
+          "fileNameExtensions": { "description": "The filename extensions.", "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["title", "extensionId", "fileNameExtensions"]
+      },
+      "BucketAvailabilityDto": {
+        "type": "object",
+        "properties": {
+          "extensions": {
+            "description": "The file types.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ExtensionBucketSettingsDto" }
+          }
+        },
+        "required": ["extensions"]
+      },
+      "TestExtensionDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "The id of the extension." },
+          "name": { "type": "string", "description": "The name of the extension." },
+          "values": { "type": "object", "description": "The values.", "additionalProperties": true }
+        },
+        "required": ["name", "values"]
+      },
+      "TestBucketDto": {
+        "type": "object",
+        "properties": {
+          "endpoint": { "type": "string", "description": "The URL to the RAG server." },
+          "headers": { "type": "string", "description": "The optional headers." }
+        },
+        "required": ["endpoint", "headers"]
+      },
+      "FileTypeDto": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "string", "description": "The value of the file type." },
+          "label": { "type": "string", "description": "The label of the file type." }
+        },
+        "required": ["value", "label"]
+      },
+      "FileTypesDto": {
+        "type": "object",
+        "properties": {
+          "items": { "description": "The files types.", "type": "array", "items": { "$ref": "#/components/schemas/FileTypeDto" } }
+        },
+        "required": ["items"]
+      },
+      "BucketDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "The ID of the bucket." },
+          "name": { "type": "string", "description": "The name of the bucket." },
+          "endpoint": { "type": "string", "description": "The URL to the RAG server." },
+          "indexName": { "type": "string", "description": "The index name" },
+          "headers": { "type": "string", "description": "The optional headers." },
+          "isDefault": { "type": "boolean", "description": "Indicates whether the bucket is the user/default bucket." },
+          "perUserQuota": {
+            "type": "number",
+            "description": "The quota per user. Only relevant if the bucket is a user bucket/default bucket."
+          },
+          "allowedFileNameExtensions": {
+            "description": "The allowed file types. Only relevant if the bucket is a user bucket/default bucket.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "type": { "type": "string", "description": "The bucket type.", "enum": ["general", "user", "conversation"] },
+          "fileSizeLimits": {
+            "type": "object",
+            "description": "Size limits per file type in MB.",
+            "properties": { "general": { "type": "number", "example": "1.5" } },
+            "additionalProperties": { "type": "number" },
+            "required": ["general"]
+          }
+        },
+        "required": ["id", "name", "endpoint", "indexName", "headers", "isDefault", "perUserQuota", "fileSizeLimits"]
+      },
+      "BucketsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The configured buckets.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/BucketDto" }
+          }
+        },
+        "required": ["items"]
+      },
+      "UpsertBucketDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the bucket." },
+          "endpoint": { "type": "string", "description": "The URL to the RAG server." },
+          "indexName": { "type": "string", "description": "The optional index name." },
+          "headers": { "type": "string", "description": "The optional headers." },
+          "isDefault": { "type": "boolean", "description": "Indicates whether the bucket is the user/default bucket." },
+          "perUserQuota": {
+            "type": "number",
+            "description": "The quota per user. Only relevant if the bucket is a user bucket/default bucket."
+          },
+          "allowedFileNameExtensions": {
+            "description": "The allowed file types. Only relevant if the bucket is a user bucket/default bucket.",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "type": { "type": "string", "description": "The bucket type.", "enum": ["general", "user", "conversation"] },
+          "fileSizeLimits": {
+            "type": "object",
+            "description": "Size limits per file type in MB.",
+            "properties": { "general": { "type": "number", "example": "1.5" } },
+            "additionalProperties": { "type": "number" },
+            "required": ["general"]
+          }
+        },
+        "required": ["name", "endpoint", "indexName", "headers", "isDefault", "perUserQuota", "fileSizeLimits"]
+      },
+      "FilesDto": {
+        "type": "object",
+        "properties": {
+          "items": { "description": "The uploaded files.", "type": "array", "items": { "$ref": "#/components/schemas/FileDto" } },
+          "total": { "type": "number", "description": "The total number of files." }
+        },
+        "required": ["items", "total"]
+      },
+      "SiteLinkDto": {
+        "type": "object",
+        "properties": {
+          "link": { "type": "string", "description": "The link." },
+          "text": { "type": "string", "description": "The text." }
+        },
+        "required": ["link", "text"]
+      },
+      "SettingsDto": {
+        "type": "object",
+        "properties": {
+          "language": { "type": "string", "description": "The language of the app." },
+          "name": { "type": "string", "description": "The name of the app." },
+          "primaryColor": { "type": "string", "description": "The primary color used for buttons and links." },
+          "primaryContentColor": { "type": "string", "description": "The primary content color used for buttons and links." },
+          "welcomeText": { "type": "string", "description": "The welcome text." },
+          "agentName": { "type": "string", "description": "The name of the agent." },
+          "chatFooter": { "type": "string", "description": "The footer text to be shown below the chat." },
+          "chatSuggestions": {
+            "description": "The suggestions to be shown for the chat.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ChatSuggestionDto" }
+          },
+          "siteLinks": {
+            "description": "The site links to be shown on login screen",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SiteLinkDto" }
+          },
+          "customCss": { "type": "string", "description": "Some custom css." },
+          "logo": { "type": "string", "description": "The key of the logo." },
+          "backgroundLogo": { "type": "string", "description": "The key of the backgroundLogo." },
+          "avatarLogo": { "type": "string", "description": "The key of the avatar logo." }
+        }
+      },
+      "UsageDto": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "description": "The date key.", "format": "date" },
+          "total": { "type": "number", "description": "The total number of tokens." },
+          "byModel": {
+            "type": "object",
+            "description": "The usage per llm and model.",
+            "additionalProperties": { "type": "number" }
+          }
+        },
+        "required": ["date", "total", "byModel"]
+      },
+      "UsagesDto": {
+        "type": "object",
+        "properties": {
+          "items": { "description": "The usage items.", "type": "array", "items": { "$ref": "#/components/schemas/UsageDto" } }
+        },
+        "required": ["items"]
+      },
+      "RatingDto": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "description": "The date key.", "format": "date" },
+          "total": { "type": "number", "description": "The total number of ratings." },
+          "byCategory": { "type": "object", "description": "The ratings per type.", "additionalProperties": { "type": "number" } }
+        },
+        "required": ["date", "total", "byCategory"]
+      },
+      "RatingsDto": {
+        "type": "object",
+        "properties": {
+          "items": { "description": "The ratings items.", "type": "array", "items": { "$ref": "#/components/schemas/RatingDto" } }
+        },
+        "required": ["items"]
+      },
+      "MessagesCountDto": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "description": "The date key.", "format": "date" },
+          "total": { "type": "number", "description": "The total number of messages." }
+        },
+        "required": ["date", "total"]
+      },
+      "MessagesCountsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The messages count items.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MessagesCountDto" }
+          }
+        },
+        "required": ["items"]
+      },
+      "UsersCountDto": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "description": "The date key.", "format": "date" },
+          "total": { "type": "number", "description": "The total number of users." }
+        },
+        "required": ["date", "total"]
+      },
+      "UsersCountsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The user count items.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UsersCountDto" }
+          }
+        },
+        "required": ["items"]
+      },
+      "UserGroupDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "The ID of the user group." },
+          "name": { "type": "string", "description": "The display name." },
+          "isAdmin": { "type": "boolean", "description": "Indicates if the users are admins." },
+          "isBuiltIn": { "type": "boolean", "description": "Indicates if the user group is builtin and cannot be deleted." },
+          "monthlyTokens": { "type": "number", "description": "The monthly allowed tokens for all users in the group." },
+          "monthlyUserTokens": { "type": "number", "description": "The monthly allowed tokens per user in the group." }
+        },
+        "required": ["id", "name", "isAdmin", "isBuiltIn"]
+      },
+      "UserGroupsDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "The user groups.",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UserGroupDto" }
+          }
+        },
+        "required": ["items"]
+      },
+      "UpsertUserGroupDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The display name." },
+          "monthlyTokens": { "type": "number", "description": "The monthly allowed tokens for all users in the group." },
+          "monthlyUserTokens": { "type": "number", "description": "The monthly allowed tokens per user in the group." }
+        },
+        "required": ["name"]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "The user ID from the auth provider." },
+          "name": { "type": "string", "description": "The display name." },
+          "email": { "type": "string", "description": "The email address." },
+          "picture": { "type": "string", "description": " The URL to an external picture." },
+          "apiKey": { "type": "string", "description": "The API Key." },
+          "userGroupId": { "type": "string", "description": "The user group ID." },
+          "hasPassword": { "type": "boolean", "description": "Indicates if the user has a password configured." }
+        },
+        "required": ["id", "name", "email", "userGroupId", "hasPassword"]
+      },
+      "UsersDto": {
+        "type": "object",
+        "properties": {
+          "items": { "description": "The users.", "type": "array", "items": { "$ref": "#/components/schemas/UserDto" } },
+          "total": { "type": "number", "description": "The total number of users." }
+        },
+        "required": ["items", "total"]
+      },
+      "UpsertUserDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The display name." },
+          "email": { "type": "string", "description": "The email address." },
+          "password": { "type": "string", "description": "The optional password." },
+          "userGroupId": { "type": "string", "description": "The user group ID." },
+          "apiKey": { "type": "string", "description": "The API Key." }
+        },
+        "required": ["name", "email", "userGroupId"]
+      }
+    }
+  }
+}

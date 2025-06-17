@@ -1,0 +1,16 @@
+---
+ducks:
+  - name: Dagobert Duck
+    birthdate: 1867-12-24
+  - name: Donald Duck
+    birthdate: 1934-08-17
+
+additional_info:
+  creator: Walt Disney
+  first_appearance:
+    Scrooge: 1947
+    Donald: 1934
+  popular_media:
+    - DuckTales
+    - Comics
+    - Animated shorts

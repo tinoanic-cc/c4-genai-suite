@@ -1,0 +1,149 @@
+services:
+  c4-frontend:
+    build:
+      context: frontend
+      dockerfile: Containerfile
+    volumes:
+      - ./dev/Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - "3333:80"
+    depends_on:
+      c4-backend:
+        condition: service_started
+
+  c4-backend:
+    build:
+      context: .
+      dockerfile: Containerfile.backend
+    hostname: c4-backend
+    environment:
+      AUTH_ENABLE_PASSWORD: true
+      BASE_URL: http://localhost:3333
+      AUTH_INITIAL_ADMIN_USERNAME: admin@example.com
+      AUTH_INITIAL_ADMIN_PASSWORD: secret
+      DB_URL: postgres://admin:secret@postgres:5432/cccc
+      NODE_ENV: production
+      SESSION_SECRET: random
+      # settings related to oicd
+      AUTH_OAUTH_AUTHORIZATION_URL: http://localhost:9999/default/authorize
+      AUTH_OAUTH_BRAND_NAME: Local OICD
+      AUTH_OAUTH_CLIENTID: client_id
+      AUTH_OAUTH_CLIENTSECRET: client_secret
+      AUTH_OAUTH_TOKEN_URL: http://oauth:9999/default/token
+      AUTH_OAUTH_USER_INFO_URL: http://oauth:9999/default/userinfo
+      AUTH_LOGOUT_REDIRECT: http://localhost:9999/default/endsession?post_logout_redirect_uri=http://localhost:3333
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --spider --tries=1 http://localhost:3000/api/health || exit 1
+      interval: 1s
+      timeout: 1s
+      retries: 100
+
+  reis:
+    hostname: reis
+    build:
+      context: ./services/reis
+    environment:
+      EMBEDDINGS_TYPE: ollama
+      EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
+      EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
+      STORE_TYPE: pgvector
+      STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
+      STORE_PGVECTOR_INDEX_NAME: basisreistest
+    ports:
+      - "3201:3201"
+      - "3202:3202"
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-models-pull:
+        condition: service_completed_successfully
+    healthcheck:
+      # debian slim based image has no curl/wget
+      test: python3 -c "import urllib.request, sys; sys.exit(0) if urllib.request.urlopen('http://localhost:3201/health').status == 200 else sys.exit(1)" || exit 2
+      interval: 1s
+      timeout: 1s
+      retries: 20
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: [ "CMD", "ollama", "list" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+
+  ollama-models-pull:
+    image: curlimages/curl:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    command: >
+      curl -X POST ollama:11434/api/pull -d '{"name" : "llama3.2"}'
+        --next -X POST ollama:11434/api/pull -d '{"name" : "all-minilm"}'
+
+  postgres:
+    hostname: postgres
+    extends:
+      file: ./dev/postgres/docker-compose.yml
+      service: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d cccc" ]
+      interval: 1s
+      timeout: 1s
+      retries: 20
+
+  oauth:
+    image: ghcr.io/codecentric/company-chat/dev-helper/oauth-mock:latest
+    ports:
+      - "9999:9999"
+
+  mcp-fetch:
+    hostname: mcp-fetch
+    image: ghcr.io/codecentric/company-chat/dev-helper/mcp-tool-as-server:latest
+    environment:
+      CONFIG: >
+        {
+          "mcpServers": {
+            "mcp-fetch": {
+              "command": "uvx",
+              "args": [
+                "mcp-server-fetch"
+              ],
+              "port": 8000
+            }
+          }
+        }
+    ports:
+      - "8000:8000"
+
+  mcp-tool-servers:
+    hostname: mcp-tool-servers
+    image: ghcr.io/codecentric/company-chat/dev-helper/mcp-tool-as-server:latest
+    profiles:
+      - no-start
+    environment:
+      CONFIG: >
+        {
+          "mcpServers": {
+            "mcp-timeserver": {
+              "command": "uvx",
+              "args": [
+                "mcp-timeserver"
+              ],
+              "port": 4000
+            }
+          }
+        }
+
+volumes:
+  extension-volume:
+  ollama-data:

@@ -1,0 +1,21 @@
+{{- if and .Values.frontend.enabled .Values.frontend.metrics.enabled .Values.frontend.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-frontend
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend-metrics
+    {{- if .Values.frontend.metrics.serviceMonitor.labels }}
+    {{- toYaml .Values.frontend.metrics.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      app.kubernetes.io/component: frontend-metrics
+  endpoints:
+      - port: metrics
+        interval: {{ .Values.frontend.metrics.serviceMonitor.interval }}
+        scrapeTimeout: {{ .Values.frontend.metrics.serviceMonitor.scrapeTimeout }}
+{{- end }}

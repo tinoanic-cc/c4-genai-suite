@@ -1,0 +1,12 @@
+{{- if .Values.grafanaDashboards.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-grafana-dashboards
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana-dashboards
+    grafana_dashboard: "1"
+data:
+{{ (.Files.Glob "grafana-dashboards/*.json").AsConfig | indent 2 }}
+{{- end }}

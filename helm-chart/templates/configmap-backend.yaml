@@ -1,0 +1,16 @@
+{{- if .Values.backend.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-backend
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+data:
+  BASE_URL: "{{ .Values.backend.baseUrl }}"
+  AUTH_ENABLE_PASSWORD: "{{ .Values.backend.auth.enablePassword }}"
+  AUTH_OAUTH_AUTHORIZATION_URL: "{{ .Values.backend.auth.authorizationUrl }}"
+  AUTH_OAUTH_TOKEN_URL: "{{ .Values.backend.auth.tokenUrl }}"
+  AUTH_OAUTH_USER_INFO_URL: "{{ .Values.backend.auth.userInfoUrl }}"
+  METRICS_PORT: "{{ .Values.backend.metrics.port }}"
+  {{- end }}

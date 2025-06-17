@@ -1,0 +1,91 @@
+@startuml
+actor Client
+
+Client -> ConversationsController: postMessage()
+ConversationsController -> SendMessageHandler: execute()
+
+entity Context
+SendMessageHandler -> Context: new()
+SendMessageHandler -> ExceptionMiddleware : invoke(context)
+ExceptionMiddleware -> CheckUsageMiddleware : invoke(context)
+alt tokens left or no token check
+    CheckUsageMiddleware -> UIMiddleware : invoke(context)
+    UIMiddleware -> UIMiddleware: setUi(context)
+    UIMiddleware -> GetHistoryMiddleware : invoke(context)
+    GetHistoryMiddleware -> GetHistoryMiddleware: setHistory(context)
+    GetHistoryMiddleware -> GetUserMiddleware : invoke(context)
+    GetUserMiddleware -> GetUserMiddleware: setUser(context)
+    GetUserMiddleware -> StoreUsageMiddleware : invoke(context)
+    StoreUsageMiddleware -> ExtensionHandler : invoke(context)
+    loop extensions
+        ExtensionHandler -> ExtensionMiddleware: invoke(context)
+        alt extension type is llm
+            ExtensionMiddleware -> ExtensionMiddleware: addLlm(context)
+        else extenion type is prompt
+            ExtensionMiddleware -> ExtensionMiddleware: addPrompt(context)
+        else extenion type tool
+            ExtensionMiddleware -> ExtensionMiddleware: addTool(context)
+        end
+        ExtensionMiddleware -> ExtensionHandler: return
+    end
+    ExtensionHandler-> CompleteMiddleware : invoke(context)
+    CompleteMiddleware -> SummarizeHistoryMiddleware : invoke(context)
+    SummarizeHistoryMiddleware -> LangfuseMiddleware: invoke(context)
+    alt langfuse client configured
+        LangfuseMiddleware -> LangfuseMiddleware: addCallback(context, langfuse)
+    end
+    LangfuseMiddleware -> ChooseLllMiddleware: invoke(context)
+    alt llm not present
+        ChooseLllMiddleware -> ChooseLllMiddleware: setLlm(getFirstLLm(context))
+    end
+    ChooseLllMiddleware -> DefaultPromptMiddleware: invoke()
+    alt prompt not present
+        DefaultPromptMiddleware -> DefaultPromptMiddleware: setPrompt(context)
+    end
+    DefaultPromptMiddleware -> ExecutorMiddleware: invoke(context)
+    alt executorEndpoint present
+        ExecutorMiddleware -> ExecutorEndpoint: invoke(context)
+        ExecutorEndpoint -> ExecutorMiddleware: return
+        ExecutorMiddleware -> ExecutorMiddleware: sendMessage(context)
+    else
+        ExecutorMiddleware -> ExecuteMiddleware: invoke(context)
+        alt llm not present or prompt no present
+            ExecuteMiddleware -> ExecuteMiddleware: addError(context)
+        else
+            ExecuteMiddleware -> LangchainAgent: invoke(context)
+            LangchainAgent -> ExecuteMiddleware: stream()
+            loop message in stream
+                ExecuteMiddleware -> ExecuteMiddleware: sendMessage(context)
+            end
+            LangchainAgent -> LangchainAgent: setTokenUsage(context)
+            LangchainAgent -> ExecuteMiddleware: return
+        end
+            ExecuteMiddleware -> ExecutorMiddleware: return
+    end
+    ExecutorMiddleware -> DefaultPromptMiddleware : return
+    DefaultPromptMiddleware -> ChooseLllMiddleware : return
+    alt llm present
+        ChooseLllMiddleware -> ChooseLllMiddleware: updateConversation(context)
+    end
+    ChooseLllMiddleware -> LangfuseMiddleware : return
+    LangfuseMiddleware -> SummarizeHistoryMiddleware : return
+    SummarizeHistoryMiddleware -> SummarizeHistoryMiddleware: addHistory(context)
+    SummarizeHistoryMiddleware -> CompleteMiddleware : return
+    CompleteMiddleware -> CompleteMiddleware: sendCompleteMessage(context)
+    CompleteMiddleware -> StoreUsageMiddleware : return
+    alt tokenUsage > 0
+        StoreUsageMiddleware -> StoreUsageMiddleware: trackTokenUsage(context)
+    end
+
+    StoreUsageMiddleware -> GetUserMiddleware : return
+    GetUserMiddleware -> GetHistoryMiddleware : return
+    GetHistoryMiddleware -> UIMiddleware : return
+    UIMiddleware -> CheckUsageMiddleware : return
+else not tokens left
+    CheckUsageMiddleware -> CheckUsageMiddleware: addError(context)
+end
+    CheckUsageMiddleware -> ExceptionMiddleware : return
+ExceptionMiddleware -> SendMessageHandler : return
+SendMessageHandler -> ConversationsController: return
+ConversationsController -> Client : return
+@enduml

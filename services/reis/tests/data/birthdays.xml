@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ducks>
+  <duck>
+    <name>Dagobert Duck</name>
+    <birthdate>1867-09-15</birthdate>
+  </duck>
+  <duck>
+    <name>Donald Duck</name>
+    <birthdate>1934-06-09</birthdate>
+  </duck>
+</ducks>

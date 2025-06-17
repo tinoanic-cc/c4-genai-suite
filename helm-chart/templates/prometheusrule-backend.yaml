@@ -1,0 +1,24 @@
+{{- if and .Values.backend.enabled .Values.backend.metrics.prometheusRule.enabled }}
+kind: PrometheusRule
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-backend
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: c4
+spec:
+  groups:
+    - name: c4-alerts
+      {{- if .Values.backend.metrics.prometheusRule.ruleGroupLabels }}
+      labels:
+        {{- .Values.backend.metrics.prometheusRule.ruleGroupLabels | toYaml | nindent 8 }}
+      {{- end }}
+      rules:
+        - alert: C4UnexpectedContainerRestart
+          annotations:
+            description: Pod container restarted {{`{{$labels.namespace}}`}}/{{`{{$labels.pod}}`}}/{{`{{$labels.container}}`}}
+            summary: C4 Container Restarted
+          expr: increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container="{{ include "c4genaisuite.fullname" . }}"}[30m]) > 0
+          labels:
+            severity: warning
+{{- end }}

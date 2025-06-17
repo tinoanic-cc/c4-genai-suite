@@ -1,0 +1,18 @@
+{{- if and .Values.reis.enabled .Values.reis.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-reis-metrics
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: reis-metrics
+spec:
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: {{ .Values.reis.metrics.port }}
+      targetPort: metrics
+  selector:
+    {{- include "c4genaisuite.commonSelectors" . | nindent 4 }}
+    app.kubernetes.io/component: reis
+{{- end }}

@@ -1,0 +1,42 @@
+{{- if .Values.ingress.enabled }}
+{{- if and (not .Values.frontend.enabled) (not .Values.backend.enabled) }}
+{{- fail "ingress cannot be enabled if backend and frontend are disabled" }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer }}
+  labels:
+    {{ include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: ingress
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          {{- if .Values.backend.enabled }}
+          - path: /api/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "c4genaisuite.fullname" . }}-backend
+                port:
+                  name: web
+          {{ end }}
+          {{- if .Values.frontend.enabled }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "c4genaisuite.fullname" . }}-frontend
+                port:
+                  name: http
+          {{- end }}
+  tls:
+    - secretName: {{ .Values.ingress.tlsSecretName }}
+      hosts:
+        - {{ .Values.ingress.host }}
+{{- end }}

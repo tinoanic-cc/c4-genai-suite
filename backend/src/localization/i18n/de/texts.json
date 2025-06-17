@@ -1,0 +1,238 @@
+{
+  "extensions": {
+    "common": {
+      "apiKey": "API Key",
+      "description": "Beschreibung",
+      "deploymentName": "Deployment Name",
+      "instanceName": "Instance Name",
+      "apiVersion": "API-Version",
+      "temperature": "Temperatur",
+      "seed": "Seed",
+      "presencePenalty": "Presence Penalty",
+      "frequencyPenalty": "Frequency Penalty",
+      "modelName": "Modell-Name",
+      "endpoint": "Endpunkt",
+      "index": "Index",
+      "vectorColumn": "Vektor-Spalte",
+      "select": "Auswählen",
+      "instructions": "Anweisungen",
+      "topK": "Top K",
+      "topP": "Top P",
+      "text": "Text",
+      "prompt": "Prompt",
+      "historySize": "Verlaufslänge",
+      "headers": "Header",
+      "name": "Name",
+      "date": "Datum",
+      "string": "String",
+      "multiSelect": "Mehrfachauswahl",
+      "singleSelect": "Einzelauswahl",
+      "dateRange": "Datumsbereich",
+      "dateFrom": "Datum (von)",
+      "dateUntil": "Datum (bis)",
+      "style": "Stil",
+      "quality": "Qualität",
+      "size": "Größe",
+      "bucket": "Bucket",
+      "take": "Take",
+      "fileIds": "Datei-IDs",
+      "temperatureHint": "Höhere Werte wie 0.8 machen die Ausgabe zufälliger, während niedrigere Werte wie 0.2 die Ausgabe fokussierter und deterministischer machen.",
+      "seedHint": "Dieses Feature befindet sich in der Beta-Phase. Wenn angegeben, wird OpenAI versuchen, deterministisch zu arbeiten, sodass wiederholte Anfragen mit demselben Seed und denselben Parametern das gleiche Ergebnis liefern sollten.",
+      "presencePenaltyHint": "Positive Werte bestrafen neue Tokens basierend darauf, ob sie bisher im Text vorkommen, und erhöhen die Wahrscheinlichkeit, dass das Modell über neue Themen spricht.",
+      "frequencyPenaltyHint": "Positive Werte bestrafen neue Tokens basierend auf ihrer bisherigen Häufigkeit im Text und verringern die Wahrscheinlichkeit, dass das Modell dieselbe Zeile wörtlich wiederholt."
+    },
+    "azure": {
+      "title": "Azure OpenAI",
+      "description": "OpenAI LLM-Integration"
+    },
+    "azure-o": {
+      "title": "Azure OpenAI Reasoning",
+      "description": "OpenAI LLM-Integration für Reasoning-Modelle"
+    },
+    "mistral": {
+      "title": "Mistral",
+      "description": "Mistral LLM-Integration"
+    },
+    "ollama": {
+      "title": "DEV: Ollama",
+      "description": "Ollama LLM-Integration"
+    },
+    "openai": {
+      "title": "OpenAI",
+      "description": "OpenAI LLM-Integration",
+      "endpointHint": "Basis-URL des OpenAI-Endpunkts"
+    },
+    "openaiCompatible": {
+      "title": "DEV: OpenAI kompatibel",
+      "description": "OpenAI-kompatible LLM-Integration"
+    },
+    "vertexai": {
+      "title": "VertexAI",
+      "description": "Vertex AI LLM-Integration"
+    },
+    "customPrompt": {
+      "title": "Prompt",
+      "description": "Verwendet einen freien Text als Systemnachricht."
+    },
+    "hubPrompt": {
+      "title": "Hub Prompt",
+      "description": "Verwendet einen Prompt aus dem freien LangChain Hub."
+    },
+    "summaryPrompt": {
+      "title": "Summary Prompt",
+      "description": "Definiert den Zusammenfassungs-Prompt, der für die Gesprächsbeschriftung verwendet wird.",
+      "promptHint": "Verwende den {content}-Platzhalter für den tatsächlichen Verlauf."
+    },
+    "always42": {
+      "title": "DEV: Add 42",
+      "description": "Addiert immer 42 zur Summe von zwei Zahlen"
+    },
+    "azureSearch": {
+      "title": "Azure AI Search",
+      "description": "Führt eine Suche mit Azure AI Search durch",
+      "apiKeyHint": "API-Key",
+      "indexHint": "Name des Indexes",
+      "vectorColumnHint": "Name der Vektor-Spalte/Feld. Standard: text_vector",
+      "selectHint": "Auszuwählende Felder. Komma-separiert.",
+      "instructionsHint": "Eine Beschreibung des Tools einschließlich Anweisungen für das Modell zur Nutzung.",
+      "topKHint": "Die Anzahl der zurückzugebenden Ergebnisse. Standard: 10.",
+      "endpointHint": "Der Endpunkt. https://<deployment>.search.windows.net"
+    },
+    "bing": {
+      "title": "Bing Web Search",
+      "description": "Führt eine Websuche mit Bing durch",
+      "apiKeyHint": "Der Bing Search Subscription Key"
+    },
+    "confirm": {
+      "title": "DEV: Confirm",
+      "description": "Fragt nach Bestätigung"
+    },
+    "azureDalle": {
+      "title": "Azure Dall-E",
+      "description": "Generiert Bilder mit dem Azure DALL-E-Bildgenerator."
+    },
+    "dalle": {
+      "title": "Dall-E",
+      "description": "Generiert Bilder mit dem DALL-E-Bildgenerator.",
+      "apiKeyHint": "API Key",
+      "styleHint": "Der Stil der generierten Bilder. Muss vivid oder natural sein. Vivid erzeugt hyperrealistische und dramatische Bilder. Natural erzeugt natürlichere, weniger hyperrealistische Bilder.",
+      "qualityHint": "Die Qualität des zu generierenden Bildes. HD erzeugt Bilder mit feineren Details und größerer Konsistenz.",
+      "sizeHint": "Die Größe des generierten Bildes. Muss 256x256, 512x512 oder 1024x1024 für DALL·E-2-Modelle sein. Für DALL·E-3-Modelle muss es 1024x1024, 1792x1024 oder 1024x1792 sein."
+    },
+    "calculator": {
+      "title": "Rechner",
+      "description": "Berechnet mathematische Formeln basierend auf Texteingaben"
+    },
+    "files": {
+      "title": "Suche in Dateien",
+      "description": "Ermöglicht dem LLM, Dateien in einem general Bucket oder von dem Benutzer über das rechte Seitenpanel hochgeladene Dateien zu durchsuchen.",
+      "descriptionHint": "Beschreibt das Tool und die Daten im Index.",
+      "bucketHint": "Zu verwendender Bucket.",
+      "takeHint": "Die Anzahl der zurückzugebenden Ergebnisse.",
+      "filesInChat": "Dateien im Chat",
+      "filesInChatHint": "Dateien in einen Chat hochladen. Dateien sind nur in dem Chat verfügbar, in dem sie hochgeladen wurden. Der Wert 'Take' wird ignoriert",
+      "errorFileTooLarge": "Die hochgeladene Datei ist größer als für dieses Format erlaubt.",
+      "errorNotAllowedFileType": "Dateiformat nicht erlaubt.",
+      "errorNotSupportedFileType": "Dateiformat nicht unterstützt.",
+      "errorNotSupportedFileTypeImage": "Das Hochladen von Bildern (.jpeg, .png) wird noch nicht unterstützt, ist aber in Planung.",
+      "errorOutdatedFileType": "Veraltetes Format. Bitte das Dokument im {format}-Format speichern und erneut hochladen.",
+      "errorREISConfiguration": "Technischer Fehler. Anscheinend liegt ein Konfigurationsfehler vor. Bitte informieren Sie einen Administrator.",
+      "errorSearchingFile": "Technischer Fehler. Bitte informieren Sie einen Administrator.",
+      "errorUploadingFile": "Technischer Fehler. Bitte informieren Sie einen Administrator.",
+      "errorUploadingFileDamaged": "Technischer Fehler. Die Datei scheint beschädigt zu sein.",
+      "errorUploadingREISConfiguration": "Die hochgeladene Datei konnte aufgrund einer fehlerhaften Konfiguration nicht verarbeitet werden. Bitte informieren Sie einen Administrator."
+    },
+    "whole-files": {
+      "title": "Vollständige Dateien",
+      "description": "Fügt den vollständigen Inhalt der in einem Chat über die Büroklammer hochgeladenen Dateien dem LLM-Kontext hinzu.",
+      "endpointHint": "Endpunkt des REIS als URL.",
+      "fileContentHint": "Inhalt der hochgeladenen Dateien.",
+      "fileSizeLimit": "Maximale Dateigröße in MB",
+      "fileSizeLimitHint": "Größere Dateien werden vor dem Upload abgelehnt."
+    },
+    "openapi": {
+      "title": "Open API",
+      "description": "Verbindet eine externe, standardisierte API als Tool.",
+      "endpointHint": "Endpunkt als URL.",
+      "headersHint": "Ein Header pro Zeile als Schlüssel=Wert"
+    },
+    "context": {
+      "title": "DEV: Contexts",
+      "description": "Zeigt den aktuellen Kontext"
+    },
+    "simpleInput": {
+      "title": "DEV: Simple Input",
+      "description": "Fragt nach einer Eingabe vom Benutzer"
+    },
+    "userArgs": {
+      "title": "DEV: User Args",
+      "description": "Zeigt die aktuellen Benutzerargumente"
+    },
+    "filesInConversation": {
+      "title": "Suche in Dateien im Chat",
+      "description": "Ermöglicht dem LLM, Dateien zu durchsuchen, die in einem Chat über die Büroklammer hochgeladen wurden.",
+      "bucket": "Bucket",
+      "bucketHint": "Bucket welches für die Dateien genutzt wird",
+      "storeInBucket": "Dateien persistieren",
+      "storeInBucketHint": "Persistiert die Dateien im Bucket",
+      "maxFiles": "Max. Dateien",
+      "maxFilesHint": "Maximale Anzahl von Dateien im Chat",
+      "showSources": "Quellen anzeigen",
+      "showSourcesHint": "Zeigt die Quellen der Dateien an"
+    },
+    "filesVision": {
+      "title": "Bilder im Chat",
+      "description": "Ermöglicht die Interaktion mit Bildern im Chat",
+      "fileTypes": "Unterstützte Dateitypen",
+      "maxFiles": "Max. Dateien",
+      "maxFilesHint": "Maximale Anzahl von Dateien im Chat"
+    },
+    "googleGenai": {
+      "title": "Google GenAI",
+      "description": "Integration des Google GenAI LLM",
+      "topKHint": "Ein Top-k von 1 bedeutet, dass das ausgewählte Token das wahrscheinlichste unter allen Tokens im Vokabular des Modells ist (auch als Greedy Decoding bezeichnet), während ein Top-k von 3 bedeutet, dass das nächste Token aus den 3 wahrscheinlichsten Tokens ausgewählt wird (unter Verwendung der Temperatur).",
+      "topPHint": "Tokens werden von den wahrscheinlichsten bis zu den unwahrscheinlichsten ausgewählt, bis die Summe ihrer Wahrscheinlichkeiten dem Top-p-Wert entspricht.\nBeispielsweise, wenn die Tokens A, B und C eine Wahrscheinlichkeit von 0,3, 0,2 und 0,1 haben und der Top-p-Wert 0,5 beträgt, dann wählt das Modell entweder A oder B als nächstes Token aus (unter Verwendung der Temperatur)."
+    },
+    "bedrock": {
+      "title": "Amazon Bedrock",
+      "description": "Integration des Amazon Bedrock LLM",
+      "region": "Region",
+      "accessKeyId": "Access Key ID",
+      "secretAccessKey": "Secret Access Key",
+      "topP": "Top-p",
+      "topPHint": "Tokens werden von den wahrscheinlichsten bis zu den unwahrscheinlichsten ausgewählt, bis die Summe ihrer Wahrscheinlichkeiten dem Top-p-Wert entspricht.\nBeispiel: Wenn die Tokens A, B und C Wahrscheinlichkeiten von 0,3, 0,2 und 0,1 haben und der Top-p-Wert 0,5 beträgt, dann wählt das Modell entweder A oder B als nächstes Token aus (unter Verwendung der Temperatur)."
+    },
+    "mcpTools": {
+      "title": "MCP Tools",
+      "description": "Integration eines MCP Servers",
+      "serverName": "Server Name",
+      "serverNameHint": "Name des Servers, der zur Anzeige im Chat verwendet wird.",
+      "transport": "Transportprotokoll",
+      "transportHint": "Transportprotokoll, das für die Kommunikation mit dem Server verwendet wird.",
+      "endpoint": "Endpunkt",
+      "endpointHint": "Endpunkt des MCP Servers als URL.",
+      "enabled": "Aktiviert",
+      "enabledHint": "Wenn aktiviert, kann das Tool über den Prompt aufgerufen werden.",
+      "toolDescription": "Beschreibung",
+      "toolDescriptionHint": "Beschreibung des Tools.",
+      "source": "Quelle",
+      "sourceHint": "Wo soll der Wert definiert werden.",
+      "value": "Wert",
+      "valueHint": "Fester Wert, der verwendet wird, wenn die ausgewählte Quelle 'Admin' ist."
+    }
+  },
+  "chat": {
+    "errorConfigurationUsed": "Der Assistent wird von mindestens einer Konversation verwendet.",
+    "errorContentFilter": "Die Frage wurde vom System aufgrund ihres Inhalts abgewiesen und wird daher nicht beantwortet.",
+    "errorContextLengthExceeded": "Der Kontext des aktuellen Chats ist zu groß für das genutzte LLM. Entweder gibt es zu viel Text in dieser Konversation oder es wurde eine zu große Datei mit der \"Vollständige Dateien\"-Extension hochgeladen.",
+    "errorStringAboveMaxLength": "Die Anfrage an das LLM is zu lang. Entweder gibt es zu viel Text in dieser Konversation oder es wurde eine zu große Datei mit der \"Vollständige Dateien\"-Extension hochgeladen.",
+    "errorFailedToolUse": "Das LLM hat Probleme das Tool zu benutzen. Möglicherweise sollte ein leistungsfähigeres LLM verwendet werden.",
+    "errorInternal": "Interner Fehler",
+    "errorMissingLLM": "Kein LLM wurde bisher konfiguriert. Bitte eine Erweiterung konfigurieren.",
+    "errorMissingPrompt": "Kein Prompt wurde bisher konfiguriert. Bitte eine Erweiterung konfigurieren.",
+    "noSummary": "Keine Zusammenfassung"
+  },
+  "conversation": {
+    "copySuffix": "KOPIE"
+  }
+}

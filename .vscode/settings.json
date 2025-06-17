@@ -1,0 +1,17 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "pg",
+            "database": "cccc",
+            "username": "admin",
+            "password": "secret"
+        }
+    ],
+    "python.testing.cwd": "${workspaceFolder}/services/reis",
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+}

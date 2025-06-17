@@ -1,0 +1,93 @@
+services:
+  c4-frontend:
+    image: ghcr.io/codecentric/c4-genai-suite/frontend:latest
+    volumes:
+      - ./dev/Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - "3333:80"
+    depends_on:
+      c4-backend:
+        condition: service_started
+
+  c4-backend:
+    image: ghcr.io/codecentric/c4-genai-suite/backend:latest
+    hostname: c4-backend
+    environment:
+      AUTH_ENABLE_PASSWORD: true
+      BASE_URL: http://localhost:3333
+      AUTH_INITIAL_ADMIN_USERNAME: admin@example.com
+      AUTH_INITIAL_ADMIN_PASSWORD: secret
+      DB_URL: postgres://admin:secret@postgres:5432/cccc
+      NODE_ENV: production
+      SESSION_SECRET: random
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --spider --tries=1 http://localhost:3000/api/health || exit 1
+      interval: 1s
+      timeout: 1s
+      retries: 100
+
+  c4-reis:
+    image: ghcr.io/codecentric/c4-genai-suite/reis:latest
+    hostname: reis
+    environment:
+      EMBEDDINGS_TYPE: ollama
+      EMBEDDINGS_OLLAMA_ENDPOINT: http://ollama:11434
+      EMBEDDINGS_OLLAMA_MODEL_NAME: all-minilm
+      STORE_TYPE: pgvector
+      STORE_PGVECTOR_URL: postgresql+psycopg://admin:secret@postgres:5432/cccc
+      STORE_PGVECTOR_INDEX_NAME: basisreistest
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-models-pull:
+        condition: service_completed_successfully
+    healthcheck:
+      # debian slim based image has no curl/wget
+      test: python3 -c "import urllib.request, sys; sys.exit(0) if urllib.request.urlopen('http://localhost:3201/health').status == 200 else sys.exit(1)" || exit 2
+      interval: 1s
+      timeout: 1s
+      retries: 20
+
+  ollama:
+    image: ollama/ollama:0.9.0
+    restart: unless-stopped
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: [ "CMD", "ollama", "list" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+
+  ollama-models-pull:
+    image: curlimages/curl:8.13.0
+    depends_on:
+      ollama:
+        condition: service_healthy
+    command: >
+      curl -X POST ollama:11434/api/pull -d '{"name" : "llama3.2"}'
+        --next -X POST ollama:11434/api/pull -d '{"name" : "all-minilm"}'
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    hostname: postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=cccc
+      - PGPORT=5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d cccc" ]
+      interval: 1s
+      timeout: 1s
+      retries: 20
+
+volumes:
+  ollama-data:
+  postgres-data:

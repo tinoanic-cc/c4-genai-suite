@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+
+suite: Service Monitor Backend
+set:
+  backend.metrics.enabled: true
+  backend.metrics.serviceMonitor.enabled: true
+templates:
+  - servicemonitor-backend.yaml
+
+tests:
+  - it: is of kind ServiceMonitor
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+
+  - it: uses default name pattern when no overrides are specified
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-c4-genai-suite-backend
+
+  - it: name should use fullnameOverride when provided
+    set:
+      fullnameOverride: my-custom-fullname
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-custom-fullname-backend
+
+  - it: should incorporate nameOverride when provided
+    set:
+      nameOverride: my-custom-name
+    asserts:
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-my-custom-name-backend
+
+  - it: targets the metrics port
+    asserts:
+      - equal:
+          path: spec.endpoints[0].port
+          value: metrics
+
+  - it: uses Prometheus global interval and scrape timeout by default
+    asserts:
+      - isNullOrEmpty:
+          path: spec.endpoints[0].interval
+      - isNullOrEmpty:
+          path: spec.endpoints[0].scrapeTimeout
+
+  - it: sets custom labels if provided
+    set:
+      backend.metrics.serviceMonitor.labels:
+        starship: Enterprise
+        registry: NCC-1701-D
+    asserts:
+      - equal:
+          path: metadata.labels.starship
+          value: Enterprise
+      - equal:
+          path: metadata.labels.registry
+          value: NCC-1701-D
+
+  - it: allows custom interval
+    set:
+      backend.metrics.serviceMonitor.interval: 45s
+    asserts:
+      - equal:
+          path: spec.endpoints[0].interval
+          value: 45s
+
+  - it: allows custom scape timeout
+    set:
+      backend.metrics.serviceMonitor.scrapeTimeout: 20s
+    asserts:
+      - equal:
+          path: spec.endpoints[0].scrapeTimeout
+          value: 20s

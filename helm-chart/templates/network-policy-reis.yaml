@@ -1,0 +1,35 @@
+{{- if and .Values.networkPolicy.enabled .Values.reis.enabled }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-reis
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: reis
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "c4genaisuite.commonSelectors" . | nindent 6 }}
+      app.kubernetes.io/component: reis
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    - ports:
+        - port: 443
+          protocol: TCP
+    - ports:
+        - port: 53
+          protocol: TCP
+        - port: 53
+          protocol: UDP
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "c4genaisuite.commonSelectors" . | nindent 14 }}
+              app.kubernetes.io/component: backend
+      ports:
+        - port: 3201
+          protocol: TCP
+{{- end }}

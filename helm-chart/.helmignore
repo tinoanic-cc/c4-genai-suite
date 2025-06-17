@@ -1,0 +1,8 @@
+# Patterns to ignore when packaging Helm charts.
+# This supports shell glob matching, relative path matching, and regex matching.
+
+.DS_Store
+.git/
+.gitignore
+tests/
+*.sh

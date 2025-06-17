@@ -1,0 +1,24 @@
+{{- if and .Values.reis.enabled .Values.reis.metrics.prometheusRule.enabled }}
+kind: PrometheusRule
+apiVersion: monitoring.coreos.com/v1
+metadata:
+  name: {{ include "c4genaisuite.fullname" . }}-reis
+  labels:
+    {{- include "c4genaisuite.commonLabels" . | nindent 4 }}
+    app.kubernetes.io/component: reis
+spec:
+  groups:
+    - name: reis-alerts
+      {{- if .Values.reis.metrics.prometheusRule.ruleGroupLabels }}
+      labels:
+        {{- .Values.reis.metrics.prometheusRule.ruleGroupLabels | toYaml | nindent 8 }}
+      {{- end }}
+      rules:
+        - alert: REISUnexpectedContainerRestart
+          annotations:
+            description: Pod container restarted {{`{{$labels.namespace}}`}}/{{`{{$labels.pod}}`}}/{{`{{$labels.container}}`}}
+            summary: REIS Container Restarted
+          expr: increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container="{{ include "c4genaisuite.fullname" . }}-reis"}[30m]) > 0
+          labels:
+            severity: warning
+{{- end }}
