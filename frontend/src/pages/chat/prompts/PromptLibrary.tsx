@@ -25,16 +25,11 @@ import {
   IconSearch,
   IconWorld,
 } from '@tabler/icons-react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
 import { Prompt } from 'src/api/prompts';
-import { ProfileButton } from 'src/components';
-import { useTransientNavigate } from 'src/hooks';
-import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
-import { useAIConversation } from '../state';
 import { PromptDetailsModal } from './PromptDetailsModal';
 
 interface PromptLibraryProps {
@@ -70,8 +65,6 @@ export function PromptSidebar({
   setSortBy,
 }: PromptSidebarProps) {
   const api = useApi();
-  const navigate = useTransientNavigate();
-  const { setConversations } = useAIConversation();
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -105,18 +98,6 @@ export function PromptSidebar({
         sortBy: apiSortBy,
         sortOrder,
       });
-    },
-  });
-
-  // Handle clearing conversations
-  const deleting = useMutation({
-    mutationFn: () => api.conversations.deleteConversations(),
-    onSuccess: () => {
-      setConversations([]);
-      navigate(`/chat`);
-    },
-    onError: async (error) => {
-      toast.error(await buildError(texts.chat.clearConversationsFailed, error));
     },
   });
 
@@ -305,11 +286,6 @@ export function PromptSidebar({
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
-      </div>
-
-      {/* Profile Button at the bottom */}
-      <div className="p-2" onClick={(e) => e.stopPropagation()}>
-        <ProfileButton section="chat" onClearConversations={deleting.mutate} />
       </div>
     </div>
   );
