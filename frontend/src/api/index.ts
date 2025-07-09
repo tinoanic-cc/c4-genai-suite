@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { Observable, ReplaySubject } from 'rxjs';
 import Cookies from 'universal-cookie';
@@ -169,7 +168,3 @@ class StreamApi {
     return replaySubject;
   }
 }
-=======
-export * from './generated';
-export * from './state/apiAppClient';
->>>>>>> origin/main
