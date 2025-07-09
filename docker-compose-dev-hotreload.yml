@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   c4-frontend-dev:
     build:
@@ -12,21 +10,52 @@ services:
       - ./frontend/public:/app/public:ro
       - ./frontend/package.json:/app/package.json:ro
       - ./frontend/package-lock.json:/app/package-lock.json:ro
+      - ./frontend/vite.config.ts:/app/vite.config.ts:ro
+      - ./frontend/.env:/app/.env:ro
     environment:
       - CHOKIDAR_USEPOLLING=true
       - FAST_REFRESH=true
-    command: npm run dev
+      - VITE_SERVER_URL=http://localhost:3333/api-proxy
+    command: npm run dev -- --host 0.0.0.0
     depends_on:
-      - c4-backend
+      c4-backend:
+        condition: service_started
 
   c4-backend:
-    # ... existing backend config
     extends:
       file: docker-compose-dev.yml
       service: c4-backend
 
   postgres:
-    # ... existing postgres config
     extends:
       file: docker-compose-dev.yml
       service: postgres
+
+  ollama:
+    extends:
+      file: docker-compose-dev.yml
+      service: ollama
+
+  ollama-models-pull:
+    extends:
+      file: docker-compose-dev.yml
+      service: ollama-models-pull
+
+  reis:
+    extends:
+      file: docker-compose-dev.yml
+      service: reis
+
+  oauth:
+    extends:
+      file: docker-compose-dev.yml
+      service: oauth
+
+  mcp-fetch:
+    extends:
+      file: docker-compose-dev.yml
+      service: mcp-fetch
+
+volumes:
+  extension-volume:
+  ollama-data:

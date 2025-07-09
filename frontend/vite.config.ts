@@ -44,7 +44,7 @@ export default defineConfig({
             }
             return 'vendor';
           }
-          
+
           // App chunks
           if (id.includes('src/pages/admin')) {
             return 'admin';
@@ -52,12 +52,12 @@ export default defineConfig({
           if (id.includes('src/pages/chat/prompts')) {
             return 'prompts';
           }
-        }
-      }
+        },
+      },
     },
     chunkSizeWarningLimit: 1000,
     sourcemap: false,
-    minify: 'esbuild'
+    minify: 'esbuild',
   },
   test: {
     include: ['src/**/*.ui-unit.spec.*', 'src/**/*.integration.spec.*'],
@@ -84,9 +84,11 @@ export default defineConfig({
   },
   plugins: [react(), tailwindcss()],
   server: {
+    host: '0.0.0.0',
+    port: 3000,
     proxy: {
       '/api-proxy': {
-        target: 'http://localhost:3000',
+        target: 'http://c4-backend:3000',
         changeOrigin: true,
         rewrite: (path: string) => path.replace(/^\/api-proxy/, ''),
       },
