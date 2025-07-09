@@ -94,6 +94,23 @@ This process is described in detail in [the `services/reis` subdirectory](servic
 
 * See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute.
 * For developer onboarding, check [DEVELOPERS.md](DEVELOPERS.md).
+* **For Cline AI development:** Read [CLINE-PROJECT-CONTEXT.md](CLINE-PROJECT-CONTEXT.md) first!
+* **Docker development issues:** See [DOCKER-DEVELOPMENT.md](DOCKER-DEVELOPMENT.md)
+
+### Quick Development Setup
+
+```bash
+# Start development environment with hot-reload
+./scripts/docker-dev.sh start-dev
+
+# If frontend changes are not visible (Docker cache issue)
+./scripts/docker-dev.sh rebuild
+
+# For troubleshooting
+./scripts/docker-dev.sh help
+```
+
+> **⚠️ Important:** Always use `./scripts/docker-dev.sh` instead of manual `docker-compose` commands to avoid cache issues!
 
 ## Main Building Blocks
 
