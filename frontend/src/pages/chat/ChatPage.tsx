@@ -88,7 +88,9 @@ export function ChatPage() {
       void checkIfEmptyChat(selectedChatId)
         .then((isEmpty) => {
           if (isEmpty) textareaRef.current?.focus();
-          else void createNewChat.mutate();
+          else {
+            void createNewChat.mutate();
+          }
         })
         .catch(() => {
           // Ignore errors in chat emptiness check

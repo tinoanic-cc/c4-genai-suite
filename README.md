@@ -94,8 +94,6 @@ This process is described in detail in [the `services/reis` subdirectory](servic
 
 * See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute.
 * For developer onboarding, check [DEVELOPERS.md](DEVELOPERS.md).
-* **For Cline AI development:** Read [CLINE-PROJECT-CONTEXT.md](CLINE-PROJECT-CONTEXT.md) first!
-* **Docker development issues:** See [DOCKER-DEVELOPMENT.md](DOCKER-DEVELOPMENT.md)
 
 ### Quick Development Setup
 
