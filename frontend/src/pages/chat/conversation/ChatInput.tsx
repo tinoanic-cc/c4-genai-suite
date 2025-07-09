@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
 import { ConfigurationDto, FileDto, useApi } from 'src/api';
 import { Icon, Markdown } from 'src/components';
-import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, useTheme } from 'src/hooks';
+import { ExtensionContext, JSONObject, useEventCallback, useExtensionContext, usePersistentState, useTheme } from 'src/hooks';
 import { useSpeechRecognitionToggle } from 'src/hooks/useSpeechRecognitionToggle';
 import { buildError } from 'src/lib';
 import { FileItem } from 'src/pages/chat/conversation/FileItem';
@@ -24,23 +24,25 @@ import {
 } from './chat-input-utils';
 
 interface ChatInputProps {
+  textareaRef?: React.RefObject<HTMLTextAreaElement>;
   configuration?: ConfigurationDto;
-  conversationId: number;
+  chatId: number;
   isDisabled?: boolean;
   isEmpty?: boolean;
-  onSubmit: (input: string, files?: FileDto[]) => void;
+  submitMessage: (input: string, files?: FileDto[]) => void;
   initialValue?: string;
 }
-export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, onSubmit, initialValue }: ChatInputProps) {
+
+export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage, initialValue }: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
-  const { updateContext, context } = useExtensionContext(conversationId);
+  const { updateContext, context } = useExtensionContext(chatId);
   const [defaultValues, setDefaultValues] = useState<UserArgumentDefaultValueByExtensionIDAndName>({});
   const {
     uploadingFiles,
     fullFileSlots,
     allowedFileNameExtensions,
-    conversationFiles,
+    chatFiles,
     handleUploadFile,
     multiple,
     uploadLimitReached,
@@ -48,14 +50,17 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     uploadMutations,
     upload,
     userBucket,
-  } = useChatDropzone(configuration?.id, conversationId);
+  } = useChatDropzone(configuration?.id, chatId);
 
   const speechRecognitionLanguages: Language[] = [
     { name: texts.chat.speechRecognition.languages.de, code: 'de-DE' },
     { name: texts.chat.speechRecognition.languages.en, code: 'en-US' },
   ];
 
-  const [speechLanguage, setSpeechLanguage] = useState<string>(speechRecognitionLanguages[0].code);
+  const [speechLanguage, setSpeechLanguage] = usePersistentState<string>(
+    'speechRecognitionLanguage',
+    speechRecognitionLanguages[0].code,
+  );
 
   useEffect(() => {
     const defaultValues = configuration?.extensions?.filter(isExtensionWithUserArgs).reduce(
@@ -73,19 +78,18 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     setDefaultValues(defaultValues ?? {});
   }, [configuration?.extensions]);
 
-  const textarea = useRef<HTMLTextAreaElement>(null);
   const { theme } = useTheme();
   const [input, setInput] = useState(initialValue ? `${initialValue}\n\n` : '');
   const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
-    textarea.current?.focus();
+    textareaRef?.current?.focus();
     // Position cursor at the end when initial value is provided
-    if (initialValue && textarea.current) {
-      const length = textarea.current.value.length;
-      textarea.current.setSelectionRange(length, length);
+    if (initialValue && textareaRef?.current) {
+      const length = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(length, length);
     }
-  }, [conversationId, initialValue]);
+  }, [chatId, textareaRef, initialValue]);
 
   const contextWithDefaults = context ?? defaultValues;
   const extensionFilterChips = extensionsWithFilter.map((extension) => ({
@@ -101,9 +105,9 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     setInput(event.target.value);
   });
 
-  const doSetText = useEventCallback((text: string, conversationFiles?: FileDto[]) => {
+  const doSetText = useEventCallback((text: string, chatFiles?: FileDto[]) => {
     try {
-      onSubmit(text, conversationFiles);
+      submitMessage(text, chatFiles);
     } finally {
       setInput('');
     }
@@ -113,7 +117,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
     if (isDisabled || !input || input.length === 0 || upload.status === 'pending') {
       return;
     }
-    doSetText(input, conversationFiles);
+    doSetText(input, chatFiles);
     event.preventDefault();
     void refetchConversationFiles();
   });
@@ -204,7 +208,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
         {isEmpty && <Suggestions configuration={configuration} theme={theme} onSelect={doSetText} />}
 
         <div className="flex flex-wrap gap-2">
-          {conversationFiles.map((file) => (
+          {chatFiles.map((file) => (
             <FileItem key={file.id} file={file} onRemove={() => deleteFile.mutate(file)} />
           ))}
           {uploadingFiles.map((file) => (
@@ -241,7 +245,7 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
               onChange={doSetInput}
               onKeyDown={doKeyDown}
               placeholder={texts.chat.placeholder(configuration?.name ?? '')}
-              ref={textarea}
+              ref={textareaRef}
             />
             <div className="flex w-full justify-between gap-2">
               <div className="flex items-center gap-2">

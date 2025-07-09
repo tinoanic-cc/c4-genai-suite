@@ -1,26 +1,24 @@
 import { Button, Tabs } from '@mantine/core';
 import { IconBulb, IconEdit, IconMessageCircle } from '@tabler/icons-react';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { Route, Routes } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useApi } from 'src/api';
 import { Prompt } from 'src/api/prompts';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
-import { useSidebarState, useTheme, useTransientNavigate } from 'src/hooks';
-import { buildError } from 'src/lib';
+import { useSidebarState, useTheme } from 'src/hooks';
 import { texts } from 'src/texts';
 import { isMobile } from '../utils';
-import { Conversations } from './Conversations';
-import { NewPage } from './NewPage';
+import { ConversationItems } from './ConversationItems';
+import { NewChatRedirect } from './NewChatRedirect';
 import { DocumentSource, SourcesChunkPreview } from './SourcesChunkPreview';
 import { ConversationPage } from './conversation/ConversationPage';
 import { Files } from './files/Files';
 import { CreatePromptModal } from './prompts/CreatePromptModal';
 import { PromptLibrary, PromptSidebar } from './prompts/PromptLibrary';
-import { useAIConversation } from './state';
+import { useStateOfSelectedChatId } from './state/chat';
+import { useListOfChatsInit, useMutateNewChat, useStateMutateRemoveAllChats, useStateOfChatEmptiness } from './state/listOfChats';
 import { useUserBucket } from './useUserBucket';
 
 const CustomResizeHandle = () => (
@@ -28,13 +26,14 @@ const CustomResizeHandle = () => (
     <div className="h-6 w-full rounded group-hover:bg-white" />
   </PanelResizeHandle>
 );
+
 const getPanelSizes = (isRightPanelOpen: boolean) => {
   const leftBarRatio = 15;
   const rightBarRatio = 20;
+  const contentRatio = 100 - leftBarRatio - (isRightPanelOpen ? rightBarRatio : 0);
+  const isMobileView = isMobile();
   const mobileSideBarRatio = 90;
   const mobileContentRatio = 100 - mobileSideBarRatio;
-  const contentRatio = isRightPanelOpen ? 100 - leftBarRatio - rightBarRatio : 100 - rightBarRatio;
-  const isMobileView = isMobile();
   return {
     left: {
       defaultSize: isMobileView ? mobileSideBarRatio : leftBarRatio,
@@ -52,17 +51,19 @@ const getPanelSizes = (isRightPanelOpen: boolean) => {
     },
   };
 };
+
 export function ChatPage() {
-  const api = useApi();
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const isMobileView = isMobile();
+  useListOfChatsInit();
+
   const [selectedDocument, setSelectedDocument] = useState<DocumentSource | undefined>();
-
-  const navigate = useTransientNavigate();
-
-  const { setConversations } = useAIConversation();
   const { userBucket, selectedConfigurationId, setSelectedConfigurationId } = useUserBucket();
-  const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
+  const checkIfEmptyChat = useStateOfChatEmptiness();
+  const selectedChatId = useStateOfSelectedChatId();
+  const removeAllChats = useStateMutateRemoveAllChats();
+  const createNewChat = useMutateNewChat();
 
   const [sidebarLeft, setSidebarLeft] = useSidebarState('sidebar-left');
   const [sidebarRight, setSidebarRight] = useSidebarState('sidebar-right');
@@ -72,32 +73,22 @@ export function ChatPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>('all');
   const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState('newest');
-  const panelSizes = getPanelSizes(leftSidebarTab === 'conversations' && (sidebarRight || !!selectedDocument));
 
-  // Consider to stop handing this down into the ProfileButton and use a hook inside the ProfileButton for this instead
-  const deleting = useMutation({
-    mutationFn: () => api.conversations.deleteConversations(),
-    onSuccess: () => {
-      setSelectedConversationId(null);
-      setConversations([]);
-      navigate(`/chat`);
-    },
-    onError: async (error) => {
-      toast.error(await buildError(texts.chat.clearConversationsFailed, error));
-    },
-  });
+  const rightPanelVisible = !!(sidebarRight && selectedChatId && (userBucket || selectedDocument) && leftSidebarTab === 'conversations');
+  const panelSizes = getPanelSizes(rightPanelVisible);
 
-  // This navigate is triggered if needed due to a deleted conversation from within the Conversations component.
-  // As this is only used inside a hook inside Conversations, consider moving it there.
-  const onConversationDeleted = (conversationId: number) => {
-    if (conversationId === selectedConversationId) {
-      navigate('/chat');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const openNewChatIfNeeded = async () => {
+    if (selectedChatId) {
+      if (await checkIfEmptyChat(selectedChatId)) textareaRef.current?.focus();
+      else createNewChat.mutate();
     }
   };
+
   // close the sources tab everytime the user selects another conversation
-  useEffect(() => setSelectedDocument(undefined), [selectedConversationId]);
-  const rightPanelVisible =
-    sidebarRight && selectedConversationId && (userBucket || selectedDocument) && leftSidebarTab === 'conversations';
+  useEffect(() => setSelectedDocument(undefined), [selectedChatId]);
+
   return (
     <div className="flex h-screen flex-col">
       <NavigationBar theme={theme}>
@@ -132,7 +123,7 @@ export function ChatPage() {
                       className="justify-start"
                       variant="subtle"
                       p="xs"
-                      onClick={() => navigate('/chat/new')}
+                      onClick={openNewChatIfNeeded}
                       fullWidth
                       justify="space-between"
                       rightSection={<IconEdit className="w-4" />}
@@ -142,13 +133,10 @@ export function ChatPage() {
                   </div>
 
                   <div className="grow overflow-y-auto p-2">
-                    <Conversations
-                      selectedConversationId={selectedConversationId}
-                      onConversationDeleted={onConversationDeleted}
-                    />
+                    <ConversationItems />
                   </div>
                   <div className="p-2" onClick={(e) => e.stopPropagation()}>
-                    <ProfileButton section="chat" onClearConversations={deleting.mutate} />
+                    <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
                   </div>
                 </div>
               ) : (
@@ -191,13 +179,12 @@ export function ChatPage() {
               />
             ) : (
               <Routes>
-                <Route path="/new" element={<NewPage name={texts.chat.newChat} />} />
-                <Route path="" element={<NewPage />} />
+                <Route path="" element={<NewChatRedirect />} />
                 <Route
                   path=":id"
                   element={
                     <ConversationPage
-                      onConversationSelected={setSelectedConversationId}
+                      textareaRef={textareaRef}
                       selectedConfigurationId={selectedConfigurationId}
                       onConfigurationSelected={setSelectedConfigurationId}
                       selectDocument={(conversationId, messageId, documentUri) => {
@@ -237,7 +224,7 @@ export function ChatPage() {
             )}
           </div>
         </Panel>
-        {rightPanelVisible && leftSidebarTab === 'conversations' && (
+        {rightPanelVisible && (
           <>
             {!isMobileView && <CustomResizeHandle />}
             <Panel style={{ overflow: 'auto' }} id="right" order={2} {...panelSizes.right} className="bg-gray-100">
@@ -245,11 +232,7 @@ export function ChatPage() {
                 <SourcesChunkPreview onClose={() => setSelectedDocument(undefined)} document={selectedDocument} />
               ) : (
                 userBucket && (
-                  <Files
-                    configurationId={selectedConfigurationId}
-                    userBucket={userBucket}
-                    conversationId={selectedConversationId}
-                  />
+                  <Files configurationId={selectedConfigurationId} userBucket={userBucket} conversationId={selectedChatId} />
                 )
               )}
             </Panel>
