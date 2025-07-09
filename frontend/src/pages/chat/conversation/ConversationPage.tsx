@@ -3,7 +3,7 @@ import { IconArrowDown } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FileDto, ResponseError, useApi } from 'src/api';
 import { useEventCallback, useTheme } from 'src/hooks';
@@ -34,6 +34,8 @@ export function ConversationPage(props: ConversationPageProps) {
   const { theme } = useTheme();
   const conversationParam = useParams<'id'>();
   const conversationId = +conversationParam.id!;
+  const location = useLocation();
+  const initialPrompt = (location.state as { initialPrompt?: string } | null)?.initialPrompt;
   const { conversation, messages, isAiWritting, setConversation, setMessages } = useChatStore();
   const { canScrollToBottom, scrollToBottom, containerRef } = useScrollToBottom([conversation.id], [messages]);
   const { sendMessage } = useAIConversation();
@@ -183,6 +185,7 @@ export function ConversationPage(props: ConversationPageProps) {
                 isDisabled={isAiWritting}
                 isEmpty={isNewConversation}
                 onSubmit={doSubmit}
+                initialValue={initialPrompt}
               />
               <div
                 data-testid={'scrollToBottomButton'}

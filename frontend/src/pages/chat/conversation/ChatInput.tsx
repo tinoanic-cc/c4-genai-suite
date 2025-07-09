@@ -29,8 +29,9 @@ interface ChatInputProps {
   isDisabled?: boolean;
   isEmpty?: boolean;
   onSubmit: (input: string, files?: FileDto[]) => void;
+  initialValue?: string;
 }
-export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, onSubmit }: ChatInputProps) {
+export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, onSubmit, initialValue }: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(conversationId);
@@ -74,12 +75,17 @@ export function ChatInput({ conversationId, configuration, isDisabled, isEmpty, 
 
   const textarea = useRef<HTMLTextAreaElement>(null);
   const { theme } = useTheme();
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialValue ? `${initialValue}\n\n` : '');
   const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
     textarea.current?.focus();
-  }, [conversationId]);
+    // Position cursor at the end when initial value is provided
+    if (initialValue && textarea.current) {
+      const length = textarea.current.value.length;
+      textarea.current.setSelectionRange(length, length);
+    }
+  }, [conversationId, initialValue]);
 
   const contextWithDefaults = context ?? defaultValues;
   const extensionFilterChips = extensionsWithFilter.map((extension) => ({

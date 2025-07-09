@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useApi } from 'src/api';
 import { useTransientContext, useTransientNavigate } from 'src/hooks';
 import { useUserBucket } from 'src/pages/chat/useUserBucket';
@@ -11,6 +12,7 @@ interface NewPageProps {
 export function NewPage(props: NewPageProps) {
   const api = useApi();
   const { selectedConfigurationId } = useUserBucket();
+  const location = useLocation();
 
   const { data: loadedConfigurations } = useQuery({
     queryKey: ['enabled-configurations'],
@@ -24,7 +26,11 @@ export function NewPage(props: NewPageProps) {
     mutationFn: (data: { configurationId?: number }) =>
       api.conversations.postConversation({ ...data, name: props.name, context }),
     onSuccess: (conversation) => {
-      navigate(`/chat/${conversation.id}`);
+      const initialPrompt = (location.state as { initialPrompt?: string })?.initialPrompt;
+      // Pass the initial prompt as state to the conversation page
+      navigate(`/chat/${conversation.id}`, {
+        state: { initialPrompt },
+      });
     },
   });
 

@@ -1,11 +1,12 @@
-import { Button } from '@mantine/core';
-import { IconEdit } from '@tabler/icons-react';
+import { Button, Tabs } from '@mantine/core';
+import { IconBulb, IconEdit, IconMessageCircle } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Route, Routes } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
+import { Prompt } from 'src/api/prompts';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useSidebarState, useTheme, useTransientNavigate } from 'src/hooks';
@@ -17,6 +18,8 @@ import { NewPage } from './NewPage';
 import { DocumentSource, SourcesChunkPreview } from './SourcesChunkPreview';
 import { ConversationPage } from './conversation/ConversationPage';
 import { Files } from './files/Files';
+import { CreatePromptModal } from './prompts/CreatePromptModal';
+import { PromptLibrary, PromptSidebar } from './prompts/PromptLibrary';
 import { useAIConversation } from './state';
 import { useUserBucket } from './useUserBucket';
 
@@ -63,7 +66,13 @@ export function ChatPage() {
 
   const [sidebarLeft, setSidebarLeft] = useSidebarState('sidebar-left');
   const [sidebarRight, setSidebarRight] = useSidebarState('sidebar-right');
-  const panelSizes = getPanelSizes(sidebarRight || !!selectedDocument);
+  const [leftSidebarTab, setLeftSidebarTab] = useState<string | null>('conversations');
+  const [createPromptModalOpen, setCreatePromptModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('all');
+  const [minRating, setMinRating] = useState(0);
+  const [sortBy, setSortBy] = useState('newest');
+  const panelSizes = getPanelSizes(leftSidebarTab === 'conversations' && (sidebarRight || !!selectedDocument));
 
   // Consider to stop handing this down into the ProfileButton and use a hook inside the ProfileButton for this instead
   const deleting = useMutation({
@@ -87,10 +96,22 @@ export function ChatPage() {
   };
   // close the sources tab everytime the user selects another conversation
   useEffect(() => setSelectedDocument(undefined), [selectedConversationId]);
-  const rightPanelVisible = sidebarRight && selectedConversationId && (userBucket || selectedDocument);
+  const rightPanelVisible =
+    sidebarRight && selectedConversationId && (userBucket || selectedDocument) && leftSidebarTab === 'conversations';
   return (
     <div className="flex h-screen flex-col">
-      <NavigationBar theme={theme} />
+      <NavigationBar theme={theme}>
+        <Tabs value={leftSidebarTab} onChange={setLeftSidebarTab} className="ml-8 flex">
+          <Tabs.List>
+            <Tabs.Tab value="conversations" leftSection={<IconMessageCircle size={16} />}>
+              Chats
+            </Tabs.Tab>
+            <Tabs.Tab value="prompts" leftSection={<IconBulb size={16} />}>
+              Prompts
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs>
+      </NavigationBar>
       <PanelGroup direction="horizontal">
         {sidebarLeft && (
           <>
@@ -104,26 +125,45 @@ export function ChatPage() {
               }}
               {...panelSizes.left}
             >
-              <div className="p-2">
-                <Button
-                  className="justify-start"
-                  variant="subtle"
-                  p="xs"
-                  onClick={() => navigate('/chat/new')}
-                  fullWidth
-                  justify="space-between"
-                  rightSection={<IconEdit className="w-4" />}
-                >
-                  {texts.chat.newChat}
-                </Button>
-              </div>
+              {leftSidebarTab === 'conversations' ? (
+                <div className="flex h-full flex-col">
+                  <div className="p-2">
+                    <Button
+                      className="justify-start"
+                      variant="subtle"
+                      p="xs"
+                      onClick={() => navigate('/chat/new')}
+                      fullWidth
+                      justify="space-between"
+                      rightSection={<IconEdit className="w-4" />}
+                    >
+                      {texts.chat.newChat}
+                    </Button>
+                  </div>
 
-              <div className="grow overflow-y-auto p-2">
-                <Conversations selectedConversationId={selectedConversationId} onConversationDeleted={onConversationDeleted} />
-              </div>
-              <div className="p-2" onClick={(e) => e.stopPropagation()}>
-                <ProfileButton section="chat" onClearConversations={deleting.mutate} />
-              </div>
+                  <div className="grow overflow-y-auto p-2">
+                    <Conversations
+                      selectedConversationId={selectedConversationId}
+                      onConversationDeleted={onConversationDeleted}
+                    />
+                  </div>
+                  <div className="p-2" onClick={(e) => e.stopPropagation()}>
+                    <ProfileButton section="chat" onClearConversations={deleting.mutate} />
+                  </div>
+                </div>
+              ) : (
+                <PromptSidebar
+                  onCreatePrompt={() => setCreatePromptModalOpen(true)}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  minRating={minRating}
+                  setMinRating={setMinRating}
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                />
+              )}
             </Panel>
             {!isMobileView && <CustomResizeHandle />}
           </>
@@ -136,6 +176,19 @@ export function ChatPage() {
                 className="h-screen w-screen bg-gray-300"
                 onClick={() => (sidebarLeft ? setSidebarLeft(!sidebarLeft) : setSidebarRight(!sidebarRight))}
               ></div>
+            ) : leftSidebarTab === 'prompts' ? (
+              <PromptLibrary
+                onPromptSelect={(prompt: Prompt) => {
+                  // Navigate to new chat with the selected prompt
+                  navigate('/chat/new', { state: { initialPrompt: prompt.content } });
+                  setLeftSidebarTab('conversations');
+                }}
+                onCreatePrompt={() => setCreatePromptModalOpen(true)}
+                searchTerm={searchTerm}
+                selectedCategory={selectedCategory}
+                minRating={minRating}
+                sortBy={sortBy}
+              />
             ) : (
               <Routes>
                 <Route path="/new" element={<NewPage name={texts.chat.newChat} />} />
@@ -163,11 +216,13 @@ export function ChatPage() {
                 isToggled={!sidebarLeft}
                 onClick={() => setSidebarLeft(!sidebarLeft)}
                 tooltip={
-                  sidebarLeft ? texts.common.hide(texts.common.conversations) : texts.common.show(texts.common.conversations)
+                  sidebarLeft
+                    ? texts.common.hide(leftSidebarTab === 'conversations' ? texts.common.conversations : 'Prompts')
+                    : texts.common.show(leftSidebarTab === 'conversations' ? texts.common.conversations : 'Prompts')
                 }
               />
             )}
-            {(!isMobileView || !sidebarLeft) && userBucket && (
+            {(!isMobileView || !sidebarLeft) && userBucket && leftSidebarTab === 'conversations' && (
               <CollapseButton
                 className="absolute top-[40%] right-2"
                 side="right"
@@ -182,7 +237,7 @@ export function ChatPage() {
             )}
           </div>
         </Panel>
-        {rightPanelVisible && (
+        {rightPanelVisible && leftSidebarTab === 'conversations' && (
           <>
             {!isMobileView && <CustomResizeHandle />}
             <Panel style={{ overflow: 'auto' }} id="right" order={2} {...panelSizes.right} className="bg-gray-100">
@@ -201,6 +256,8 @@ export function ChatPage() {
           </>
         )}
       </PanelGroup>
+
+      <CreatePromptModal opened={createPromptModalOpen} onClose={() => setCreatePromptModalOpen(false)} />
     </div>
   );
 }
