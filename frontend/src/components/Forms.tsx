@@ -524,6 +524,7 @@ const InputText = ({
     <input
       id={name}
       {...field}
+      value={field.value || ''}
       {...other}
       className={cn('input input-bordered w-full', className, { 'input-error': isInvalid(fieldState, formState) })}
     />
