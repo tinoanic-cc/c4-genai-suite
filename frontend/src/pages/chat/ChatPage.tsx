@@ -88,7 +88,7 @@ export function ChatPage() {
       void checkIfEmptyChat(selectedChatId)
         .then((isEmpty) => {
           if (isEmpty) textareaRef.current?.focus();
-          else createNewChat.mutate();
+          else void createNewChat.mutate();
         })
         .catch(() => {
           // Ignore errors in chat emptiness check
@@ -190,6 +190,7 @@ export function ChatPage() {
             ) : (
               <Routes>
                 <Route path="" element={<NewChatRedirect />} />
+                <Route path="new" element={<NewChatRedirect />} />
                 <Route
                   path=":id"
                   element={
