@@ -1,7 +1,6 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { Observable, ReplaySubject } from 'rxjs';
 import Cookies from 'universal-cookie';
-import { create } from 'zustand';
 import {
   AuthApi,
   Configuration,
@@ -17,17 +16,13 @@ import {
 } from 'src/api/generated';
 import { useTransientNavigate } from 'src/hooks';
 import { i18next } from 'src/texts/i18n';
-import { PromptsApi } from './prompts';
+import { PromptsApi as CustomPromptsApi } from './prompts';
 import { TaskCategoriesApi } from './task-categories';
 export * from './generated';
-export * from './prompts';
 export * from './task-categories';
+// Note: Not exporting ./prompts to avoid conflict with generated PromptsApi
 
 type TransientNavigateFn = ReturnType<typeof useTransientNavigate>;
-
-type AppClientStore = {
-  getAppClient: (navigate: TransientNavigateFn) => AppClient;
-};
 
 const createAppClientMiddleware: (navigate: TransientNavigateFn) => Middleware = (navigate) => ({
   pre: async (context) => {
@@ -50,35 +45,25 @@ const createAppClientMiddleware: (navigate: TransientNavigateFn) => Middleware =
   },
 });
 
-/**
- * @description An appClient provider that can be reused without reinitializing
- * the appClient. The singleton functionality of Zustand enables us to do so.
- */
-const useAppClientStore = create<AppClientStore>(() => {
-  let appClient: AppClient | undefined;
+// Simple singleton without Zustand
+let appClientInstance: AppClient | undefined;
 
-  const initializeAppClient = (navigate: TransientNavigateFn): AppClient => {
-    if (!appClient) {
-      const basePath = import.meta.env.VITE_SERVER_URL || '';
-      const configuration = new Configuration({
-        basePath,
-      });
-      const middleware = createAppClientMiddleware(navigate);
-      appClient = new AppClient(configuration, middleware);
-    }
+const initializeAppClient = (navigate: TransientNavigateFn): AppClient => {
+  if (!appClientInstance) {
+    const basePath = import.meta.env.VITE_SERVER_URL || '';
+    const configuration = new Configuration({
+      basePath,
+    });
+    const middleware = createAppClientMiddleware(navigate);
+    appClientInstance = new AppClient(configuration, middleware);
+  }
 
-    return appClient;
-  };
+  return appClientInstance;
+};
 
-  return {
-    getAppClient: (navigate: TransientNavigateFn) => initializeAppClient(navigate),
-  };
-});
-
-// This wrapper around useAppClientStore is needed since react hooks cannot be nested inside Zustand hooks
 export function useApi() {
   const navigate = useTransientNavigate();
-  return useAppClientStore((state) => state.getAppClient(navigate));
+  return initializeAppClient(navigate);
 }
 
 export class AppClient {
@@ -86,7 +71,7 @@ export class AppClient {
   public readonly conversations: ConversationApi;
   public readonly extensions: ExtensionsApi;
   public readonly files: FilesApi;
-  public readonly prompts: PromptsApi;
+  public readonly prompts: CustomPromptsApi;
   public readonly taskCategories: TaskCategoriesApi;
   public readonly settings: SettingsApi;
   public readonly stream: StreamApi;
@@ -111,7 +96,7 @@ export class AppClient {
 
     this.files = new FilesApi(configuration).withMiddleware(middleware);
 
-    this.prompts = new PromptsApi(configuration).withMiddleware(middleware);
+    this.prompts = new CustomPromptsApi(configuration).withMiddleware(middleware);
 
     this.taskCategories = new TaskCategoriesApi(configuration).withMiddleware(middleware);
 

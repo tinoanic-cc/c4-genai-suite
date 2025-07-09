@@ -3,7 +3,6 @@ import { IconBulb, IconEdit, IconMessageCircle } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { useApi } from 'src/api';
 import { Prompt } from 'src/api/prompts';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
@@ -74,15 +73,26 @@ export function ChatPage() {
   const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState('newest');
 
-  const rightPanelVisible = !!(sidebarRight && selectedChatId && (userBucket || selectedDocument) && leftSidebarTab === 'conversations');
+  const rightPanelVisible = !!(
+    sidebarRight &&
+    selectedChatId &&
+    (userBucket || selectedDocument) &&
+    leftSidebarTab === 'conversations'
+  );
   const panelSizes = getPanelSizes(rightPanelVisible);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const openNewChatIfNeeded = async () => {
+  const openNewChatIfNeeded = () => {
     if (selectedChatId) {
-      if (await checkIfEmptyChat(selectedChatId)) textareaRef.current?.focus();
-      else createNewChat.mutate();
+      void checkIfEmptyChat(selectedChatId)
+        .then((isEmpty) => {
+          if (isEmpty) textareaRef.current?.focus();
+          else createNewChat.mutate();
+        })
+        .catch(() => {
+          // Ignore errors in chat emptiness check
+        });
     }
   };
 

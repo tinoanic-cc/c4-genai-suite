@@ -333,7 +333,7 @@ function load() {
         descriptionPlaceholder: translate('admin.promptCategories.descriptionPlaceholder'),
         sortOrderLabel: translate('admin.promptCategories.sortOrderLabel'),
         sortOrderPlaceholder: translate('admin.promptCategories.sortOrderPlaceholder'),
-        
+
         tableHeaders: {
           name: translate('admin.promptCategories.tableHeaders.name'),
           description: translate('admin.promptCategories.tableHeaders.description'),
@@ -343,28 +343,28 @@ function load() {
           created: translate('admin.promptCategories.tableHeaders.created'),
           actions: translate('admin.promptCategories.tableHeaders.actions'),
         },
-        
+
         createModalTitle: translate('admin.promptCategories.createModalTitle'),
         editModalTitle: translate('admin.promptCategories.editModalTitle'),
-        
+
         cancel: translate('admin.promptCategories.cancel'),
         create: translate('admin.promptCategories.create'),
         update: translate('admin.promptCategories.update'),
-        
+
         loading: translate('admin.promptCategories.loading'),
         noCategories: translate('admin.promptCategories.noCategories'),
-        
+
         nameValidation: translate('admin.promptCategories.nameValidation'),
-        
+
         deleteConfirmation: (name: string) => translate('admin.promptCategories.deleteConfirmation', { name }),
-        
+
         createSuccess: translate('admin.promptCategories.createSuccess'),
         createError: translate('admin.promptCategories.createError'),
         updateSuccess: translate('admin.promptCategories.updateSuccess'),
         updateError: translate('admin.promptCategories.updateError'),
         deleteSuccess: translate('admin.promptCategories.deleteSuccess'),
         deleteError: translate('admin.promptCategories.deleteError'),
-        
+
         sidebarTitle: translate('admin.promptCategories.sidebarTitle'),
       },
     },

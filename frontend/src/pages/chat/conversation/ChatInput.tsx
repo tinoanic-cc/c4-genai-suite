@@ -33,7 +33,15 @@ interface ChatInputProps {
   initialValue?: string;
 }
 
-export function ChatInput({ textareaRef, chatId, configuration, isDisabled, isEmpty, submitMessage, initialValue }: ChatInputProps) {
+export function ChatInput({
+  textareaRef,
+  chatId,
+  configuration,
+  isDisabled,
+  isEmpty,
+  submitMessage,
+  initialValue,
+}: ChatInputProps) {
   const api = useApi();
   const extensionsWithFilter = configuration?.extensions?.filter(isExtensionWithUserArgs) ?? [];
   const { updateContext, context } = useExtensionContext(chatId);
