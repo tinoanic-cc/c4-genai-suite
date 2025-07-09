@@ -35,6 +35,19 @@ describe('PromptsService', () => {
   } as unknown as PromptEntity;
 
   beforeEach(async () => {
+    const mockQueryBuilder = {
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getManyAndCount: jest.fn().mockResolvedValue([[mockPrompt], 1]),
+      select: jest.fn().mockReturnThis(),
+      addSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      getRawOne: jest.fn().mockResolvedValue({ averageRating: '4.5', ratingCount: '10' }),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PromptsService,
@@ -48,7 +61,7 @@ describe('PromptsService', () => {
             delete: jest.fn(),
             increment: jest.fn(),
             update: jest.fn(),
-            createQueryBuilder: jest.fn(),
+            createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
           },
         },
         {
@@ -61,7 +74,7 @@ describe('PromptsService', () => {
         {
           provide: getRepositoryToken(PromptRatingEntity),
           useValue: {
-            createQueryBuilder: jest.fn(),
+            createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
           },
         },
         {

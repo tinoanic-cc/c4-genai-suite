@@ -180,7 +180,7 @@ export function ChatPage() {
               <PromptLibrary
                 onPromptSelect={(prompt: Prompt) => {
                   // Navigate to new chat with the selected prompt
-                  navigate('/chat/new', { state: { initialPrompt: prompt.content } });
+                  void navigate('/chat/new', { state: { initialPrompt: prompt.content } });
                   setLeftSidebarTab('conversations');
                 }}
                 onCreatePrompt={() => setCreatePromptModalOpen(true)}
