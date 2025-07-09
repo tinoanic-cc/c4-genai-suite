@@ -29,7 +29,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useApi } from 'src/api';
 import { Prompt } from 'src/api/prompts';
+import { ProfileButton } from 'src/components';
 import { texts } from 'src/texts';
+import { useStateMutateRemoveAllChats } from '../state/listOfChats';
 import { PromptDetailsModal } from './PromptDetailsModal';
 
 interface PromptLibraryProps {
@@ -65,6 +67,7 @@ export function PromptSidebar({
   setSortBy,
 }: PromptSidebarProps) {
   const api = useApi();
+  const removeAllChats = useStateMutateRemoveAllChats();
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
@@ -286,6 +289,11 @@ export function PromptSidebar({
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
+      </div>
+
+      {/* Profile Button at the bottom */}
+      <div className="p-2" onClick={(e) => e.stopPropagation()}>
+        <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
       </div>
     </div>
   );
