@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PromptEntity, PromptRatingEntity, PromptUsageEntity, PromptVersionEntity } from '../database';
@@ -121,7 +121,7 @@ export class PromptsService {
     });
 
     if (!prompt) {
-      throw new Error('Prompt not found or not authorized');
+      throw new NotFoundException('Prompt not found');
     }
 
     Object.assign(prompt, updatePromptDto);
@@ -132,15 +132,19 @@ export class PromptsService {
     const result = await this.promptRepository.delete({ id, authorId });
 
     if (result.affected === 0) {
-      throw new Error('Prompt not found or not authorized');
+      throw new NotFoundException('Prompt not found');
     }
   }
 
   async clone(id: number, authorId: string, title?: string): Promise<PromptEntity> {
     const originalPrompt = await this.findOne(id);
 
-    if (!originalPrompt || !originalPrompt.isPublic) {
-      throw new Error('Prompt not found or not public');
+    if (!originalPrompt) {
+      throw new NotFoundException('Prompt not found');
+    }
+
+    if (!originalPrompt.isPublic) {
+      throw new BadRequestException('Prompt is not public');
     }
 
     const clonedPrompt = this.promptRepository.create({
@@ -210,11 +214,11 @@ export class PromptsService {
     });
 
     if (!prompt) {
-      throw new Error('Prompt not found or not authorized');
+      throw new NotFoundException('Prompt not found');
     }
 
     if (!updateData.versionComment) {
-      throw new Error('Version comment is required');
+      throw new BadRequestException('Version comment is required');
     }
 
     // Mark current version as not current
@@ -264,12 +268,12 @@ export class PromptsService {
     });
 
     if (!prompt) {
-      throw new Error('Prompt not found or not authorized');
+      throw new NotFoundException('Prompt not found');
     }
 
     const versionToRestore = await this.getVersion(promptId, versionNumber);
     if (!versionToRestore) {
-      throw new Error('Version not found');
+      throw new NotFoundException('Version not found');
     }
 
     // Create new version based on the restored version

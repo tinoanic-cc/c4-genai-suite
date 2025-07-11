@@ -1,9 +1,23 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth';
 import { UserEntity } from '../../domain/database';
-import { CreatePromptDto, PaginationOptions, PromptFilters, UpdatePromptDto } from '../../domain/prompts/interfaces';
+import { CreatePromptDto, PaginationOptions, PromptFilters, PromptResponseDto, UpdatePromptDto } from '../../domain/prompts/dtos';
+import { PromptMapper } from '../../domain/prompts/mappers/prompt.mapper';
 import { PromptsService } from '../../domain/prompts/prompts.service';
 
 @ApiTags('prompts')
@@ -14,10 +28,11 @@ export class PromptsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new prompt' })
-  @ApiResponse({ status: 201, description: 'Prompt created successfully' })
-  async create(@Req() req: Request, @Body() createPromptDto: CreatePromptDto) {
+  @ApiResponse({ status: 201, description: 'Prompt created successfully', type: PromptResponseDto })
+  async create(@Req() req: Request, @Body() createPromptDto: CreatePromptDto): Promise<PromptResponseDto> {
     const user = req.user as UserEntity;
-    return this.promptsService.create(user.id, createPromptDto);
+    const entity = await this.promptsService.create(user.id, createPromptDto);
+    return PromptMapper.toPromptResponseDto(entity);
   }
 
   @Get()
@@ -87,14 +102,14 @@ export class PromptsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get prompt by ID' })
-  @ApiResponse({ status: 200, description: 'Prompt details' })
+  @ApiResponse({ status: 200, description: 'Prompt details', type: PromptResponseDto })
   @ApiResponse({ status: 404, description: 'Prompt not found' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<PromptResponseDto> {
     const prompt = await this.promptsService.findOne(id);
     if (!prompt) {
-      throw new Error('Prompt not found');
+      throw new NotFoundException('Prompt not found');
     }
-    return prompt;
+    return PromptMapper.toPromptResponseDto(prompt);
   }
 
   @Put(':id')
@@ -158,7 +173,7 @@ export class PromptsController {
   async getVersion(@Param('id', ParseIntPipe) id: number, @Param('version', ParseIntPipe) version: number) {
     const promptVersion = await this.promptsService.getVersion(id, version);
     if (!promptVersion) {
-      throw new Error('Version not found');
+      throw new NotFoundException('Version not found');
     }
     return promptVersion;
   }
