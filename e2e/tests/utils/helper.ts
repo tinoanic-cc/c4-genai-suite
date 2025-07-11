@@ -4,9 +4,95 @@ import { config } from './config';
 
 export async function login(page: Page, user?: { email: string; password: string }) {
   await page.goto(`${config.URL}/login`);
-  await page.getByPlaceholder('Email').fill(user?.email ?? 'admin@example.com');
-  await page.getByPlaceholder('Password').fill(user?.password ?? 'secret');
-  await page.getByRole('button', { name: 'Login' }).click();
+
+  // Wait for the page to load and check if login form is available
+  try {
+    // Wait for either email input or login providers to be visible
+    await page.waitForSelector('input[name="email"], input[placeholder*="mail" i], a[href*="login"], button:has-text("Login")', {
+      timeout: 30000,
+    });
+  } catch (_error) {
+    console.log('Login page elements not found, page content:', await page.content());
+    throw new Error(`Login page did not load properly. URL: ${config.URL}/login`);
+  }
+
+  // Try different selectors for email field
+  const emailSelectors = [
+    'input[name="email"]',
+    'input[placeholder="Email"]',
+    'input[placeholder*="mail" i]',
+    'input[type="email"]',
+  ];
+
+  let emailField = null;
+  for (const selector of emailSelectors) {
+    try {
+      emailField = page.locator(selector).first();
+      if (await emailField.isVisible({ timeout: 1000 })) {
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  if (!emailField || !(await emailField.isVisible())) {
+    throw new Error('Email input field not found on login page');
+  }
+
+  await emailField.fill(user?.email ?? 'admin@example.com');
+
+  // Try different selectors for password field
+  const passwordSelectors = [
+    'input[name="password"]',
+    'input[placeholder="Password"]',
+    'input[placeholder*="password" i]',
+    'input[type="password"]',
+  ];
+
+  let passwordField = null;
+  for (const selector of passwordSelectors) {
+    try {
+      passwordField = page.locator(selector).first();
+      if (await passwordField.isVisible({ timeout: 1000 })) {
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  if (!passwordField || !(await passwordField.isVisible())) {
+    throw new Error('Password input field not found on login page');
+  }
+
+  await passwordField.fill(user?.password ?? 'secret');
+
+  // Try different selectors for login button
+  const loginButtonSelectors = [
+    'button[type="submit"]',
+    'button:has-text("Login")',
+    'input[type="submit"]',
+    'button:has-text("Anmelden")',
+  ];
+
+  let loginButton = null;
+  for (const selector of loginButtonSelectors) {
+    try {
+      loginButton = page.locator(selector).first();
+      if (await loginButton.isVisible({ timeout: 1000 })) {
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  if (!loginButton || !(await loginButton.isVisible())) {
+    throw new Error('Login button not found on login page');
+  }
+
+  await loginButton.click();
   await page.waitForURL(`${config.URL}/chat`);
   await page.getByTestId('menu user').waitFor({ state: 'visible' });
 }
