@@ -30,31 +30,31 @@ export class PromptEntity {
   @Column({ length: 1000, nullable: true })
   description?: string;
 
-  @Column({ name: 'isPublic', default: true })
+  @Column({ default: true })
   isPublic!: boolean;
 
-  @Column({ name: 'originalPromptId', nullable: true })
+  @Column({ nullable: true })
   originalPromptId?: number; // For cloned prompts
 
-  @Column({ name: 'usageCount', default: 0 })
+  @Column({ default: 0 })
   usageCount!: number;
 
-  @Column({ name: 'averageRating', type: 'decimal', precision: 3, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
   averageRating!: number;
 
-  @Column({ name: 'ratingCount', default: 0 })
+  @Column({ default: 0 })
   ratingCount!: number;
 
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   author!: UserEntity;
 
-  @Column({ name: 'authorId' })
+  @Column()
   authorId!: string;
 
   @ManyToOne(() => PromptCategoryEntity, (category) => category.prompts, { onDelete: 'SET NULL' })
   category?: PromptCategoryEntity;
 
-  @Column({ name: 'categoryId', nullable: true })
+  @Column({ nullable: true })
   categoryId?: number;
 
   @ManyToOne(() => PromptEntity, (prompt) => prompt.id, { onDelete: 'SET NULL' })
@@ -69,7 +69,7 @@ export class PromptEntity {
   @OneToMany(() => PromptVersionEntity, (version) => version.prompt)
   versions!: PromptVersionEntity[];
 
-  @Column({ name: 'current_version', default: 1 })
+  @Column({ default: 1 })
   currentVersion!: number;
 
   @CreateDateColumn({ type: 'timestamptz' })

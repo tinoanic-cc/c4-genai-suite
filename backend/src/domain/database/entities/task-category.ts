@@ -17,15 +17,15 @@ export class TaskCategoryEntity {
   @Column({ length: 7, nullable: true })
   color?: string; // Hex color code for UI
 
-  @Column({ name: 'sort_order', default: 0 })
+  @Column({ default: 0 })
   sortOrder!: number;
 
   @OneToMany(() => TaskEntity, (task) => task.category)
   tasks!: TaskEntity[];
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date;
 }
