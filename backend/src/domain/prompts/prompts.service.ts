@@ -147,8 +147,14 @@ export class PromptsService {
       throw new BadRequestException('Prompt is not public');
     }
 
+    // Generate a unique title with numerical suffix if no custom title provided
+    let cloneTitle = title;
+    if (!cloneTitle) {
+      cloneTitle = await this.generateUniqueCloneTitle(originalPrompt.title, authorId);
+    }
+
     const clonedPrompt = this.promptRepository.create({
-      title: title || `${originalPrompt.title} (Copy)`,
+      title: cloneTitle,
       content: originalPrompt.content,
       description: originalPrompt.description,
       categoryId: originalPrompt.categoryId,
@@ -158,6 +164,44 @@ export class PromptsService {
     });
 
     return this.promptRepository.save(clonedPrompt);
+  }
+
+  private async generateUniqueCloneTitle(originalTitle: string, authorId: string): Promise<string> {
+    // Find existing clones by this author with similar titles
+    const baseTitle = originalTitle;
+    const existingTitles = await this.promptRepository
+      .createQueryBuilder('prompt')
+      .select('prompt.title')
+      .where('prompt.authorId = :authorId', { authorId })
+      .andWhere('(prompt.title = :baseTitle OR prompt.title LIKE :pattern)', {
+        baseTitle,
+        pattern: `${baseTitle} (%`,
+      })
+      .getMany();
+
+    // If no conflicts, use "Title (Copy)"
+    if (existingTitles.length === 0) {
+      return `${baseTitle} (Copy)`;
+    }
+
+    // Extract existing copy numbers
+    const copyNumbers = existingTitles
+      .map((prompt) => {
+        const match = prompt.title.match(new RegExp(`^${baseTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\((Copy|\\d+)\\)$`));
+        if (match) {
+          return match[1] === 'Copy' ? 1 : parseInt(match[1], 10);
+        }
+        return 0;
+      })
+      .filter((num) => num > 0);
+
+    // Find the next available number
+    let nextNumber = 1;
+    while (copyNumbers.includes(nextNumber)) {
+      nextNumber++;
+    }
+
+    return nextNumber === 1 ? `${baseTitle} (Copy)` : `${baseTitle} (${nextNumber})`;
   }
 
   async recordUsage(promptId: number, userId: string): Promise<void> {

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { PromptCategoryEntity } from '../database';
 import { CreatePromptCategoryDto, UpdatePromptCategoryDto } from './interfaces';
 
@@ -19,15 +19,21 @@ export class PromptCategoriesService {
   async findAll(): Promise<PromptCategoryEntity[]> {
     return this.promptCategoryRepository.find({
       order: { sortOrder: 'ASC', name: 'ASC' },
-      relations: ['prompts'],
+      // Remove relations to avoid loading all prompts - use getCategoriesWithPromptCount for counts
     });
   }
 
-  async findOne(id: number): Promise<PromptCategoryEntity | null> {
-    return this.promptCategoryRepository.findOne({
+  async findOne(id: number, includePrompts: boolean = false): Promise<PromptCategoryEntity | null> {
+    const options: FindOneOptions<PromptCategoryEntity> = {
       where: { id },
-      relations: ['prompts'],
-    });
+    };
+
+    // Only include prompts relation if explicitly requested and with pagination
+    if (includePrompts) {
+      options.relations = ['prompts'];
+    }
+
+    return this.promptCategoryRepository.findOne(options);
   }
 
   async findByName(name: string): Promise<PromptCategoryEntity | null> {
