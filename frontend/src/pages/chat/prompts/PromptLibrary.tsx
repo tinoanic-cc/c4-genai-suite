@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   Group,
+  Pagination,
   Rating,
   ScrollArea,
   Select,
@@ -26,7 +27,7 @@ import {
   IconWorld,
 } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApi } from 'src/api';
 import { Prompt } from 'src/api/prompts';
 import { ProfileButton } from 'src/components';
@@ -184,7 +185,7 @@ export function PromptSidebar({
         {/* Category Dropdown */}
         <div className="mb-6">
           <Text size="sm" fw={600} mb="sm">
-            Kategorien
+            {texts.chat.prompts.categories.all}
           </Text>
           <Select
             placeholder={texts.chat.prompts.categories.all}
@@ -238,7 +239,7 @@ export function PromptSidebar({
             <Accordion.Control>{texts.chat.prompts.rating}</Accordion.Control>
             <Accordion.Panel>
               <Text size="xs" c="dimmed" mb="xs">
-                Mindestbewertung: {minRating.toFixed(1)}
+                {texts.chat.prompts.minRating(minRating)}
               </Text>
               <Slider
                 value={minRating}
@@ -303,10 +304,15 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
   const api = useApi();
   const [selectedPromptId, setSelectedPromptId] = useState<number | null>(null);
   const [detailsModalOpened, setDetailsModalOpened] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(12);
+
+  // Reset to page 1 when filters change
+  const resetPage = () => setCurrentPage(1);
 
   // Fetch prompts with search, category and rating filters
   const { data: promptsData, isLoading } = useQuery({
-    queryKey: ['prompts-library', searchTerm, selectedCategory, minRating, sortBy],
+    queryKey: ['prompts-library', searchTerm, selectedCategory, minRating, sortBy, currentPage],
     queryFn: () => {
       const getSortParams = (sortBy: string) => {
         switch (sortBy) {
@@ -326,13 +332,22 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
         search: searchTerm || undefined,
         categoryId: selectedCategory && selectedCategory !== 'all' ? parseInt(selectedCategory) : undefined,
         minRating: minRating > 0 ? minRating : undefined,
-        page: 1,
-        limit: 12,
+        page: currentPage,
+        limit: pageSize,
         sortBy: apiSortBy,
         sortOrder,
       });
     },
   });
+
+  // Reset page when filters change
+  useEffect(() => {
+    resetPage();
+  }, [searchTerm, selectedCategory, minRating, sortBy]);
+
+  // Calculate pagination info
+  const totalPages = promptsData ? Math.ceil(promptsData.total / pageSize) : 0;
+  const showPagination = totalPages > 1;
 
   // Utility function to get prompt preview
   const getPromptPreview = (content: string, maxLength: number = 150): string => {
@@ -414,7 +429,7 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                           color={prompt.isPublic ? 'green' : 'gray'}
                           leftSection={prompt.isPublic ? <IconWorld size={10} /> : <IconLock size={10} />}
                         >
-                          {prompt.isPublic ? 'Öffentlich' : 'Privat'}
+                          {prompt.isPublic ? texts.common.public : texts.common.private}
                         </Badge>
                       </Group>
                     </div>
@@ -437,7 +452,7 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                   {prompt.content && (
                     <Box p="xs" className="rounded border-l-2 border-blue-200 bg-gray-50">
                       <Text size="xs" c="dimmed" mb="xs" fw={500}>
-                        Vorschau:
+                        {texts.common.text}:
                       </Text>
                       <Text size="xs" c="dark" lineClamp={4} className="font-mono">
                         {getPromptPreview(prompt.content, 200)}
@@ -518,6 +533,24 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
               </Card>
             ))}
           </SimpleGrid>
+        )}
+
+        {/* Pagination Controls */}
+        {showPagination && (
+          <Group justify="center" mt="xl" mb="md">
+            <Pagination
+              value={currentPage}
+              onChange={setCurrentPage}
+              total={totalPages}
+              size="sm"
+              withEdges
+              siblings={1}
+              boundaries={1}
+            />
+            <Text size="xs" c="dimmed" ml="md">
+              Page {currentPage} of {totalPages} ({promptsData?.total || 0} prompts total)
+            </Text>
+          </Group>
         )}
       </ScrollArea>
 

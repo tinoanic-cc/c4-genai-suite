@@ -19,12 +19,24 @@ export class PromptMapper {
       isPublic: entity.isPublic,
       authorId: entity.authorId,
       categoryId: entity.categoryId,
+      category: entity.category ? this.toCategoryResponseDto(entity.category) : undefined,
       averageRating: entity.averageRating,
       ratingCount: entity.ratingCount,
       usageCount: entity.usageCount,
-      version: entity.currentVersion,
+      currentVersion: entity.currentVersion,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      author: entity.author
+        ? {
+            id: entity.author.id,
+            name: entity.author.name,
+            email: entity.author.email,
+          }
+        : {
+            id: entity.authorId,
+            name: 'Unknown User',
+            email: 'unknown@example.com',
+          },
     };
   }
 

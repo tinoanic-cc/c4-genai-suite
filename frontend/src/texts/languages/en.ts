@@ -72,6 +72,8 @@ export const en = {
     userGroup: 'User Group',
     userGroups: 'User Groups',
     yes: 'Yes',
+    public: 'Public',
+    private: 'Private',
     selectOption: 'Select an option',
     selectOptions: 'Select options',
     addItem: 'Add an item',

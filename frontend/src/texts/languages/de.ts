@@ -72,6 +72,8 @@ export const de: typeof en = {
     userGroup: 'Benutzergruppe',
     userGroups: 'Benutzergruppen',
     yes: 'Ja',
+    public: 'Öffentlich',
+    private: 'Privat',
     errorLoading: 'Fehler bei Laden.',
     tryAgain: 'Neu versuchen',
     selectOption: 'Option auswählen',

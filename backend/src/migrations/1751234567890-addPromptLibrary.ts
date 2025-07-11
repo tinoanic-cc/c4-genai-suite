@@ -33,6 +33,7 @@ export class AddPromptLibrary1751234567890 implements MigrationInterface {
         "ratingCount" integer NOT NULL DEFAULT '0',
         "authorId" character varying NOT NULL,
         "categoryId" integer,
+        "currentVersion" integer NOT NULL DEFAULT '1',
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         CONSTRAINT "PK_prompts" PRIMARY KEY ("id")

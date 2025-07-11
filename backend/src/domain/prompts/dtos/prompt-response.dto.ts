@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { PromptCategoryResponseDto } from './prompt-category-response.dto';
 
 export class PromptResponseDto {
   @ApiProperty({ description: 'Unique identifier of the prompt' })
@@ -22,6 +23,9 @@ export class PromptResponseDto {
   @ApiProperty({ description: 'Category ID', required: false })
   categoryId?: number;
 
+  @ApiProperty({ description: 'Category details', required: false })
+  category?: PromptCategoryResponseDto;
+
   @ApiProperty({ description: 'Average rating', required: false })
   averageRating?: number;
 
@@ -32,11 +36,18 @@ export class PromptResponseDto {
   usageCount!: number;
 
   @ApiProperty({ description: 'Current version number' })
-  version!: number;
+  currentVersion!: number;
 
   @ApiProperty({ description: 'Creation date' })
   createdAt!: Date;
 
   @ApiProperty({ description: 'Last update date' })
   updatedAt!: Date;
+
+  @ApiProperty({ description: 'Author details' })
+  author!: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }

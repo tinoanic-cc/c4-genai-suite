@@ -102,6 +102,8 @@ function load() {
       userGroup: translate('common.userGroup'),
       userGroups: translate('common.userGroups'),
       yes: translate('common.yes'),
+      public: translate('common.public'),
+      private: translate('common.private'),
       selectOption: translate('common.selectOption'),
       selectOptions: translate('common.selectOptions'),
       addItem: translate('common.addItem'),

@@ -41,7 +41,18 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
     onSuccess: () => {
       toast.success(texts.chat.prompts.create.successMessage);
       void queryClient.invalidateQueries({ queryKey: ['prompts'] });
+      void queryClient.invalidateQueries({ queryKey: ['prompts-library'] });
       void queryClient.invalidateQueries({ queryKey: ['popular-prompts'] });
+      void queryClient
+        .invalidateQueries({
+          predicate: (query) => {
+            const key = query.queryKey[0];
+            return key === 'prompts' || key === 'prompts-library';
+          },
+        })
+        .catch(() => {
+          // Ignore invalidation errors
+        });
       form.reset();
       onClose();
     },
