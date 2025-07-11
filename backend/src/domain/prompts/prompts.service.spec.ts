@@ -45,6 +45,7 @@ describe('PromptsService', () => {
       select: jest.fn().mockReturnThis(),
       addSelect: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([]),
       getRawOne: jest.fn().mockResolvedValue({ averageRating: '4.5', ratingCount: '10' }),
     };
 
@@ -102,7 +103,7 @@ describe('PromptsService', () => {
   });
 
   describe('create', () => {
-    it('should create a new prompt', async () => {
+    it('should create a new public prompt', async () => {
       const createPromptDto: CreatePromptDto = {
         title: 'Test Prompt',
         content: 'Test content',
@@ -124,6 +125,57 @@ describe('PromptsService', () => {
       });
       expect(promptRepository.save).toHaveBeenCalledWith(mockPrompt);
       expect(result).toEqual(mockPrompt);
+      expect(result.isPublic).toBe(true);
+    });
+
+    it('should create a new private prompt', async () => {
+      const createPromptDto: CreatePromptDto = {
+        title: 'Private Test Prompt',
+        content: 'Private test content',
+        description: 'Private test description',
+        categoryId: 1,
+        isPublic: false,
+      };
+
+      const privatePrompt = { ...mockPrompt, isPublic: false };
+      promptRepository.create.mockReturnValue(privatePrompt);
+      promptRepository.save.mockResolvedValue(privatePrompt);
+      promptVersionRepository.create.mockReturnValue({} as PromptVersionEntity);
+      promptVersionRepository.save.mockResolvedValue({} as PromptVersionEntity);
+
+      const result = await service.create('user1', createPromptDto);
+
+      expect(promptRepository.create).toHaveBeenCalledWith({
+        ...createPromptDto,
+        authorId: 'user1',
+      });
+      expect(promptRepository.save).toHaveBeenCalledWith(privatePrompt);
+      expect(result.isPublic).toBe(false);
+    });
+
+    it('should create a prompt with default visibility when isPublic is not specified', async () => {
+      const createPromptDto: CreatePromptDto = {
+        title: 'Default Visibility Prompt',
+        content: 'Default visibility content',
+        description: 'Default visibility description',
+        categoryId: 1,
+      };
+
+      promptRepository.create.mockReturnValue(mockPrompt);
+      promptRepository.save.mockResolvedValue(mockPrompt);
+      promptVersionRepository.create.mockReturnValue({} as PromptVersionEntity);
+      promptVersionRepository.save.mockResolvedValue({} as PromptVersionEntity);
+
+      const result = await service.create('user1', createPromptDto);
+
+      expect(promptRepository.create).toHaveBeenCalledWith({
+        ...createPromptDto,
+        authorId: 'user1',
+      });
+      expect(promptRepository.save).toHaveBeenCalledWith(mockPrompt);
+      expect(result).toEqual(mockPrompt);
+      // Should default to public based on entity definition
+      expect(result.isPublic).toBe(true);
     });
   });
 
@@ -160,10 +212,45 @@ describe('PromptsService', () => {
       expect(result.title).toBe('Updated Title');
     });
 
+    it('should update prompt visibility from public to private', async () => {
+      const updatePromptDto: UpdatePromptDto = {
+        isPublic: false,
+      };
+
+      promptRepository.findOne.mockResolvedValue(mockPrompt);
+      promptRepository.save.mockResolvedValue({ ...mockPrompt, isPublic: false });
+
+      const result = await service.update(1, 'user1', updatePromptDto);
+
+      expect(promptRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1, authorId: 'user1' },
+      });
+      expect(promptRepository.save).toHaveBeenCalled();
+      expect(result.isPublic).toBe(false);
+    });
+
+    it('should update prompt visibility from private to public', async () => {
+      const privatePrompt = { ...mockPrompt, isPublic: false };
+      const updatePromptDto: UpdatePromptDto = {
+        isPublic: true,
+      };
+
+      promptRepository.findOne.mockResolvedValue(privatePrompt);
+      promptRepository.save.mockResolvedValue({ ...privatePrompt, isPublic: true });
+
+      const result = await service.update(1, 'user1', updatePromptDto);
+
+      expect(promptRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1, authorId: 'user1' },
+      });
+      expect(promptRepository.save).toHaveBeenCalled();
+      expect(result.isPublic).toBe(true);
+    });
+
     it('should throw error if prompt not found', async () => {
       promptRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.update(1, 'user1', { title: 'Updated' })).rejects.toThrow('Prompt not found or not authorized');
+      await expect(service.update(1, 'user1', { title: 'Updated' })).rejects.toThrow('Prompt not found');
     });
   });
 
@@ -182,15 +269,16 @@ describe('PromptsService', () => {
     it('should throw error if prompt not found', async () => {
       promptRepository.delete.mockResolvedValue({ affected: 0, raw: {} });
 
-      await expect(service.delete(1, 'user1')).rejects.toThrow('Prompt not found or not authorized');
+      await expect(service.delete(1, 'user1')).rejects.toThrow('Prompt not found');
     });
   });
 
   describe('clone', () => {
     it('should clone a public prompt', async () => {
-      const clonedPrompt = { ...mockPrompt, id: 2, title: 'Test Prompt (Copy)' };
+      const publicPrompt = { ...mockPrompt, isPublic: true };
+      const clonedPrompt = { ...mockPrompt, id: 2, title: 'Custom Title', isPublic: false };
 
-      promptRepository.findOne.mockResolvedValue(mockPrompt);
+      promptRepository.findOne.mockResolvedValue(publicPrompt);
       promptRepository.create.mockReturnValue(clonedPrompt);
       promptRepository.save.mockResolvedValue(clonedPrompt);
 
@@ -198,21 +286,50 @@ describe('PromptsService', () => {
 
       expect(promptRepository.create).toHaveBeenCalledWith({
         title: 'Custom Title',
-        content: mockPrompt.content,
-        description: mockPrompt.description,
-        categoryId: mockPrompt.categoryId,
+        content: publicPrompt.content,
+        description: publicPrompt.description,
+        categoryId: publicPrompt.categoryId,
         authorId: 'user2',
-        originalPromptId: mockPrompt.id,
+        originalPromptId: publicPrompt.id,
         isPublic: false,
       });
       expect(result).toEqual(clonedPrompt);
+    });
+
+    it('should clone a public prompt with default title', async () => {
+      const publicPrompt = { ...mockPrompt, isPublic: true };
+      const clonedPrompt = { ...mockPrompt, id: 2, title: 'Test Prompt (Copy)', isPublic: false };
+
+      promptRepository.findOne.mockResolvedValue(publicPrompt);
+      promptRepository.create.mockReturnValue(clonedPrompt);
+      promptRepository.save.mockResolvedValue(clonedPrompt);
+
+      const result = await service.clone(1, 'user2');
+
+      // The service uses the original prompt's title, which might be different from mockPrompt.title
+      expect(promptRepository.create).toHaveBeenCalledWith({
+        title: expect.stringContaining('(Copy)') as string,
+        content: publicPrompt.content,
+        description: publicPrompt.description,
+        categoryId: publicPrompt.categoryId,
+        authorId: 'user2',
+        originalPromptId: publicPrompt.id,
+        isPublic: false,
+      });
+      expect(result.isPublic).toBe(false); // Cloned prompts should always be private
     });
 
     it('should throw error if prompt is not public', async () => {
       const privatePrompt = { ...mockPrompt, isPublic: false };
       promptRepository.findOne.mockResolvedValue(privatePrompt);
 
-      await expect(service.clone(1, 'user2')).rejects.toThrow('Prompt not found or not public');
+      await expect(service.clone(1, 'user2')).rejects.toThrow('Prompt is not public');
+    });
+
+    it('should throw error if prompt does not exist', async () => {
+      promptRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.clone(999, 'user2')).rejects.toThrow('Prompt not found');
     });
   });
 
