@@ -11,6 +11,7 @@ import {
   ScrollArea,
   Select,
   Stack,
+  Switch,
   Tabs,
   Text,
   Textarea,
@@ -62,6 +63,7 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
   const [editDescription, setEditDescription] = useState('');
   const [editContent, setEditContent] = useState('');
   const [editCategoryId, setEditCategoryId] = useState<number | null>(null);
+  const [editIsPublic, setEditIsPublic] = useState(true);
   const [selectedVersion, setSelectedVersion] = useState<PromptVersion | null>(null);
   const [showVersionCommentModal, setShowVersionCommentModal] = useState(false);
   const [versionCommentAction, setVersionCommentAction] = useState<'update' | 'restore' | null>(null);
@@ -129,7 +131,14 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
       data,
     }: {
       id: number;
-      data: { title?: string; description?: string; content?: string; categoryId?: number; versionComment: string };
+      data: {
+        title?: string;
+        description?: string;
+        content?: string;
+        categoryId?: number;
+        isPublic?: boolean;
+        versionComment: string;
+      };
     }) => api.prompts.updatePrompt(id, data),
     onSuccess: () => {
       toast.success('Prompt erfolgreich aktualisiert!');
@@ -247,6 +256,7 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
   // Event handlers
   const handleUsePrompt = () => {
     if (prompt?.content) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       navigate('/chat/new', { state: { initialPrompt: prompt.content } });
       onClose();
     }
@@ -287,6 +297,7 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
       setEditDescription(prompt.description || '');
       setEditContent(prompt.content);
       setEditCategoryId(prompt.categoryId || null);
+      setEditIsPublic(prompt.isPublic);
       setIsEditing(true);
     }
   };
@@ -297,6 +308,7 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
     setEditDescription('');
     setEditContent('');
     setEditCategoryId(null);
+    setEditIsPublic(true);
   };
 
   const handleSaveEdit = () => {
@@ -321,6 +333,7 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
           description: editDescription.trim() || undefined,
           content: editContent.trim(),
           categoryId: editCategoryId || undefined,
+          isPublic: editIsPublic,
           versionComment: comment,
         },
       });
@@ -429,6 +442,14 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
                           }))}
                           placeholder={texts.chat.prompts.placeholders.selectCategory}
                           clearable
+                        />
+                        <Switch
+                          label="Visibility"
+                          description={
+                            editIsPublic ? 'Other users can see and use this prompt' : 'Only you can see and use this prompt'
+                          }
+                          checked={editIsPublic}
+                          onChange={(event) => setEditIsPublic(event.currentTarget.checked)}
                         />
                       </Stack>
                     ) : (

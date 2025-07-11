@@ -1,5 +1,6 @@
 ## Brief overview
 Guidelines for Git workflow and commit practices specific to this project, emphasizing proper linting and code quality checks.
+Breaking the rules is not allowed. If you are unable to follow the rules, ask for permission.
 
 ## Git commit practices
 - Never use `--no-verify` flag when committing code
