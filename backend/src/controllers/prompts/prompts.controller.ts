@@ -12,7 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth';
 import { UserEntity } from '../../domain/database';
@@ -38,6 +38,18 @@ export class PromptsController {
   @Get()
   @ApiOperation({ summary: 'Get all public prompts and own private prompts' })
   @ApiResponse({ status: 200, description: 'List of prompts' })
+  @ApiQuery({ name: 'categoryId', required: false, type: Number, description: 'Filter by category ID' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search in title and content' })
+  @ApiQuery({ name: 'minRating', required: false, type: Number, description: 'Minimum average rating' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page' })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['createdAt', 'updatedAt', 'averageRating', 'usageCount', 'title'],
+    description: 'Sort field',
+  })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
   async findAll(
     @Req() req: Request,
     @Query('categoryId') categoryId?: number,
@@ -68,6 +80,15 @@ export class PromptsController {
   @Get('my')
   @ApiOperation({ summary: 'Get current user prompts' })
   @ApiResponse({ status: 200, description: 'List of user prompts' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page' })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['createdAt', 'updatedAt', 'averageRating', 'usageCount', 'title'],
+    description: 'Sort field',
+  })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['ASC', 'DESC'], description: 'Sort order' })
   async findMy(
     @Req() req: Request,
     @Query('page') page?: number,
@@ -89,6 +110,7 @@ export class PromptsController {
   @Get('popular')
   @ApiOperation({ summary: 'Get popular prompts' })
   @ApiResponse({ status: 200, description: 'List of popular prompts' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Maximum number of prompts to return' })
   async getPopular(@Query('limit') limit?: number) {
     return this.promptsService.getPopularPrompts(limit);
   }
@@ -96,6 +118,7 @@ export class PromptsController {
   @Get('recent')
   @ApiOperation({ summary: 'Get recent prompts' })
   @ApiResponse({ status: 200, description: 'List of recent prompts' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Maximum number of prompts to return' })
   async getRecent(@Query('limit') limit?: number) {
     return this.promptsService.getRecentPrompts(limit);
   }
