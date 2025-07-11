@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PromptRatingEntity } from '../database';
@@ -20,7 +20,7 @@ export class PromptRatingsService {
     });
 
     if (existingRating) {
-      throw new Error('User has already rated this prompt');
+      throw new BadRequestException('User has already rated this prompt');
     }
 
     const rating = this.promptRatingRepository.create({
@@ -43,7 +43,7 @@ export class PromptRatingsService {
     });
 
     if (!rating) {
-      throw new Error('Rating not found');
+      throw new NotFoundException('Rating not found');
     }
 
     Object.assign(rating, updatePromptRatingDto);
@@ -59,7 +59,7 @@ export class PromptRatingsService {
     const result = await this.promptRatingRepository.delete({ promptId, userId });
 
     if (result.affected === 0) {
-      throw new Error('Rating not found');
+      throw new NotFoundException('Rating not found');
     }
 
     // Update prompt rating statistics
