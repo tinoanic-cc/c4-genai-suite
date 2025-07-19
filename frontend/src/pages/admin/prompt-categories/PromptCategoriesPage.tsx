@@ -4,7 +4,15 @@ import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { CreatePromptCategoryDto, PromptCategory, UpdatePromptCategoryDto } from 'src/api/prompts';
+import { CreatePromptCategoryDto, PromptCategory } from 'src/api/generated/temp-types';
+
+// Temporary interface until UpdatePromptCategoryDto is generated
+interface UpdatePromptCategoryDto {
+  name?: string;
+  description?: string;
+  color?: string;
+  sortOrder?: number;
+}
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 

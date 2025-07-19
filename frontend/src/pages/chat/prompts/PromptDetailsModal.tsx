@@ -38,7 +38,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
-import { CreatePromptRatingDto, Prompt, PromptVersion } from 'src/api/prompts';
+import { CreatePromptRatingDto, Prompt, PromptVersion } from 'src/api/generated/temp-types';
 import { texts } from 'src/texts';
 import { VersionCommentModal } from './VersionCommentModal';
 

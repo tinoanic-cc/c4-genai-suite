@@ -25,6 +25,9 @@ export interface PromptCategory {
   color?: string;
   description?: string;
   promptCount?: number;
+  sortOrder?: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PromptVersion {

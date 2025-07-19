@@ -3,7 +3,7 @@ import { IconBulb, IconEdit, IconMessageCircle } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { Prompt } from 'src/api/prompts';
+import { Prompt } from 'src/api/generated/temp-types';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useSidebarState, useTheme } from 'src/hooks';
