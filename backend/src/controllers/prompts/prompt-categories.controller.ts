@@ -3,7 +3,13 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth';
 import { UserEntity } from '../../domain/database';
-import { CreatePromptCategoryDto, PromptCategoriesService, UpdatePromptCategoryDto } from '../../domain/prompts';
+import {
+  CreatePromptCategoryDto,
+  PromptCategoriesService,
+  PromptCategoryResponseDto,
+  PromptCategoryWithCountResponseDto,
+  UpdatePromptCategoryDto,
+} from '../../domain/prompts';
 
 @ApiTags('prompt-categories')
 @UseGuards(LocalAuthGuard)
@@ -13,44 +19,51 @@ export class PromptCategoriesController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new prompt category' })
-  @ApiResponse({ status: 201, description: 'Category created successfully' })
-  async create(@Body() createPromptCategoryDto: CreatePromptCategoryDto) {
-    return this.promptCategoriesService.create(createPromptCategoryDto);
+  @ApiResponse({ status: 201, description: 'Category created successfully', type: PromptCategoryResponseDto })
+  async create(@Body() createPromptCategoryDto: CreatePromptCategoryDto): Promise<PromptCategoryResponseDto> {
+    const category = await this.promptCategoriesService.create(createPromptCategoryDto);
+    return this.transformToPromptCategoryResponseDto(category);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all prompt categories' })
-  @ApiResponse({ status: 200, description: 'List of categories' })
-  async findAll() {
-    return this.promptCategoriesService.findAll();
+  @ApiResponse({ status: 200, description: 'List of categories', type: [PromptCategoryResponseDto] })
+  async findAll(): Promise<PromptCategoryResponseDto[]> {
+    const categories = await this.promptCategoriesService.findAll();
+    return categories.map((category) => this.transformToPromptCategoryResponseDto(category));
   }
 
   @Get('with-counts')
   @ApiOperation({ summary: 'Get all categories with prompt counts' })
-  @ApiResponse({ status: 200, description: 'List of categories with prompt counts' })
-  async findAllWithCounts(@Req() req: Request) {
+  @ApiResponse({ status: 200, description: 'List of categories with prompt counts', type: [PromptCategoryWithCountResponseDto] })
+  async findAllWithCounts(@Req() req: Request): Promise<PromptCategoryWithCountResponseDto[]> {
     const user = req.user as UserEntity;
-    return this.promptCategoriesService.getCategoriesWithPromptCount(user?.id);
+    const categoriesWithCounts = await this.promptCategoriesService.getCategoriesWithPromptCount(user?.id);
+    return categoriesWithCounts.map((categoryWithCount) => this.transformToPromptCategoryWithCountResponseDto(categoryWithCount));
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get category by ID' })
-  @ApiResponse({ status: 200, description: 'Category details' })
+  @ApiResponse({ status: 200, description: 'Category details', type: PromptCategoryResponseDto })
   @ApiResponse({ status: 404, description: 'Category not found' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<PromptCategoryResponseDto> {
     const category = await this.promptCategoriesService.findOne(id);
     if (!category) {
       throw new Error('Category not found');
     }
-    return category;
+    return this.transformToPromptCategoryResponseDto(category);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update category' })
-  @ApiResponse({ status: 200, description: 'Category updated successfully' })
+  @ApiResponse({ status: 200, description: 'Category updated successfully', type: PromptCategoryResponseDto })
   @ApiResponse({ status: 404, description: 'Category not found' })
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updatePromptCategoryDto: UpdatePromptCategoryDto) {
-    return this.promptCategoriesService.update(id, updatePromptCategoryDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePromptCategoryDto: UpdatePromptCategoryDto,
+  ): Promise<PromptCategoryResponseDto> {
+    const category = await this.promptCategoriesService.update(id, updatePromptCategoryDto);
+    return this.transformToPromptCategoryResponseDto(category);
   }
 
   @Delete(':id')
@@ -60,5 +73,47 @@ export class PromptCategoriesController {
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.promptCategoriesService.delete(id);
     return { message: 'Category deleted successfully' };
+  }
+
+  private transformToPromptCategoryResponseDto(category: {
+    id: number;
+    name: string;
+    description?: string;
+    color?: string;
+    sortOrder?: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }): PromptCategoryResponseDto {
+    return {
+      id: category.id,
+      name: category.name,
+      description: category.description,
+      color: category.color,
+      sortOrder: category.sortOrder,
+      createdAt: category.createdAt.toISOString(),
+      updatedAt: category.updatedAt.toISOString(),
+    };
+  }
+
+  private transformToPromptCategoryWithCountResponseDto(categoryWithCount: {
+    id: number;
+    name: string;
+    description?: string;
+    color?: string;
+    sortOrder?: number;
+    createdAt: Date;
+    updatedAt: Date;
+    promptCount?: number;
+  }): PromptCategoryWithCountResponseDto {
+    return {
+      id: categoryWithCount.id,
+      name: categoryWithCount.name,
+      description: categoryWithCount.description,
+      color: categoryWithCount.color,
+      sortOrder: categoryWithCount.sortOrder,
+      createdAt: categoryWithCount.createdAt.toISOString(),
+      updatedAt: categoryWithCount.updatedAt.toISOString(),
+      promptCount: categoryWithCount.promptCount || 0,
+    };
   }
 }

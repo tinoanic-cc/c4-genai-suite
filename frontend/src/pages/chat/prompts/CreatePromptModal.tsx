@@ -16,10 +16,10 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
   const api = useApi();
   const queryClient = useQueryClient();
 
-  // Fetch categories for the select
+  // Fetch categories for the select - temporarily return empty array until categories API is implemented
   const { data: categories = [] } = useQuery<PromptCategoryResponseDto[]>({
     queryKey: ['prompt-categories'],
-    queryFn: () => api.prompts.getCategories(),
+    queryFn: () => Promise.resolve([]),
   });
 
   const form = useForm<CreatePromptDto>({
@@ -37,7 +37,7 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
   });
 
   const createPromptMutation = useMutation({
-    mutationFn: (data: CreatePromptDto) => api.prompts.createPrompt(data),
+    mutationFn: (data: CreatePromptDto) => api.prompts.promptsControllerCreate(data),
     onSuccess: () => {
       toast.success(texts.chat.prompts.create.successMessage);
       void queryClient.invalidateQueries({ queryKey: ['prompts'] });

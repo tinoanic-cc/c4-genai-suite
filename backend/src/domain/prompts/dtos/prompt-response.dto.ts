@@ -224,3 +224,39 @@ export class PromptRatingResponseDto {
   })
   author?: PromptAuthorResponseDto;
 }
+
+export class PaginatedPromptsResponseDto {
+  @ApiProperty({
+    description: 'List of prompts',
+    type: [PromptResponseDto],
+  })
+  items!: PromptResponseDto[];
+
+  @ApiProperty({
+    description: 'Total number of prompts',
+    type: 'integer',
+    example: 100,
+  })
+  total!: number;
+
+  @ApiProperty({
+    description: 'Current page number',
+    type: 'integer',
+    example: 1,
+  })
+  page!: number;
+
+  @ApiProperty({
+    description: 'Number of items per page',
+    type: 'integer',
+    example: 12,
+  })
+  limit!: number;
+
+  @ApiProperty({
+    description: 'Total number of pages',
+    type: 'integer',
+    example: 9,
+  })
+  totalPages!: number;
+}

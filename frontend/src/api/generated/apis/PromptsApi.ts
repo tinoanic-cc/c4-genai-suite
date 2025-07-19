@@ -17,14 +17,20 @@
 import * as runtime from '../runtime';
 import type {
   CreatePromptDto,
+  PaginatedPromptsResponseDto,
   PromptResponseDto,
+  PromptVersionResponseDto,
   UpdatePromptDto,
 } from '../models/index';
 import {
     CreatePromptDtoFromJSON,
     CreatePromptDtoToJSON,
+    PaginatedPromptsResponseDtoFromJSON,
+    PaginatedPromptsResponseDtoToJSON,
     PromptResponseDtoFromJSON,
     PromptResponseDtoToJSON,
+    PromptVersionResponseDtoFromJSON,
+    PromptVersionResponseDtoToJSON,
     UpdatePromptDtoFromJSON,
     UpdatePromptDtoToJSON,
 } from '../models/index';
@@ -105,7 +111,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Clone a prompt
      */
-    async promptsControllerCloneRaw(requestParameters: PromptsControllerCloneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerCloneRaw(requestParameters: PromptsControllerCloneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -124,14 +130,15 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Clone a prompt
      */
-    async promptsControllerClone(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerCloneRaw({ id: id }, initOverrides);
+    async promptsControllerClone(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptResponseDto> {
+        const response = await this.promptsControllerCloneRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -205,7 +212,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Get all public prompts and own private prompts
      */
-    async promptsControllerFindAllRaw(requestParameters: PromptsControllerFindAllRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerFindAllRaw(requestParameters: PromptsControllerFindAllRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedPromptsResponseDto>> {
         if (requestParameters['categoryId'] == null) {
             throw new runtime.RequiredError(
                 'categoryId',
@@ -294,20 +301,21 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedPromptsResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Get all public prompts and own private prompts
      */
-    async promptsControllerFindAll(categoryId: number, search: string, minRating: number, page: number, limit: number, sortBy: string, sortOrder: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerFindAllRaw({ categoryId: categoryId, search: search, minRating: minRating, page: page, limit: limit, sortBy: sortBy, sortOrder: sortOrder }, initOverrides);
+    async promptsControllerFindAll(categoryId: number, search: string, minRating: number, page: number, limit: number, sortBy: string, sortOrder: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedPromptsResponseDto> {
+        const response = await this.promptsControllerFindAllRaw({ categoryId: categoryId, search: search, minRating: minRating, page: page, limit: limit, sortBy: sortBy, sortOrder: sortOrder }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Get current user prompts
      */
-    async promptsControllerFindMyRaw(requestParameters: PromptsControllerFindMyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerFindMyRaw(requestParameters: PromptsControllerFindMyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedPromptsResponseDto>> {
         if (requestParameters['page'] == null) {
             throw new runtime.RequiredError(
                 'page',
@@ -363,14 +371,15 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedPromptsResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Get current user prompts
      */
-    async promptsControllerFindMy(page: number, limit: number, sortBy: string, sortOrder: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerFindMyRaw({ page: page, limit: limit, sortBy: sortBy, sortOrder: sortOrder }, initOverrides);
+    async promptsControllerFindMy(page: number, limit: number, sortBy: string, sortOrder: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedPromptsResponseDto> {
+        const response = await this.promptsControllerFindMyRaw({ page: page, limit: limit, sortBy: sortBy, sortOrder: sortOrder }, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -409,7 +418,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Get popular prompts
      */
-    async promptsControllerGetPopularRaw(requestParameters: PromptsControllerGetPopularRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerGetPopularRaw(requestParameters: PromptsControllerGetPopularRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PromptResponseDto>>> {
         if (requestParameters['limit'] == null) {
             throw new runtime.RequiredError(
                 'limit',
@@ -432,20 +441,21 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PromptResponseDtoFromJSON));
     }
 
     /**
      * Get popular prompts
      */
-    async promptsControllerGetPopular(limit: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerGetPopularRaw({ limit: limit }, initOverrides);
+    async promptsControllerGetPopular(limit: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PromptResponseDto>> {
+        const response = await this.promptsControllerGetPopularRaw({ limit: limit }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Get recent prompts
      */
-    async promptsControllerGetRecentRaw(requestParameters: PromptsControllerGetRecentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerGetRecentRaw(requestParameters: PromptsControllerGetRecentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PromptResponseDto>>> {
         if (requestParameters['limit'] == null) {
             throw new runtime.RequiredError(
                 'limit',
@@ -468,20 +478,21 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PromptResponseDtoFromJSON));
     }
 
     /**
      * Get recent prompts
      */
-    async promptsControllerGetRecent(limit: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerGetRecentRaw({ limit: limit }, initOverrides);
+    async promptsControllerGetRecent(limit: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PromptResponseDto>> {
+        const response = await this.promptsControllerGetRecentRaw({ limit: limit }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Get specific version of a prompt
      */
-    async promptsControllerGetVersionRaw(requestParameters: PromptsControllerGetVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerGetVersionRaw(requestParameters: PromptsControllerGetVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptVersionResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -507,20 +518,21 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptVersionResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Get specific version of a prompt
      */
-    async promptsControllerGetVersion(id: number, version: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerGetVersionRaw({ id: id, version: version }, initOverrides);
+    async promptsControllerGetVersion(id: number, version: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptVersionResponseDto> {
+        const response = await this.promptsControllerGetVersionRaw({ id: id, version: version }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Get all versions of a prompt
      */
-    async promptsControllerGetVersionsRaw(requestParameters: PromptsControllerGetVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerGetVersionsRaw(requestParameters: PromptsControllerGetVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PromptVersionResponseDto>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -539,14 +551,15 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PromptVersionResponseDtoFromJSON));
     }
 
     /**
      * Get all versions of a prompt
      */
-    async promptsControllerGetVersions(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerGetVersionsRaw({ id: id }, initOverrides);
+    async promptsControllerGetVersions(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PromptVersionResponseDto>> {
+        const response = await this.promptsControllerGetVersionsRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -584,7 +597,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Restore a specific version of a prompt
      */
-    async promptsControllerRestoreVersionRaw(requestParameters: PromptsControllerRestoreVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerRestoreVersionRaw(requestParameters: PromptsControllerRestoreVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -610,20 +623,21 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Restore a specific version of a prompt
      */
-    async promptsControllerRestoreVersion(id: number, version: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerRestoreVersionRaw({ id: id, version: version }, initOverrides);
+    async promptsControllerRestoreVersion(id: number, version: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptResponseDto> {
+        const response = await this.promptsControllerRestoreVersionRaw({ id: id, version: version }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Toggle prompt visibility (public/private)
      */
-    async promptsControllerToggleVisibilityRaw(requestParameters: PromptsControllerToggleVisibilityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerToggleVisibilityRaw(requestParameters: PromptsControllerToggleVisibilityRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -642,20 +656,21 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Toggle prompt visibility (public/private)
      */
-    async promptsControllerToggleVisibility(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerToggleVisibilityRaw({ id: id }, initOverrides);
+    async promptsControllerToggleVisibility(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptResponseDto> {
+        const response = await this.promptsControllerToggleVisibilityRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Update prompt (creates new version)
      */
-    async promptsControllerUpdateRaw(requestParameters: PromptsControllerUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerUpdateRaw(requestParameters: PromptsControllerUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -684,14 +699,15 @@ export class PromptsApi extends runtime.BaseAPI {
             body: UpdatePromptDtoToJSON(requestParameters['updatePromptDto']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Update prompt (creates new version)
      */
-    async promptsControllerUpdate(id: number, updatePromptDto: UpdatePromptDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerUpdateRaw({ id: id, updatePromptDto: updatePromptDto }, initOverrides);
+    async promptsControllerUpdate(id: number, updatePromptDto: UpdatePromptDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptResponseDto> {
+        const response = await this.promptsControllerUpdateRaw({ id: id, updatePromptDto: updatePromptDto }, initOverrides);
+        return await response.value();
     }
 
 }

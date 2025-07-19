@@ -946,7 +946,12 @@
           { "name": "sortBy", "required": true, "in": "query", "schema": { "type": "string" } },
           { "name": "sortOrder", "required": true, "in": "query", "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "List of prompts" } },
+        "responses": {
+          "200": {
+            "description": "Paginated list of prompts",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedPromptsResponseDto" } } }
+          }
+        },
         "summary": "Get all public prompts and own private prompts",
         "tags": ["prompts"]
       }
@@ -960,7 +965,12 @@
           { "name": "sortBy", "required": true, "in": "query", "schema": { "type": "string" } },
           { "name": "sortOrder", "required": true, "in": "query", "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "List of user prompts" } },
+        "responses": {
+          "200": {
+            "description": "Paginated list of user prompts",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaginatedPromptsResponseDto" } } }
+          }
+        },
         "summary": "Get current user prompts",
         "tags": ["prompts"]
       }
@@ -969,7 +979,14 @@
       "get": {
         "operationId": "PromptsController_getPopular",
         "parameters": [{ "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "List of popular prompts" } },
+        "responses": {
+          "200": {
+            "description": "List of popular prompts",
+            "content": {
+              "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+            }
+          }
+        },
         "summary": "Get popular prompts",
         "tags": ["prompts"]
       }
@@ -978,7 +995,14 @@
       "get": {
         "operationId": "PromptsController_getRecent",
         "parameters": [{ "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "List of recent prompts" } },
+        "responses": {
+          "200": {
+            "description": "List of recent prompts",
+            "content": {
+              "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+            }
+          }
+        },
         "summary": "Get recent prompts",
         "tags": ["prompts"]
       }
@@ -1004,7 +1028,13 @@
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePromptDto" } } }
         },
-        "responses": { "200": { "description": "Prompt updated successfully" }, "404": { "description": "Prompt not found" } },
+        "responses": {
+          "200": {
+            "description": "Prompt updated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+          },
+          "404": { "description": "Prompt not found" }
+        },
         "summary": "Update prompt (creates new version)",
         "tags": ["prompts"]
       },
@@ -1020,7 +1050,13 @@
       "post": {
         "operationId": "PromptsController_clone",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "201": { "description": "Prompt cloned successfully" }, "404": { "description": "Prompt not found" } },
+        "responses": {
+          "201": {
+            "description": "Prompt cloned successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+          },
+          "404": { "description": "Prompt not found" }
+        },
         "summary": "Clone a prompt",
         "tags": ["prompts"]
       }
@@ -1039,7 +1075,10 @@
         "operationId": "PromptsController_toggleVisibility",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
         "responses": {
-          "200": { "description": "Visibility updated successfully" },
+          "200": {
+            "description": "Visibility updated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+          },
           "404": { "description": "Prompt not found" }
         },
         "summary": "Toggle prompt visibility (public/private)",
@@ -1050,7 +1089,16 @@
       "get": {
         "operationId": "PromptsController_getVersions",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "List of prompt versions" } },
+        "responses": {
+          "200": {
+            "description": "List of prompt versions",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PromptVersionResponseDto" } }
+              }
+            }
+          }
+        },
         "summary": "Get all versions of a prompt",
         "tags": ["prompts"]
       }
@@ -1062,7 +1110,13 @@
           { "name": "id", "required": true, "in": "path", "schema": { "type": "number" } },
           { "name": "version", "required": true, "in": "path", "schema": { "type": "number" } }
         ],
-        "responses": { "200": { "description": "Prompt version details" }, "404": { "description": "Version not found" } },
+        "responses": {
+          "200": {
+            "description": "Prompt version details",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptVersionResponseDto" } } }
+          },
+          "404": { "description": "Version not found" }
+        },
         "summary": "Get specific version of a prompt",
         "tags": ["prompts"]
       }
@@ -1074,7 +1128,13 @@
           { "name": "id", "required": true, "in": "path", "schema": { "type": "number" } },
           { "name": "version", "required": true, "in": "path", "schema": { "type": "number" } }
         ],
-        "responses": { "200": { "description": "Version restored successfully" }, "404": { "description": "Version not found" } },
+        "responses": {
+          "200": {
+            "description": "Version restored successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+          },
+          "404": { "description": "Version not found" }
+        },
         "summary": "Restore a specific version of a prompt",
         "tags": ["prompts"]
       }
@@ -2669,6 +2729,21 @@
         },
         "required": ["id", "title", "content", "isPublic", "createdAt", "updatedAt"]
       },
+      "PaginatedPromptsResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "List of prompts",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PromptResponseDto" }
+          },
+          "total": { "type": "integer", "description": "Total number of prompts", "example": 100 },
+          "page": { "type": "integer", "description": "Current page number", "example": 1 },
+          "limit": { "type": "integer", "description": "Number of items per page", "example": 12 },
+          "totalPages": { "type": "integer", "description": "Total number of pages", "example": 9 }
+        },
+        "required": ["items", "total", "page", "limit", "totalPages"]
+      },
       "UpdatePromptDto": {
         "type": "object",
         "properties": {
@@ -2702,6 +2777,53 @@
             "example": "Added more detailed feedback criteria"
           }
         }
+      },
+      "PromptVersionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "Unique identifier for the version", "example": 1 },
+          "content": {
+            "type": "string",
+            "description": "Content of this version",
+            "example": "Please review the following code and provide feedback on..."
+          },
+          "version": { "type": "integer", "description": "Version number", "example": 2 },
+          "createdAt": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": ["id", "content", "version", "createdAt"]
+      },
+      "PromptCategoryWithCountResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "Unique identifier for the category", "example": 1 },
+          "name": { "type": "string", "description": "Name of the category", "example": "Code Review" },
+          "description": {
+            "type": "string",
+            "description": "Description of the category",
+            "example": "Templates for code review and analysis"
+          },
+          "color": { "type": "string", "description": "Hex color code for the category", "example": "#3B82F6" },
+          "sortOrder": { "type": "integer", "description": "Sort order for displaying categories", "example": 1 },
+          "createdAt": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Last update timestamp",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "promptCount": { "type": "integer", "description": "Number of prompts in this category", "example": 5 }
+        },
+        "required": ["id", "name", "createdAt", "updatedAt", "promptCount"]
       },
       "CreatePromptRatingDto": {
         "type": "object",

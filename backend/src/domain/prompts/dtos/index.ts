@@ -11,6 +11,7 @@ export {
   PromptVersionResponseDto,
   PromptRatingResponseDto,
   PromptAuthorResponseDto,
+  PaginatedPromptsResponseDto,
 } from './prompt-response.dto';
 
 // Re-export interfaces that are still used

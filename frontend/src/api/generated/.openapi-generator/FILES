@@ -58,10 +58,13 @@ models/MessageDto.ts
 models/MessagesCountDto.ts
 models/MessagesCountsDto.ts
 models/MessagesDto.ts
+models/PaginatedPromptsResponseDto.ts
 models/ProfileDto.ts
 models/PromptAuthorResponseDto.ts
 models/PromptCategoryResponseDto.ts
+models/PromptCategoryWithCountResponseDto.ts
 models/PromptResponseDto.ts
+models/PromptVersionResponseDto.ts
 models/RateMessageDto.ts
 models/RatingDto.ts
 models/RatingsDto.ts

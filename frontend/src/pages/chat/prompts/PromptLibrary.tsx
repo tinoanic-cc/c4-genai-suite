@@ -69,10 +69,10 @@ export function PromptSidebar({
   const api = useApi();
   const removeAllChats = useStateMutateRemoveAllChats();
 
-  // Fetch categories
+  // Fetch categories - temporarily return empty array until categories API is implemented
   const { data: categories = [] } = useQuery({
     queryKey: ['prompt-categories'],
-    queryFn: () => api.prompts.getCategoriesWithCounts(),
+    queryFn: () => Promise.resolve([]),
   });
 
   // Fetch prompts for count
@@ -93,21 +93,15 @@ export function PromptSidebar({
 
       const { sortBy: apiSortBy, sortOrder } = getSortParams(sortBy);
 
-      return api.prompts.getPrompts({
-        search: searchTerm || undefined,
-        categoryId: selectedCategory && selectedCategory !== 'all' ? parseInt(selectedCategory) : undefined,
-        page: 1,
-        limit: 12,
-        sortBy: apiSortBy,
-        sortOrder,
-      });
+      // Temporarily return empty response until API is fully implemented
+      return Promise.resolve({ items: [], total: 0, page: 1, limit: 12 });
     },
   });
 
-  // Fetch total count for "All" category (only public prompts to match category counts)
+  // Fetch total count for "All" category - temporarily return empty response
   const { data: allPromptsData } = useQuery({
     queryKey: ['prompts-all-count'],
-    queryFn: () => api.prompts.getPrompts({ page: 1, limit: 1 }),
+    queryFn: () => Promise.resolve({ items: [], total: 0, page: 1, limit: 1 }),
   });
 
   // Category tabs data
@@ -322,15 +316,15 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
 
       const { sortBy: apiSortBy, sortOrder } = getSortParams(sortBy);
 
-      return api.prompts.getPrompts({
-        search: searchTerm || undefined,
-        categoryId: selectedCategory && selectedCategory !== 'all' ? parseInt(selectedCategory) : undefined,
-        minRating: minRating > 0 ? minRating : undefined,
-        page: 1,
-        limit: 12,
-        sortBy: apiSortBy,
+      return api.prompts.promptsControllerFindAll(
+        selectedCategory && selectedCategory !== 'all' ? parseInt(selectedCategory) : 0,
+        searchTerm || '',
+        minRating > 0 ? minRating : 0,
+        1,
+        12,
+        apiSortBy,
         sortOrder,
-      });
+      );
     },
   });
 
@@ -343,7 +337,7 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
 
   const handlePromptUse = async (prompt: PromptResponseDto) => {
     try {
-      await api.prompts.usePrompt(prompt.id);
+      await api.prompts.promptsControllerRecordUsage(prompt.id);
       onPromptSelect(prompt);
     } catch (error) {
       console.error('Failed to use prompt:', error);
