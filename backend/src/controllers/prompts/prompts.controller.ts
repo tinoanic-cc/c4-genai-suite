@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth';
 import { UserEntity } from '../../domain/database';
-import { CreatePromptDto, PaginationOptions, PromptFilters, UpdatePromptDto } from '../../domain/prompts/interfaces';
+import { CreatePromptDto, PaginationOptions, PromptFilters, PromptResponseDto, PromptVersionResponseDto, UpdatePromptDto } from '../../domain/prompts/dtos';
 import { PromptsService } from '../../domain/prompts/prompts.service';
 
 @ApiTags('prompts')
