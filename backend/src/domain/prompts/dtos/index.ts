@@ -2,6 +2,10 @@ export { CreatePromptDto } from './create-prompt.dto';
 export { UpdatePromptDto } from './update-prompt.dto';
 export { CreatePromptRatingDto } from './create-prompt-rating.dto';
 export { CreatePromptCategoryDto } from './create-prompt-category.dto';
+export { PromptSortBy, SortOrder } from './prompt-sort.enum';
+
+// Import enums for use in interfaces
+import { PromptSortBy, SortOrder } from './prompt-sort.enum';
 
 // Export response DTOs
 export {
@@ -38,6 +42,6 @@ export interface PromptFilters {
 export interface PaginationOptions {
   page?: number;
   limit?: number;
-  sortBy?: 'createdAt' | 'updatedAt' | 'averageRating' | 'usageCount' | 'title';
-  sortOrder?: 'ASC' | 'DESC';
+  sortBy?: PromptSortBy;
+  sortOrder?: SortOrder;
 }

@@ -12,7 +12,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth';
 import { PromptEntity, PromptVersionEntity, UserEntity } from '../../domain/database';
@@ -22,7 +22,9 @@ import {
   PaginationOptions,
   PromptFilters,
   PromptResponseDto,
+  PromptSortBy,
   PromptVersionResponseDto,
+  SortOrder,
   UpdatePromptDto,
 } from '../../domain/prompts/dtos';
 import { PromptsService } from '../../domain/prompts/prompts.service';
@@ -86,6 +88,13 @@ export class PromptsController {
   @Get()
   @ApiOperation({ summary: 'Get all public prompts and own private prompts' })
   @ApiResponse({ status: 200, description: 'Paginated list of prompts', type: PaginatedPromptsResponseDto })
+  @ApiQuery({ name: 'categoryId', required: false, type: Number, description: 'Filter by category ID' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search in title, content, and description' })
+  @ApiQuery({ name: 'minRating', required: false, type: Number, description: 'Minimum average rating filter' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10, max: 100)' })
+  @ApiQuery({ name: 'sortBy', required: false, enum: PromptSortBy, description: 'Sort field' })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: SortOrder, description: 'Sort direction' })
   async findAll(
     @Req() req: Request,
     @Query('categoryId', new ParseIntPipe({ optional: true })) categoryId?: number,
@@ -93,8 +102,8 @@ export class PromptsController {
     @Query('minRating', new ParseIntPipe({ optional: true })) minRating?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
-    @Query('sortBy') sortBy?: 'createdAt' | 'updatedAt' | 'averageRating' | 'usageCount' | 'title',
-    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
+    @Query('sortBy') sortBy?: PromptSortBy,
+    @Query('sortOrder') sortOrder?: SortOrder,
   ): Promise<PaginatedPromptsResponseDto> {
     const user = req.user as UserEntity;
     const filters: PromptFilters = {
@@ -126,12 +135,16 @@ export class PromptsController {
   @Get('my')
   @ApiOperation({ summary: 'Get current user prompts' })
   @ApiResponse({ status: 200, description: 'Paginated list of user prompts', type: PaginatedPromptsResponseDto })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number for pagination (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10, max: 100)' })
+  @ApiQuery({ name: 'sortBy', required: false, enum: PromptSortBy, description: 'Sort field' })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: SortOrder, description: 'Sort direction' })
   async findMy(
     @Req() req: Request,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
-    @Query('sortBy') sortBy?: 'createdAt' | 'updatedAt' | 'averageRating' | 'usageCount' | 'title',
-    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
+    @Query('sortBy') sortBy?: PromptSortBy,
+    @Query('sortOrder') sortOrder?: SortOrder,
   ): Promise<PaginatedPromptsResponseDto> {
     const user = req.user as UserEntity;
     const pagination: PaginationOptions = {
@@ -156,6 +169,7 @@ export class PromptsController {
   @Get('popular')
   @ApiOperation({ summary: 'Get popular prompts' })
   @ApiResponse({ status: 200, description: 'List of popular prompts', type: [PromptResponseDto] })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Maximum number of prompts to return (default: 10)' })
   async getPopular(@Query('limit', new ParseIntPipe({ optional: true })) limit?: number): Promise<PromptResponseDto[]> {
     const prompts = await this.promptsService.getPopularPrompts(limit);
     return prompts.map((prompt) => this.transformToPromptResponseDto(prompt));
@@ -164,6 +178,7 @@ export class PromptsController {
   @Get('recent')
   @ApiOperation({ summary: 'Get recent prompts' })
   @ApiResponse({ status: 200, description: 'List of recent prompts', type: [PromptResponseDto] })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Maximum number of prompts to return (default: 10)' })
   async getRecent(@Query('limit', new ParseIntPipe({ optional: true })) limit?: number): Promise<PromptResponseDto[]> {
     const prompts = await this.promptsService.getRecentPrompts(limit);
     return prompts.map((prompt) => this.transformToPromptResponseDto(prompt));
