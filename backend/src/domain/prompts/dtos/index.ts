@@ -1,6 +1,7 @@
 export { CreatePromptDto } from './create-prompt.dto';
 export { UpdatePromptDto } from './update-prompt.dto';
 export { CreatePromptRatingDto } from './create-prompt-rating.dto';
+export { UpdatePromptRatingDto } from './update-prompt-rating.dto';
 export { CreatePromptCategoryDto } from './create-prompt-category.dto';
 export { UpdatePromptCategoryDto } from './update-prompt-category.dto';
 export { PromptSortBy, SortOrder } from './prompt-sort.enum';
@@ -20,11 +21,6 @@ export {
 } from './prompt-response.dto';
 
 // Re-export interfaces that are still used
-export interface UpdatePromptRatingDto {
-  rating?: number;
-  comment?: string;
-}
-
 export interface PromptFilters {
   isPublic?: boolean;
   categoryId?: number;
