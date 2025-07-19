@@ -44,8 +44,11 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
     mutationFn: (data: CreatePromptDto) => api.prompts.promptsControllerCreate(data),
     onSuccess: () => {
       toast.success(texts.chat.prompts.create.successMessage);
+      // Invalidate all prompt-related queries to refresh the lists
       void queryClient.invalidateQueries({ queryKey: ['prompts'] });
+      void queryClient.invalidateQueries({ queryKey: ['prompts-library'] });
       void queryClient.invalidateQueries({ queryKey: ['popular-prompts'] });
+      void queryClient.invalidateQueries({ queryKey: ['prompt-categories-with-counts'] });
       form.reset();
       onClose();
     },
