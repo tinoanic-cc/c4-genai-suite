@@ -28,14 +28,14 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useApi } from 'src/api';
-import { Prompt } from 'src/api/generated/temp-types';
+import { PromptResponseDto } from 'src/api/generated/models';
 import { ProfileButton } from 'src/components';
 import { texts } from 'src/texts';
 import { useStateMutateRemoveAllChats } from '../state/listOfChats';
 import { PromptDetailsModal } from './PromptDetailsModal';
 
 interface PromptLibraryProps {
-  onPromptSelect: (prompt: Prompt) => void;
+  onPromptSelect: (prompt: PromptResponseDto) => void;
   onCreatePrompt: () => void;
   searchTerm: string;
   selectedCategory: string | null;
@@ -341,7 +341,7 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
     return content.substring(0, maxLength).trim() + '...';
   };
 
-  const handlePromptUse = async (prompt: Prompt) => {
+  const handlePromptUse = async (prompt: PromptResponseDto) => {
     try {
       await api.prompts.usePrompt(prompt.id);
       onPromptSelect(prompt);

@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
-import { CreatePromptDto, PromptCategory } from 'src/api/generated/temp-types';
+import { CreatePromptDto, PromptCategoryResponseDto } from 'src/api/generated/models';
 import { texts } from 'src/texts';
 
 interface CreatePromptModalProps {
@@ -17,7 +17,7 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
   const queryClient = useQueryClient();
 
   // Fetch categories for the select
-  const { data: categories = [] } = useQuery<PromptCategory[]>({
+  const { data: categories = [] } = useQuery<PromptCategoryResponseDto[]>({
     queryKey: ['prompt-categories'],
     queryFn: () => api.prompts.getCategories(),
   });

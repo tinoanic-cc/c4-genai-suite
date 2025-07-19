@@ -926,7 +926,12 @@
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptDto" } } }
         },
-        "responses": { "201": { "description": "Prompt created successfully" } },
+        "responses": {
+          "201": {
+            "description": "Prompt created successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+          }
+        },
         "summary": "Create a new prompt",
         "tags": ["prompts"]
       },
@@ -982,7 +987,13 @@
       "get": {
         "operationId": "PromptsController_findOne",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "Prompt details" }, "404": { "description": "Prompt not found" } },
+        "responses": {
+          "200": {
+            "description": "Prompt details",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+          },
+          "404": { "description": "Prompt not found" }
+        },
         "summary": "Get prompt by ID",
         "tags": ["prompts"]
       },
@@ -2580,6 +2591,83 @@
           }
         },
         "required": ["title", "content"]
+      },
+      "PromptCategoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "Unique identifier for the category", "example": 1 },
+          "name": { "type": "string", "description": "Name of the category", "example": "Code Review" },
+          "description": {
+            "type": "string",
+            "description": "Description of the category",
+            "example": "Templates for code review and analysis"
+          },
+          "color": { "type": "string", "description": "Hex color code for the category", "example": "#3B82F6" },
+          "sortOrder": { "type": "integer", "description": "Sort order for displaying categories", "example": 1 },
+          "createdAt": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Last update timestamp",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": ["id", "name", "createdAt", "updatedAt"]
+      },
+      "PromptAuthorResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "Unique identifier for the author", "example": 1 },
+          "name": { "type": "string", "description": "Name of the author", "example": "John Doe" }
+        },
+        "required": ["id", "name"]
+      },
+      "PromptResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "Unique identifier for the prompt", "example": 1 },
+          "title": { "type": "string", "description": "Title of the prompt", "example": "Code Review Assistant" },
+          "content": {
+            "type": "string",
+            "description": "Content/template of the prompt",
+            "example": "Please review the following code and provide feedback on..."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the prompt does",
+            "example": "A prompt template for conducting thorough code reviews"
+          },
+          "isPublic": { "type": "boolean", "description": "Whether the prompt is publicly visible", "example": true },
+          "averageRating": { "type": "number", "description": "Average rating of the prompt", "format": "float", "example": 4.2 },
+          "ratingCount": { "type": "integer", "description": "Number of ratings received", "example": 15 },
+          "usageCount": { "type": "integer", "description": "Number of times the prompt has been used", "example": 42 },
+          "createdAt": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Last update timestamp",
+            "format": "date-time",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "category": {
+            "description": "Category this prompt belongs to",
+            "allOf": [{ "$ref": "#/components/schemas/PromptCategoryResponseDto" }]
+          },
+          "author": {
+            "description": "Author of the prompt",
+            "allOf": [{ "$ref": "#/components/schemas/PromptAuthorResponseDto" }]
+          }
+        },
+        "required": ["id", "title", "content", "isPublic", "createdAt", "updatedAt"]
       },
       "UpdatePromptDto": {
         "type": "object",

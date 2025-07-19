@@ -17,11 +17,14 @@
 import * as runtime from '../runtime';
 import type {
   CreatePromptDto,
+  PromptResponseDto,
   UpdatePromptDto,
 } from '../models/index';
 import {
     CreatePromptDtoFromJSON,
     CreatePromptDtoToJSON,
+    PromptResponseDtoFromJSON,
+    PromptResponseDtoToJSON,
     UpdatePromptDtoFromJSON,
     UpdatePromptDtoToJSON,
 } from '../models/index';
@@ -134,7 +137,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Create a new prompt
      */
-    async promptsControllerCreateRaw(requestParameters: PromptsControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerCreateRaw(requestParameters: PromptsControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptResponseDto>> {
         if (requestParameters['createPromptDto'] == null) {
             throw new runtime.RequiredError(
                 'createPromptDto',
@@ -156,14 +159,15 @@ export class PromptsApi extends runtime.BaseAPI {
             body: CreatePromptDtoToJSON(requestParameters['createPromptDto']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Create a new prompt
      */
-    async promptsControllerCreate(createPromptDto: CreatePromptDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerCreateRaw({ createPromptDto: createPromptDto }, initOverrides);
+    async promptsControllerCreate(createPromptDto: CreatePromptDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptResponseDto> {
+        const response = await this.promptsControllerCreateRaw({ createPromptDto: createPromptDto }, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -372,7 +376,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Get prompt by ID
      */
-    async promptsControllerFindOneRaw(requestParameters: PromptsControllerFindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerFindOneRaw(requestParameters: PromptsControllerFindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -391,14 +395,15 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Get prompt by ID
      */
-    async promptsControllerFindOne(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerFindOneRaw({ id: id }, initOverrides);
+    async promptsControllerFindOne(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptResponseDto> {
+        const response = await this.promptsControllerFindOneRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
     /**

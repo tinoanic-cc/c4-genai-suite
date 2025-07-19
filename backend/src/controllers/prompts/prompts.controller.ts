@@ -14,7 +14,7 @@ export class PromptsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new prompt' })
-  @ApiResponse({ status: 201, description: 'Prompt created successfully' })
+  @ApiResponse({ status: 201, description: 'Prompt created successfully', type: PromptResponseDto })
   async create(@Req() req: Request, @Body() createPromptDto: CreatePromptDto) {
     const user = req.user as UserEntity;
     return this.promptsService.create(user.id, createPromptDto);
@@ -87,7 +87,7 @@ export class PromptsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get prompt by ID' })
-  @ApiResponse({ status: 200, description: 'Prompt details' })
+  @ApiResponse({ status: 200, description: 'Prompt details', type: PromptResponseDto })
   @ApiResponse({ status: 404, description: 'Prompt not found' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const prompt = await this.promptsService.findOne(id);
