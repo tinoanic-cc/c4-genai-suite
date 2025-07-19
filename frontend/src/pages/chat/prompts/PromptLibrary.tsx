@@ -66,7 +66,6 @@ export function PromptSidebar({
   sortBy,
   setSortBy,
 }: PromptSidebarProps) {
-  const api = useApi();
   const removeAllChats = useStateMutateRemoveAllChats();
 
   // Fetch categories - temporarily return empty array until categories API is implemented
@@ -91,7 +90,7 @@ export function PromptSidebar({
         }
       };
 
-      const { sortBy: apiSortBy, sortOrder } = getSortParams(sortBy);
+      const { sortBy: _apiSortBy, sortOrder: _sortOrder } = getSortParams(sortBy);
 
       // Temporarily return empty response until API is fully implemented
       return Promise.resolve({ items: [], total: 0, page: 1, limit: 12 });
@@ -459,14 +458,14 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                       </Tooltip>
                       <Tooltip label={texts.chat.prompts.tooltips.currentVersion} position="top" withArrow>
                         <Text size="xs" c="dimmed">
-                          v{prompt.currentVersion}
+                          v1.0
                         </Text>
                       </Tooltip>
                       <Tooltip label={texts.chat.prompts.tooltips.usageCount} position="top" withArrow>
                         <Group gap={2}>
                           <IconEye size={12} className="text-gray-500" />
                           <Text size="xs" c="dimmed">
-                            {texts.chat.prompts.usageCount(prompt.usageCount)}
+                            {texts.chat.prompts.usageCount(prompt.usageCount || 0)}
                           </Text>
                         </Group>
                       </Tooltip>
@@ -476,7 +475,7 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                   {/* Author and Date */}
                   <Group justify="space-between" align="center" mb="md">
                     <Text size="xs" c="dimmed">
-                      {texts.chat.prompts.author(prompt.author.name)}
+                      {texts.chat.prompts.author(prompt.author?.name || 'Unknown')}
                     </Text>
                     <Text size="xs" c="dimmed">
                       {texts.chat.prompts.createdAt(new Date(prompt.createdAt).toLocaleDateString('de-DE'))}
