@@ -66,12 +66,13 @@ export function PromptSidebar({
   sortBy,
   setSortBy,
 }: PromptSidebarProps) {
+  const api = useApi();
   const removeAllChats = useStateMutateRemoveAllChats();
 
-  // Fetch categories - temporarily return empty array until categories API is implemented
+  // Fetch categories with counts
   const { data: categories = [] } = useQuery({
     queryKey: ['prompt-categories'],
-    queryFn: () => Promise.resolve([] as Array<{ id: number; name: string; promptCount: number }>),
+    queryFn: () => api.promptCategories.promptCategoriesControllerFindAllWithCounts(),
   });
 
   // Fetch prompts for count

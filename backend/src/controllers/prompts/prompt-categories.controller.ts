@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, Use
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth';
-import { UserEntity } from '../../domain/database';
+import { PromptCategoryEntity, UserEntity } from '../../domain/database';
 import {
   CreatePromptCategoryDto,
   PromptCategoriesService,
@@ -75,15 +75,7 @@ export class PromptCategoriesController {
     return { message: 'Category deleted successfully' };
   }
 
-  private transformToPromptCategoryResponseDto(category: {
-    id: number;
-    name: string;
-    description?: string;
-    color?: string;
-    sortOrder?: number;
-    createdAt: Date;
-    updatedAt: Date;
-  }): PromptCategoryResponseDto {
+  private transformToPromptCategoryResponseDto(category: PromptCategoryEntity): PromptCategoryResponseDto {
     return {
       id: category.id,
       name: category.name,
@@ -95,16 +87,9 @@ export class PromptCategoriesController {
     };
   }
 
-  private transformToPromptCategoryWithCountResponseDto(categoryWithCount: {
-    id: number;
-    name: string;
-    description?: string;
-    color?: string;
-    sortOrder?: number;
-    createdAt: Date;
-    updatedAt: Date;
-    promptCount?: number;
-  }): PromptCategoryWithCountResponseDto {
+  private transformToPromptCategoryWithCountResponseDto(
+    categoryWithCount: PromptCategoryEntity & { promptCount: number },
+  ): PromptCategoryWithCountResponseDto {
     return {
       id: categoryWithCount.id,
       name: categoryWithCount.name,
