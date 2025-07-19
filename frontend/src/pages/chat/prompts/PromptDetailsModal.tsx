@@ -38,7 +38,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
-import { CreatePromptRatingDto, PromptResponseDto } from 'src/api/generated/models';
+import { CreatePromptRatingDto, PromptResponseDto, PromptVersionResponseDto } from 'src/api/generated/models';
 
 // Temporary interface for PromptVersion until it's generated
 interface PromptVersion {
@@ -116,7 +116,7 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
   // Fetch ratings (temporarily disabled until backend is fixed)
   const { data: ratings = [] } = useQuery({
     queryKey: ['prompt-ratings', promptId],
-    queryFn: () => Promise.resolve([]),
+    queryFn: () => Promise.resolve([] as Array<{ id: number; rating: number; comment?: string; createdAt: string; userId: number; user: { name: string } }>),
     enabled: false, // Disabled until backend controller is fixed
     retry: false,
   });
@@ -124,7 +124,7 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
   // Fetch user's rating (temporarily disabled until backend is fixed)
   const { data: myRating } = useQuery({
     queryKey: ['my-rating', promptId],
-    queryFn: () => Promise.resolve(null),
+    queryFn: () => Promise.resolve(null as { rating: number; comment?: string; createdAt: string; userId: number } | null),
     enabled: false, // Disabled until backend controller is fixed
     retry: false,
   });
@@ -132,7 +132,7 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
   // Fetch categories for editing (temporarily disabled until backend is fixed)
   const { data: categories = [] } = useQuery({
     queryKey: ['prompt-categories'],
-    queryFn: () => Promise.resolve([]),
+    queryFn: () => Promise.resolve([] as Array<{ id: number; name: string }>),
     enabled: false, // Disabled until backend controller is fixed
     retry: false,
   });
@@ -355,8 +355,8 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
     setRestoreVersionNumber(null);
   };
 
-  const handleVersionSelect = (version: PromptVersion) => {
-    setSelectedVersion(version);
+  const handleVersionSelect = (version: PromptVersionResponseDto) => {
+    setSelectedVersion(version as any); // Temporary cast until proper typing is available
   };
 
   const getRatingDistribution = () => {
@@ -639,17 +639,16 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
                         <Group justify="space-between" align="flex-start">
                           <div className="flex-1">
                             <Group gap="sm" mb="xs">
-                              <Badge variant={version.isCurrent ? 'filled' : 'light'} color="blue" size="sm">
-                                v{version.versionNumber}
-                                {version.isCurrent && ` (${texts.chat.prompts.messages.current})`}
+                              <Badge variant="light" color="blue" size="sm">
+                                v{version.version}
                               </Badge>
                               <Text size="sm" fw={500}>
-                                {version.versionComment}
+                                Version {version.version}
                               </Text>
                             </Group>
                             <Group gap="sm" mb="xs">
                               <Text size="xs" c="dimmed">
-                                {version.author.name}
+                                Unknown Author
                               </Text>
                               <Text size="xs" c="dimmed">
                                 {new Date(version.createdAt).toLocaleDateString('de-DE', {
@@ -661,32 +660,25 @@ export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }
                                 })}
                               </Text>
                             </Group>
-                            {version.title !== prompt.title && (
-                              <Text size="xs" c="dimmed">
-                                Title: {version.title}
-                              </Text>
-                            )}
                           </div>
-                          {!version.isCurrent && (
-                            <Tooltip
-                              label={texts.chat.prompts.messages.restoreVersion(version.versionNumber)}
-                              position="top"
-                              withArrow
+                          <Tooltip
+                            label={texts.chat.prompts.messages.restoreVersion(version.version)}
+                            position="top"
+                            withArrow
+                          >
+                            <Button
+                              size="xs"
+                              variant="light"
+                              leftSection={<IconRestore size={14} />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRestoreVersion(version.version);
+                              }}
+                              loading={restoreVersionMutation.isPending}
                             >
-                              <Button
-                                size="xs"
-                                variant="light"
-                                leftSection={<IconRestore size={14} />}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRestoreVersion(version.versionNumber);
-                                }}
-                                loading={restoreVersionMutation.isPending}
-                              >
-                                {texts.chat.prompts.buttons.restore}
-                              </Button>
-                            </Tooltip>
-                          )}
+                              {texts.chat.prompts.buttons.restore}
+                            </Button>
+                          </Tooltip>
                         </Group>
                       </Card>
                     ))}
