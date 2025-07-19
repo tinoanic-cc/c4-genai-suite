@@ -3,7 +3,7 @@ import { IconBulb, IconEdit, IconMessageCircle } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { Prompt } from 'src/api/prompts';
+import { PromptResponseDto } from 'src/api/generated';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useSidebarState, useTheme } from 'src/hooks';
@@ -68,10 +68,10 @@ export function ChatPage() {
   const [sidebarRight, setSidebarRight] = useSidebarState('sidebar-right');
   const [leftSidebarTab, setLeftSidebarTab] = useState<string | null>('conversations');
   const [createPromptModalOpen, setCreatePromptModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>('all');
-  const [minRating, setMinRating] = useState(0);
-  const [sortBy, setSortBy] = useState('newest');
+  const [searchTerm, _setSearchTerm] = useState('');
+  const [selectedCategory, _setSelectedCategory] = useState<string | null>('all');
+  const [minRating, _setMinRating] = useState(0);
+  const [sortBy, _setSortBy] = useState('newest');
 
   const rightPanelVisible = !!(
     sidebarRight &&
@@ -152,17 +152,7 @@ export function ChatPage() {
                   </div>
                 </div>
               ) : (
-                <PromptSidebar
-                  onCreatePrompt={() => setCreatePromptModalOpen(true)}
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                  selectedCategory={selectedCategory}
-                  setSelectedCategory={setSelectedCategory}
-                  minRating={minRating}
-                  setMinRating={setMinRating}
-                  sortBy={sortBy}
-                  setSortBy={setSortBy}
-                />
+                <PromptSidebar />
               )}
             </Panel>
             {!isMobileView && <CustomResizeHandle />}
@@ -178,7 +168,7 @@ export function ChatPage() {
               ></div>
             ) : leftSidebarTab === 'prompts' ? (
               <PromptLibrary
-                onPromptSelect={(prompt: Prompt) => {
+                onPromptSelect={(prompt: PromptResponseDto) => {
                   // Navigate to new chat with the selected prompt
                   void navigate('/chat/new', { state: { initialPrompt: prompt.content } });
                   setLeftSidebarTab('conversations');

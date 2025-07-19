@@ -9,14 +9,28 @@
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptCategoryDto" } } }
         },
-        "responses": { "201": { "description": "Category created successfully" } },
+        "responses": {
+          "201": {
+            "description": "Category created successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptCategoryResponseDto" } } }
+          }
+        },
         "summary": "Create a new prompt category",
         "tags": ["admin-prompt-categories"]
       },
       "get": {
         "operationId": "AdminPromptCategoriesController_findAll",
         "parameters": [],
-        "responses": { "200": { "description": "List of categories" } },
+        "responses": {
+          "200": {
+            "description": "List of categories",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PromptCategoryResponseDto" } }
+              }
+            }
+          }
+        },
         "summary": "Get all prompt categories",
         "tags": ["admin-prompt-categories"]
       }
@@ -25,7 +39,16 @@
       "get": {
         "operationId": "AdminPromptCategoriesController_findAllWithCounts",
         "parameters": [],
-        "responses": { "200": { "description": "List of categories with prompt counts" } },
+        "responses": {
+          "200": {
+            "description": "List of categories with prompt counts",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PromptCategoryWithCountResponseDto" } }
+              }
+            }
+          }
+        },
         "summary": "Get all categories with prompt counts",
         "tags": ["admin-prompt-categories"]
       }
@@ -34,7 +57,13 @@
       "get": {
         "operationId": "AdminPromptCategoriesController_findOne",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "Category details" }, "404": { "description": "Category not found" } },
+        "responses": {
+          "200": {
+            "description": "Category details",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptCategoryResponseDto" } } }
+          },
+          "404": { "description": "Category not found" }
+        },
         "summary": "Get category by ID",
         "tags": ["admin-prompt-categories"]
       },
@@ -42,7 +71,10 @@
         "operationId": "AdminPromptCategoriesController_update",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
         "responses": {
-          "200": { "description": "Category updated successfully" },
+          "200": {
+            "description": "Category updated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptCategoryResponseDto" } } }
+          },
           "404": { "description": "Category not found" }
         },
         "summary": "Update category",
@@ -926,20 +958,67 @@
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptDto" } } }
         },
-        "responses": { "201": { "description": "Prompt created successfully" } },
+        "responses": {
+          "201": {
+            "description": "Prompt created successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+          }
+        },
         "summary": "Create a new prompt",
         "tags": ["prompts"]
       },
       "get": {
         "operationId": "PromptsController_findAll",
         "parameters": [
-          { "name": "categoryId", "required": true, "in": "query", "schema": { "type": "number" } },
-          { "name": "search", "required": true, "in": "query", "schema": { "type": "string" } },
-          { "name": "minRating", "required": true, "in": "query", "schema": { "type": "number" } },
-          { "name": "page", "required": true, "in": "query", "schema": { "type": "number" } },
-          { "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } },
-          { "name": "sortBy", "required": true, "in": "query", "schema": { "type": "string" } },
-          { "name": "sortOrder", "required": true, "in": "query", "schema": { "type": "string" } }
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by category ID",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search in title and content",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "minRating",
+            "required": false,
+            "in": "query",
+            "description": "Minimum average rating",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": { "enum": ["createdAt", "updatedAt", "averageRating", "usageCount", "title"], "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": { "enum": ["ASC", "DESC"], "type": "string" }
+          }
         ],
         "responses": { "200": { "description": "List of prompts" } },
         "summary": "Get all public prompts and own private prompts",
@@ -950,10 +1029,34 @@
       "get": {
         "operationId": "PromptsController_findMy",
         "parameters": [
-          { "name": "page", "required": true, "in": "query", "schema": { "type": "number" } },
-          { "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } },
-          { "name": "sortBy", "required": true, "in": "query", "schema": { "type": "string" } },
-          { "name": "sortOrder", "required": true, "in": "query", "schema": { "type": "string" } }
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": { "enum": ["createdAt", "updatedAt", "averageRating", "usageCount", "title"], "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": { "enum": ["ASC", "DESC"], "type": "string" }
+          }
         ],
         "responses": { "200": { "description": "List of user prompts" } },
         "summary": "Get current user prompts",
@@ -963,7 +1066,15 @@
     "/api/prompts/popular": {
       "get": {
         "operationId": "PromptsController_getPopular",
-        "parameters": [{ "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } }],
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of prompts to return",
+            "schema": { "type": "number" }
+          }
+        ],
         "responses": { "200": { "description": "List of popular prompts" } },
         "summary": "Get popular prompts",
         "tags": ["prompts"]
@@ -972,7 +1083,15 @@
     "/api/prompts/recent": {
       "get": {
         "operationId": "PromptsController_getRecent",
-        "parameters": [{ "name": "limit", "required": true, "in": "query", "schema": { "type": "number" } }],
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximum number of prompts to return",
+            "schema": { "type": "number" }
+          }
+        ],
         "responses": { "200": { "description": "List of recent prompts" } },
         "summary": "Get recent prompts",
         "tags": ["prompts"]
@@ -982,7 +1101,13 @@
       "get": {
         "operationId": "PromptsController_findOne",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "Prompt details" }, "404": { "description": "Prompt not found" } },
+        "responses": {
+          "200": {
+            "description": "Prompt details",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptResponseDto" } } }
+          },
+          "404": { "description": "Prompt not found" }
+        },
         "summary": "Get prompt by ID",
         "tags": ["prompts"]
       },
@@ -1135,7 +1260,10 @@
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptRatingDto" } } }
         },
         "responses": {
-          "201": { "description": "Rating created successfully" },
+          "201": {
+            "description": "Rating created successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptRatingResponseDto" } } }
+          },
           "400": { "description": "User has already rated this prompt" }
         },
         "summary": "Rate a prompt",
@@ -1144,14 +1272,29 @@
       "get": {
         "operationId": "PromptRatingsController_findByPrompt",
         "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "List of ratings" } },
+        "responses": {
+          "200": {
+            "description": "List of ratings",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PromptRatingResponseDto" } }
+              }
+            }
+          }
+        },
         "summary": "Get all ratings for a prompt",
         "tags": ["prompt-ratings"]
       },
       "put": {
         "operationId": "PromptRatingsController_update",
         "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "Rating updated successfully" }, "404": { "description": "Rating not found" } },
+        "responses": {
+          "200": {
+            "description": "Rating updated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptRatingResponseDto" } } }
+          },
+          "404": { "description": "Rating not found" }
+        },
         "summary": "Update user rating for a prompt",
         "tags": ["prompt-ratings"]
       },
@@ -1167,7 +1310,13 @@
       "get": {
         "operationId": "PromptRatingsController_findMyRating",
         "parameters": [{ "name": "promptId", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "User rating" }, "404": { "description": "Rating not found" } },
+        "responses": {
+          "200": {
+            "description": "User rating",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptRatingResponseDto" } } }
+          },
+          "404": { "description": "Rating not found" }
+        },
         "summary": "Get current user rating for a prompt",
         "tags": ["prompt-ratings"]
       }
@@ -1621,6 +1770,33 @@
   "components": {
     "schemas": {
       "CreatePromptCategoryDto": { "type": "object", "properties": {} },
+      "PromptCategoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "Unique identifier of the category" },
+          "name": { "type": "string", "description": "Name of the category" },
+          "description": { "type": "string", "description": "Description of the category" },
+          "color": { "type": "string", "description": "Color code for UI" },
+          "sortOrder": { "type": "number", "description": "Sort order" },
+          "createdAt": { "format": "date-time", "type": "string", "description": "Creation date" },
+          "updatedAt": { "format": "date-time", "type": "string", "description": "Last update date" }
+        },
+        "required": ["id", "name", "sortOrder", "createdAt", "updatedAt"]
+      },
+      "PromptCategoryWithCountResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "Unique identifier of the category" },
+          "name": { "type": "string", "description": "Name of the category" },
+          "description": { "type": "string", "description": "Description of the category" },
+          "color": { "type": "string", "description": "Color code for UI" },
+          "sortOrder": { "type": "number", "description": "Sort order" },
+          "createdAt": { "format": "date-time", "type": "string", "description": "Creation date" },
+          "updatedAt": { "format": "date-time", "type": "string", "description": "Last update date" },
+          "promptCount": { "type": "number", "description": "Number of prompts in this category" }
+        },
+        "required": ["id", "name", "sortOrder", "createdAt", "updatedAt", "promptCount"]
+      },
       "AuthProviderDto": {
         "type": "object",
         "properties": {
@@ -2524,8 +2700,57 @@
         "required": ["items", "total"]
       },
       "CreatePromptDto": { "type": "object", "properties": {} },
+      "PromptResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "Unique identifier of the prompt" },
+          "title": { "type": "string", "description": "Title of the prompt" },
+          "content": { "type": "string", "description": "Content of the prompt" },
+          "description": { "type": "string", "description": "Description of the prompt" },
+          "isPublic": { "type": "boolean", "description": "Whether the prompt is public" },
+          "authorId": { "type": "string", "description": "ID of the prompt author" },
+          "categoryId": { "type": "number", "description": "Category ID" },
+          "category": {
+            "description": "Category details",
+            "allOf": [{ "$ref": "#/components/schemas/PromptCategoryResponseDto" }]
+          },
+          "averageRating": { "type": "number", "description": "Average rating" },
+          "ratingCount": { "type": "number", "description": "Number of ratings" },
+          "usageCount": { "type": "number", "description": "Usage count" },
+          "currentVersion": { "type": "number", "description": "Current version number" },
+          "createdAt": { "format": "date-time", "type": "string", "description": "Creation date" },
+          "updatedAt": { "format": "date-time", "type": "string", "description": "Last update date" },
+          "author": { "type": "object", "description": "Author details" }
+        },
+        "required": [
+          "id",
+          "title",
+          "content",
+          "isPublic",
+          "authorId",
+          "ratingCount",
+          "usageCount",
+          "currentVersion",
+          "createdAt",
+          "updatedAt",
+          "author"
+        ]
+      },
       "UpdatePromptDto": { "type": "object", "properties": {} },
       "CreatePromptRatingDto": { "type": "object", "properties": {} },
+      "PromptRatingResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "description": "Unique identifier of the rating" },
+          "promptId": { "type": "number", "description": "ID of the prompt being rated" },
+          "userId": { "type": "string", "description": "ID of the user who rated" },
+          "rating": { "type": "number", "description": "Rating value (1-5)" },
+          "comment": { "type": "string", "description": "Optional comment" },
+          "createdAt": { "format": "date-time", "type": "string", "description": "Creation date" },
+          "updatedAt": { "format": "date-time", "type": "string", "description": "Last update date" }
+        },
+        "required": ["id", "promptId", "userId", "rating", "createdAt", "updatedAt"]
+      },
       "SiteLinkDto": {
         "type": "object",
         "properties": {

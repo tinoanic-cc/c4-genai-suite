@@ -8,6 +8,7 @@ import {
   ExtensionsApi,
   FilesApi,
   Middleware,
+  PromptsApi,
   SendMessageDto,
   SettingsApi,
   StreamEventDto,
@@ -16,11 +17,7 @@ import {
 } from 'src/api/generated';
 import { useTransientNavigate } from 'src/hooks';
 import { i18next } from 'src/texts/i18n';
-import { PromptsApi as CustomPromptsApi } from './prompts';
-import { TaskCategoriesApi } from './task-categories';
 export * from './generated';
-export * from './task-categories';
-// Note: Not exporting ./prompts to avoid conflict with generated PromptsApi
 
 type TransientNavigateFn = ReturnType<typeof useTransientNavigate>;
 
@@ -71,8 +68,7 @@ export class AppClient {
   public readonly conversations: ConversationApi;
   public readonly extensions: ExtensionsApi;
   public readonly files: FilesApi;
-  public readonly prompts: CustomPromptsApi;
-  public readonly taskCategories: TaskCategoriesApi;
+  public readonly prompts: PromptsApi;
   public readonly settings: SettingsApi;
   public readonly stream: StreamApi;
   public readonly usages: UsagesApi;
@@ -96,9 +92,7 @@ export class AppClient {
 
     this.files = new FilesApi(configuration).withMiddleware(middleware);
 
-    this.prompts = new CustomPromptsApi(configuration).withMiddleware(middleware);
-
-    this.taskCategories = new TaskCategoriesApi(configuration).withMiddleware(middleware);
+    this.prompts = new PromptsApi(configuration).withMiddleware(middleware);
 
     this.settings = new SettingsApi(configuration).withMiddleware(middleware);
 

@@ -15,6 +15,13 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PromptResponseDto,
+} from '../models/index';
+import {
+    PromptResponseDtoFromJSON,
+    PromptResponseDtoToJSON,
+} from '../models/index';
 
 export interface PromptsControllerCloneRequest {
     id: number;
@@ -29,20 +36,20 @@ export interface PromptsControllerDeleteRequest {
 }
 
 export interface PromptsControllerFindAllRequest {
-    categoryId: number;
-    search: string;
-    minRating: number;
-    page: number;
-    limit: number;
-    sortBy: string;
-    sortOrder: string;
+    categoryId?: number;
+    search?: string;
+    minRating?: number;
+    page?: number;
+    limit?: number;
+    sortBy?: PromptsControllerFindAllSortByEnum;
+    sortOrder?: PromptsControllerFindAllSortOrderEnum;
 }
 
 export interface PromptsControllerFindMyRequest {
-    page: number;
-    limit: number;
-    sortBy: string;
-    sortOrder: string;
+    page?: number;
+    limit?: number;
+    sortBy?: PromptsControllerFindMySortByEnum;
+    sortOrder?: PromptsControllerFindMySortOrderEnum;
 }
 
 export interface PromptsControllerFindOneRequest {
@@ -50,11 +57,11 @@ export interface PromptsControllerFindOneRequest {
 }
 
 export interface PromptsControllerGetPopularRequest {
-    limit: number;
+    limit?: number;
 }
 
 export interface PromptsControllerGetRecentRequest {
-    limit: number;
+    limit?: number;
 }
 
 export interface PromptsControllerGetVersionRequest {
@@ -124,7 +131,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Create a new prompt
      */
-    async promptsControllerCreateRaw(requestParameters: PromptsControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerCreateRaw(requestParameters: PromptsControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptResponseDto>> {
         if (requestParameters['body'] == null) {
             throw new runtime.RequiredError(
                 'body',
@@ -146,14 +153,15 @@ export class PromptsApi extends runtime.BaseAPI {
             body: requestParameters['body'] as any,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Create a new prompt
      */
-    async promptsControllerCreate(body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerCreateRaw({ body: body }, initOverrides);
+    async promptsControllerCreate(body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptResponseDto> {
+        const response = await this.promptsControllerCreateRaw({ body: body }, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -192,55 +200,6 @@ export class PromptsApi extends runtime.BaseAPI {
      * Get all public prompts and own private prompts
      */
     async promptsControllerFindAllRaw(requestParameters: PromptsControllerFindAllRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['categoryId'] == null) {
-            throw new runtime.RequiredError(
-                'categoryId',
-                'Required parameter "categoryId" was null or undefined when calling promptsControllerFindAll().'
-            );
-        }
-
-        if (requestParameters['search'] == null) {
-            throw new runtime.RequiredError(
-                'search',
-                'Required parameter "search" was null or undefined when calling promptsControllerFindAll().'
-            );
-        }
-
-        if (requestParameters['minRating'] == null) {
-            throw new runtime.RequiredError(
-                'minRating',
-                'Required parameter "minRating" was null or undefined when calling promptsControllerFindAll().'
-            );
-        }
-
-        if (requestParameters['page'] == null) {
-            throw new runtime.RequiredError(
-                'page',
-                'Required parameter "page" was null or undefined when calling promptsControllerFindAll().'
-            );
-        }
-
-        if (requestParameters['limit'] == null) {
-            throw new runtime.RequiredError(
-                'limit',
-                'Required parameter "limit" was null or undefined when calling promptsControllerFindAll().'
-            );
-        }
-
-        if (requestParameters['sortBy'] == null) {
-            throw new runtime.RequiredError(
-                'sortBy',
-                'Required parameter "sortBy" was null or undefined when calling promptsControllerFindAll().'
-            );
-        }
-
-        if (requestParameters['sortOrder'] == null) {
-            throw new runtime.RequiredError(
-                'sortOrder',
-                'Required parameter "sortOrder" was null or undefined when calling promptsControllerFindAll().'
-            );
-        }
-
         const queryParameters: any = {};
 
         if (requestParameters['categoryId'] != null) {
@@ -286,7 +245,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Get all public prompts and own private prompts
      */
-    async promptsControllerFindAll(categoryId: number, search: string, minRating: number, page: number, limit: number, sortBy: string, sortOrder: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async promptsControllerFindAll(categoryId?: number, search?: string, minRating?: number, page?: number, limit?: number, sortBy?: PromptsControllerFindAllSortByEnum, sortOrder?: PromptsControllerFindAllSortOrderEnum, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.promptsControllerFindAllRaw({ categoryId: categoryId, search: search, minRating: minRating, page: page, limit: limit, sortBy: sortBy, sortOrder: sortOrder }, initOverrides);
     }
 
@@ -294,34 +253,6 @@ export class PromptsApi extends runtime.BaseAPI {
      * Get current user prompts
      */
     async promptsControllerFindMyRaw(requestParameters: PromptsControllerFindMyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['page'] == null) {
-            throw new runtime.RequiredError(
-                'page',
-                'Required parameter "page" was null or undefined when calling promptsControllerFindMy().'
-            );
-        }
-
-        if (requestParameters['limit'] == null) {
-            throw new runtime.RequiredError(
-                'limit',
-                'Required parameter "limit" was null or undefined when calling promptsControllerFindMy().'
-            );
-        }
-
-        if (requestParameters['sortBy'] == null) {
-            throw new runtime.RequiredError(
-                'sortBy',
-                'Required parameter "sortBy" was null or undefined when calling promptsControllerFindMy().'
-            );
-        }
-
-        if (requestParameters['sortOrder'] == null) {
-            throw new runtime.RequiredError(
-                'sortOrder',
-                'Required parameter "sortOrder" was null or undefined when calling promptsControllerFindMy().'
-            );
-        }
-
         const queryParameters: any = {};
 
         if (requestParameters['page'] != null) {
@@ -355,14 +286,14 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Get current user prompts
      */
-    async promptsControllerFindMy(page: number, limit: number, sortBy: string, sortOrder: string, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async promptsControllerFindMy(page?: number, limit?: number, sortBy?: PromptsControllerFindMySortByEnum, sortOrder?: PromptsControllerFindMySortOrderEnum, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.promptsControllerFindMyRaw({ page: page, limit: limit, sortBy: sortBy, sortOrder: sortOrder }, initOverrides);
     }
 
     /**
      * Get prompt by ID
      */
-    async promptsControllerFindOneRaw(requestParameters: PromptsControllerFindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptsControllerFindOneRaw(requestParameters: PromptsControllerFindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -381,27 +312,21 @@ export class PromptsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Get prompt by ID
      */
-    async promptsControllerFindOne(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerFindOneRaw({ id: id }, initOverrides);
+    async promptsControllerFindOne(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptResponseDto> {
+        const response = await this.promptsControllerFindOneRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Get popular prompts
      */
     async promptsControllerGetPopularRaw(requestParameters: PromptsControllerGetPopularRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['limit'] == null) {
-            throw new runtime.RequiredError(
-                'limit',
-                'Required parameter "limit" was null or undefined when calling promptsControllerGetPopular().'
-            );
-        }
-
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -423,7 +348,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Get popular prompts
      */
-    async promptsControllerGetPopular(limit: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async promptsControllerGetPopular(limit?: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.promptsControllerGetPopularRaw({ limit: limit }, initOverrides);
     }
 
@@ -431,13 +356,6 @@ export class PromptsApi extends runtime.BaseAPI {
      * Get recent prompts
      */
     async promptsControllerGetRecentRaw(requestParameters: PromptsControllerGetRecentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['limit'] == null) {
-            throw new runtime.RequiredError(
-                'limit',
-                'Required parameter "limit" was null or undefined when calling promptsControllerGetRecent().'
-            );
-        }
-
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -459,7 +377,7 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Get recent prompts
      */
-    async promptsControllerGetRecent(limit: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async promptsControllerGetRecent(limit?: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.promptsControllerGetRecentRaw({ limit: limit }, initOverrides);
     }
 
@@ -680,3 +598,42 @@ export class PromptsApi extends runtime.BaseAPI {
     }
 
 }
+
+/**
+ * @export
+ */
+export const PromptsControllerFindAllSortByEnum = {
+    CreatedAt: 'createdAt',
+    UpdatedAt: 'updatedAt',
+    AverageRating: 'averageRating',
+    UsageCount: 'usageCount',
+    Title: 'title'
+} as const;
+export type PromptsControllerFindAllSortByEnum = typeof PromptsControllerFindAllSortByEnum[keyof typeof PromptsControllerFindAllSortByEnum];
+/**
+ * @export
+ */
+export const PromptsControllerFindAllSortOrderEnum = {
+    Asc: 'ASC',
+    Desc: 'DESC'
+} as const;
+export type PromptsControllerFindAllSortOrderEnum = typeof PromptsControllerFindAllSortOrderEnum[keyof typeof PromptsControllerFindAllSortOrderEnum];
+/**
+ * @export
+ */
+export const PromptsControllerFindMySortByEnum = {
+    CreatedAt: 'createdAt',
+    UpdatedAt: 'updatedAt',
+    AverageRating: 'averageRating',
+    UsageCount: 'usageCount',
+    Title: 'title'
+} as const;
+export type PromptsControllerFindMySortByEnum = typeof PromptsControllerFindMySortByEnum[keyof typeof PromptsControllerFindMySortByEnum];
+/**
+ * @export
+ */
+export const PromptsControllerFindMySortOrderEnum = {
+    Asc: 'ASC',
+    Desc: 'DESC'
+} as const;
+export type PromptsControllerFindMySortOrderEnum = typeof PromptsControllerFindMySortOrderEnum[keyof typeof PromptsControllerFindMySortOrderEnum];

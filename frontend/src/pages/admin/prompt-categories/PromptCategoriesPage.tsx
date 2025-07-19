@@ -4,7 +4,7 @@ import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { CreatePromptCategoryDto, PromptCategory, UpdatePromptCategoryDto } from 'src/api/prompts';
+import { PromptCategoryWithCountResponseDto } from 'src/api/generated';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 
@@ -15,20 +15,34 @@ interface CategoryFormData {
   sortOrder: number;
 }
 
+interface CreatePromptCategoryDto {
+  name: string;
+  description?: string;
+  color: string;
+  sortOrder: number;
+}
+
+interface UpdatePromptCategoryDto {
+  name?: string;
+  description?: string;
+  color?: string;
+  sortOrder?: number;
+}
+
 export function PromptCategoriesPage() {
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<PromptCategory | null>(null);
+  const [editingCategory, setEditingCategory] = useState<PromptCategoryWithCountResponseDto | null>(null);
 
   // Fetch categories
-  const { data: categories = [], isLoading } = useQuery<PromptCategory[]>({
+  const { data: categories = [], isLoading } = useQuery<PromptCategoryWithCountResponseDto[]>({
     queryKey: ['prompt-categories'],
-    queryFn: async (): Promise<PromptCategory[]> => {
+    queryFn: async (): Promise<PromptCategoryWithCountResponseDto[]> => {
       const response = await fetch('/api/admin/prompt-categories/with-counts');
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
       }
-      return response.json() as Promise<PromptCategory[]>;
+      return response.json() as Promise<PromptCategoryWithCountResponseDto[]>;
     },
   });
 
@@ -47,7 +61,7 @@ export function PromptCategoriesPage() {
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: async (data: CreatePromptCategoryDto): Promise<PromptCategory> => {
+    mutationFn: async (data: CreatePromptCategoryDto): Promise<PromptCategoryWithCountResponseDto> => {
       const response = await fetch('/api/admin/prompt-categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,7 +70,7 @@ export function PromptCategoriesPage() {
       if (!response.ok) {
         throw new Error('Failed to create category');
       }
-      return response.json() as Promise<PromptCategory>;
+      return response.json() as Promise<PromptCategoryWithCountResponseDto>;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['prompt-categories'] });
@@ -71,7 +85,13 @@ export function PromptCategoriesPage() {
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: UpdatePromptCategoryDto }): Promise<PromptCategory> => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: UpdatePromptCategoryDto;
+    }): Promise<PromptCategoryWithCountResponseDto> => {
       const response = await fetch(`/api/admin/prompt-categories/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -80,7 +100,7 @@ export function PromptCategoriesPage() {
       if (!response.ok) {
         throw new Error('Failed to update category');
       }
-      return response.json() as Promise<PromptCategory>;
+      return response.json() as Promise<PromptCategoryWithCountResponseDto>;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['prompt-categories'] });
@@ -127,7 +147,7 @@ export function PromptCategoriesPage() {
     }
   };
 
-  const handleEdit = (category: PromptCategory) => {
+  const handleEdit = (category: PromptCategoryWithCountResponseDto) => {
     setEditingCategory(category);
     form.setValues({
       name: category.name,
@@ -137,7 +157,7 @@ export function PromptCategoriesPage() {
     });
   };
 
-  const handleDelete = (category: PromptCategory) => {
+  const handleDelete = (category: PromptCategoryWithCountResponseDto) => {
     if (window.confirm(texts.admin.promptCategories.deleteConfirmation(category.name))) {
       deleteMutation.mutate(category.id);
     }

@@ -2,9 +2,16 @@ import { Button, Group, Modal, Select, Stack, Switch, Textarea, TextInput } from
 import { useForm } from '@mantine/form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { useApi } from 'src/api';
-import { CreatePromptDto } from 'src/api/prompts';
+import { PromptCategoryResponseDto, PromptResponseDto } from 'src/api/generated';
 import { texts } from 'src/texts';
+
+interface CreatePromptDto {
+  title: string;
+  content: string;
+  description?: string;
+  categoryId?: number;
+  isPublic: boolean;
+}
 
 interface CreatePromptModalProps {
   opened: boolean;
@@ -13,13 +20,18 @@ interface CreatePromptModalProps {
 }
 
 export function CreatePromptModal({ opened, onClose, initialContent = '' }: CreatePromptModalProps) {
-  const api = useApi();
   const queryClient = useQueryClient();
 
   // Fetch categories for the select
-  const { data: categories = [] } = useQuery({
+  const { data: categories = [] } = useQuery<PromptCategoryResponseDto[]>({
     queryKey: ['prompt-categories'],
-    queryFn: () => api.prompts.getCategories(),
+    queryFn: async (): Promise<PromptCategoryResponseDto[]> => {
+      const response = await fetch('/api/prompt-categories');
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+      return response.json() as Promise<PromptCategoryResponseDto[]>;
+    },
   });
 
   const form = useForm<CreatePromptDto>({
@@ -37,7 +49,18 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
   });
 
   const createPromptMutation = useMutation({
-    mutationFn: (data: CreatePromptDto) => api.prompts.createPrompt(data),
+    mutationFn: async (data: CreatePromptDto): Promise<PromptResponseDto> => {
+      const response = await fetch('/api/prompts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create prompt');
+      }
+      const result: unknown = await response.json();
+      return result as PromptResponseDto;
+    },
     onSuccess: () => {
       toast.success(texts.chat.prompts.create.successMessage);
       void queryClient.invalidateQueries({ queryKey: ['prompts'] });

@@ -15,6 +15,13 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PromptRatingResponseDto,
+} from '../models/index';
+import {
+    PromptRatingResponseDtoFromJSON,
+    PromptRatingResponseDtoToJSON,
+} from '../models/index';
 
 export interface PromptRatingsControllerCreateRequest {
     promptId: number;
@@ -49,7 +56,7 @@ export class PromptRatingsApi extends runtime.BaseAPI {
     /**
      * Rate a prompt
      */
-    async promptRatingsControllerCreateRaw(requestParameters: PromptRatingsControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptRatingsControllerCreateRaw(requestParameters: PromptRatingsControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptRatingResponseDto>> {
         if (requestParameters['promptId'] == null) {
             throw new runtime.RequiredError(
                 'promptId',
@@ -78,14 +85,15 @@ export class PromptRatingsApi extends runtime.BaseAPI {
             body: requestParameters['body'] as any,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptRatingResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Rate a prompt
      */
-    async promptRatingsControllerCreate(promptId: number, body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptRatingsControllerCreateRaw({ promptId: promptId, body: body }, initOverrides);
+    async promptRatingsControllerCreate(promptId: number, body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptRatingResponseDto> {
+        const response = await this.promptRatingsControllerCreateRaw({ promptId: promptId, body: body }, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -123,7 +131,7 @@ export class PromptRatingsApi extends runtime.BaseAPI {
     /**
      * Get all ratings for a prompt
      */
-    async promptRatingsControllerFindByPromptRaw(requestParameters: PromptRatingsControllerFindByPromptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptRatingsControllerFindByPromptRaw(requestParameters: PromptRatingsControllerFindByPromptRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PromptRatingResponseDto>>> {
         if (requestParameters['promptId'] == null) {
             throw new runtime.RequiredError(
                 'promptId',
@@ -142,20 +150,21 @@ export class PromptRatingsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PromptRatingResponseDtoFromJSON));
     }
 
     /**
      * Get all ratings for a prompt
      */
-    async promptRatingsControllerFindByPrompt(promptId: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptRatingsControllerFindByPromptRaw({ promptId: promptId }, initOverrides);
+    async promptRatingsControllerFindByPrompt(promptId: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PromptRatingResponseDto>> {
+        const response = await this.promptRatingsControllerFindByPromptRaw({ promptId: promptId }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Get current user rating for a prompt
      */
-    async promptRatingsControllerFindMyRatingRaw(requestParameters: PromptRatingsControllerFindMyRatingRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptRatingsControllerFindMyRatingRaw(requestParameters: PromptRatingsControllerFindMyRatingRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptRatingResponseDto>> {
         if (requestParameters['promptId'] == null) {
             throw new runtime.RequiredError(
                 'promptId',
@@ -174,14 +183,15 @@ export class PromptRatingsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptRatingResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Get current user rating for a prompt
      */
-    async promptRatingsControllerFindMyRating(promptId: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptRatingsControllerFindMyRatingRaw({ promptId: promptId }, initOverrides);
+    async promptRatingsControllerFindMyRating(promptId: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptRatingResponseDto> {
+        const response = await this.promptRatingsControllerFindMyRatingRaw({ promptId: promptId }, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -219,7 +229,7 @@ export class PromptRatingsApi extends runtime.BaseAPI {
     /**
      * Update user rating for a prompt
      */
-    async promptRatingsControllerUpdateRaw(requestParameters: PromptRatingsControllerUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptRatingsControllerUpdateRaw(requestParameters: PromptRatingsControllerUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptRatingResponseDto>> {
         if (requestParameters['promptId'] == null) {
             throw new runtime.RequiredError(
                 'promptId',
@@ -238,14 +248,15 @@ export class PromptRatingsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptRatingResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Update user rating for a prompt
      */
-    async promptRatingsControllerUpdate(promptId: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptRatingsControllerUpdateRaw({ promptId: promptId }, initOverrides);
+    async promptRatingsControllerUpdate(promptId: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptRatingResponseDto> {
+        const response = await this.promptRatingsControllerUpdateRaw({ promptId: promptId }, initOverrides);
+        return await response.value();
     }
 
 }

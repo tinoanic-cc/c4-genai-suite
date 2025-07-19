@@ -15,6 +15,16 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PromptCategoryResponseDto,
+  PromptCategoryWithCountResponseDto,
+} from '../models/index';
+import {
+    PromptCategoryResponseDtoFromJSON,
+    PromptCategoryResponseDtoToJSON,
+    PromptCategoryWithCountResponseDtoFromJSON,
+    PromptCategoryWithCountResponseDtoToJSON,
+} from '../models/index';
 
 export interface AdminPromptCategoriesControllerCreateRequest {
     body: object;
@@ -40,7 +50,7 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
     /**
      * Create a new prompt category
      */
-    async adminPromptCategoriesControllerCreateRaw(requestParameters: AdminPromptCategoriesControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async adminPromptCategoriesControllerCreateRaw(requestParameters: AdminPromptCategoriesControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptCategoryResponseDto>> {
         if (requestParameters['body'] == null) {
             throw new runtime.RequiredError(
                 'body',
@@ -62,14 +72,15 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
             body: requestParameters['body'] as any,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptCategoryResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Create a new prompt category
      */
-    async adminPromptCategoriesControllerCreate(body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.adminPromptCategoriesControllerCreateRaw({ body: body }, initOverrides);
+    async adminPromptCategoriesControllerCreate(body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptCategoryResponseDto> {
+        const response = await this.adminPromptCategoriesControllerCreateRaw({ body: body }, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -107,7 +118,7 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
     /**
      * Get all prompt categories
      */
-    async adminPromptCategoriesControllerFindAllRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async adminPromptCategoriesControllerFindAllRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PromptCategoryResponseDto>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -119,20 +130,21 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PromptCategoryResponseDtoFromJSON));
     }
 
     /**
      * Get all prompt categories
      */
-    async adminPromptCategoriesControllerFindAll(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.adminPromptCategoriesControllerFindAllRaw(initOverrides);
+    async adminPromptCategoriesControllerFindAll(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PromptCategoryResponseDto>> {
+        const response = await this.adminPromptCategoriesControllerFindAllRaw(initOverrides);
+        return await response.value();
     }
 
     /**
      * Get all categories with prompt counts
      */
-    async adminPromptCategoriesControllerFindAllWithCountsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async adminPromptCategoriesControllerFindAllWithCountsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PromptCategoryWithCountResponseDto>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -144,20 +156,21 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PromptCategoryWithCountResponseDtoFromJSON));
     }
 
     /**
      * Get all categories with prompt counts
      */
-    async adminPromptCategoriesControllerFindAllWithCounts(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.adminPromptCategoriesControllerFindAllWithCountsRaw(initOverrides);
+    async adminPromptCategoriesControllerFindAllWithCounts(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PromptCategoryWithCountResponseDto>> {
+        const response = await this.adminPromptCategoriesControllerFindAllWithCountsRaw(initOverrides);
+        return await response.value();
     }
 
     /**
      * Get category by ID
      */
-    async adminPromptCategoriesControllerFindOneRaw(requestParameters: AdminPromptCategoriesControllerFindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async adminPromptCategoriesControllerFindOneRaw(requestParameters: AdminPromptCategoriesControllerFindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptCategoryResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -176,20 +189,21 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptCategoryResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Get category by ID
      */
-    async adminPromptCategoriesControllerFindOne(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.adminPromptCategoriesControllerFindOneRaw({ id: id }, initOverrides);
+    async adminPromptCategoriesControllerFindOne(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptCategoryResponseDto> {
+        const response = await this.adminPromptCategoriesControllerFindOneRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Update category
      */
-    async adminPromptCategoriesControllerUpdateRaw(requestParameters: AdminPromptCategoriesControllerUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async adminPromptCategoriesControllerUpdateRaw(requestParameters: AdminPromptCategoriesControllerUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptCategoryResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -208,14 +222,15 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptCategoryResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Update category
      */
-    async adminPromptCategoriesControllerUpdate(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.adminPromptCategoriesControllerUpdateRaw({ id: id }, initOverrides);
+    async adminPromptCategoriesControllerUpdate(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptCategoryResponseDto> {
+        const response = await this.adminPromptCategoriesControllerUpdateRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
 }

@@ -1,353 +1,60 @@
-import {
-  Accordion,
-  Badge,
-  Box,
-  Button,
-  Card,
-  Group,
-  Pagination,
-  Rating,
-  ScrollArea,
-  Select,
-  SimpleGrid,
-  Slider,
-  Stack,
-  Text,
-  TextInput,
-  Tooltip,
-} from '@mantine/core';
-import {
-  IconChevronDown,
-  IconCopy,
-  IconEye,
-  IconLock,
-  IconPlayerPlay,
-  IconPlus,
-  IconSearch,
-  IconWorld,
-} from '@tabler/icons-react';
+import { Badge, Box, Button, Card, Group, Rating, ScrollArea, SimpleGrid, Text, Tooltip } from '@mantine/core';
+import { IconEye, IconLock, IconPlayerPlay, IconWorld } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { useApi } from 'src/api';
-import { Prompt } from 'src/api/prompts';
-import { ProfileButton } from 'src/components';
+import { useState } from 'react';
+import { PromptResponseDto } from 'src/api/generated';
 import { texts } from 'src/texts';
-import { useStateMutateRemoveAllChats } from '../state/listOfChats';
 import { PromptDetailsModal } from './PromptDetailsModal';
 
 interface PromptLibraryProps {
-  onPromptSelect: (prompt: Prompt) => void;
+  onPromptSelect: (prompt: PromptResponseDto) => void;
   onCreatePrompt: () => void;
   searchTerm: string;
   selectedCategory: string | null;
   minRating: number;
   sortBy: string;
-}
-
-interface PromptSidebarProps {
-  onCreatePrompt: () => void;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  selectedCategory: string | null;
-  setSelectedCategory: (category: string | null) => void;
-  minRating: number;
-  setMinRating: (rating: number) => void;
-  sortBy: string;
-  setSortBy: (sortBy: string) => void;
-}
-
-export function PromptSidebar({
-  onCreatePrompt,
-  searchTerm,
-  setSearchTerm,
-  selectedCategory,
-  setSelectedCategory,
-  minRating,
-  setMinRating,
-  sortBy,
-  setSortBy,
-}: PromptSidebarProps) {
-  const api = useApi();
-  const removeAllChats = useStateMutateRemoveAllChats();
-
-  // Fetch categories
-  const { data: categories = [] } = useQuery({
-    queryKey: ['prompt-categories'],
-    queryFn: () => api.prompts.getCategoriesWithCounts(),
-  });
-
-  // Fetch prompts for count
-  const { data: _promptsData } = useQuery({
-    queryKey: ['prompts', searchTerm, selectedCategory, sortBy],
-    queryFn: () => {
-      const getSortParams = (sortBy: string) => {
-        switch (sortBy) {
-          case 'rating':
-            return { sortBy: 'averageRating' as const, sortOrder: 'DESC' as const };
-          case 'usage':
-            return { sortBy: 'usageCount' as const, sortOrder: 'DESC' as const };
-          case 'newest':
-          default:
-            return { sortBy: 'createdAt' as const, sortOrder: 'DESC' as const };
-        }
-      };
-
-      const { sortBy: apiSortBy, sortOrder } = getSortParams(sortBy);
-
-      return api.prompts.getPrompts({
-        search: searchTerm || undefined,
-        categoryId: selectedCategory && selectedCategory !== 'all' ? parseInt(selectedCategory) : undefined,
-        page: 1,
-        limit: 12,
-        sortBy: apiSortBy,
-        sortOrder,
-      });
-    },
-  });
-
-  // Fetch total count for "All" category (only public prompts to match category counts)
-  const { data: allPromptsData } = useQuery({
-    queryKey: ['prompts-all-count'],
-    queryFn: () => api.prompts.getPrompts({ page: 1, limit: 1 }),
-  });
-
-  // Category tabs data
-  const categoryTabs = [
-    { value: 'all', label: texts.chat.prompts.categories.all, count: allPromptsData?.total || 0 },
-    ...categories.map((cat) => ({
-      value: cat.id.toString(),
-      label: cat.name,
-      count: cat.promptCount || 0,
-    })),
-  ];
-
-  const clearSearch = () => {
-    setSearchTerm('');
-  };
-
-  return (
-    <div className="flex h-full flex-col">
-      {/* Header - Optimized */}
-      <div className="border-b border-gray-200 bg-white p-4">
-        <Text size="xl" fw={700} mb="md" className="text-gray-900">
-          {texts.chat.prompts.library}
-        </Text>
-
-        {/* Primary Action Button - More prominent */}
-        <Tooltip label={texts.chat.prompts.tooltips.createNew} position="top" withArrow>
-          <Button
-            leftSection={<IconPlus size={18} />}
-            onClick={onCreatePrompt}
-            fullWidth
-            size="md"
-            className="mb-4 bg-blue-600 hover:bg-blue-700"
-            radius="md"
-          >
-            {texts.chat.prompts.newPrompt}
-          </Button>
-        </Tooltip>
-
-        {/* Enhanced Search */}
-        <div className="relative">
-          <TextInput
-            placeholder={texts.chat.prompts.searchPlaceholder}
-            leftSection={<IconSearch size={18} className="text-gray-400" />}
-            rightSection={
-              searchTerm && (
-                <button
-                  onClick={clearSearch}
-                  className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-gray-500 hover:bg-gray-300 hover:text-gray-700"
-                  type="button"
-                >
-                  ×
-                </button>
-              )
-            }
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="md"
-            radius="md"
-            className="w-full"
-            styles={{
-              input: {
-                fontSize: '14px',
-                padding: '12px 16px',
-                paddingLeft: '44px',
-                paddingRight: searchTerm ? '44px' : '16px',
-              },
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Filter Content */}
-      <div className="flex-1 overflow-y-auto p-4">
-        {/* Category Dropdown */}
-        <div className="mb-6">
-          <Text size="sm" fw={600} mb="sm">
-            {texts.chat.prompts.categories.all}
-          </Text>
-          <Select
-            placeholder={texts.chat.prompts.categories.all}
-            value={selectedCategory}
-            onChange={setSelectedCategory}
-            data={categoryTabs.map((tab) => ({
-              value: tab.value,
-              label: `${tab.label} (${tab.count})`,
-            }))}
-            rightSection={<IconChevronDown size={16} />}
-            size="sm"
-            radius="md"
-            searchable
-            clearable
-            maxDropdownHeight={200}
-            styles={{
-              input: {
-                fontSize: '14px',
-              },
-            }}
-          />
-        </div>
-
-        {/* Collapsible Filter Sections */}
-        <Accordion
-          multiple
-          defaultValue={['rating', 'sorting']}
-          styles={{
-            item: {
-              border: 'none',
-              marginBottom: '16px',
-            },
-            control: {
-              padding: '8px 0',
-              backgroundColor: 'transparent',
-              border: 'none',
-              fontSize: '14px',
-              fontWeight: 600,
-            },
-            content: {
-              padding: '12px 0 0 0',
-            },
-            chevron: {
-              width: '16px',
-              height: '16px',
-            },
-          }}
-        >
-          {/* Rating Section */}
-          <Accordion.Item value="rating">
-            <Accordion.Control>{texts.chat.prompts.rating}</Accordion.Control>
-            <Accordion.Panel>
-              <Text size="xs" c="dimmed" mb="xs">
-                {texts.chat.prompts.minRating(minRating)}
-              </Text>
-              <Slider
-                value={minRating}
-                onChange={setMinRating}
-                min={0}
-                max={5}
-                step={0.1}
-                size="sm"
-                color="blue"
-                marks={[
-                  { value: 0, label: '0' },
-                  { value: 2.5, label: '2.5' },
-                  { value: 5, label: '5' },
-                ]}
-                styles={{
-                  mark: {
-                    fontSize: '11px',
-                    color: '#6b7280',
-                  },
-                  markLabel: {
-                    fontSize: '11px',
-                    color: '#6b7280',
-                  },
-                }}
-                mb="sm"
-              />
-            </Accordion.Panel>
-          </Accordion.Item>
-
-          {/* Sorting Section */}
-          <Accordion.Item value="sorting">
-            <Accordion.Control>{texts.chat.prompts.sorting}</Accordion.Control>
-            <Accordion.Panel>
-              <Stack gap="xs">
-                <label className="flex items-center gap-2">
-                  <input type="radio" name="sort" checked={sortBy === 'newest'} onChange={() => setSortBy('newest')} />
-                  <Text size="sm">{texts.chat.prompts.newestFirst}</Text>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="radio" name="sort" checked={sortBy === 'rating'} onChange={() => setSortBy('rating')} />
-                  <Text size="sm">{texts.chat.prompts.bestRating}</Text>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="radio" name="sort" checked={sortBy === 'usage'} onChange={() => setSortBy('usage')} />
-                  <Text size="sm">{texts.chat.prompts.mostUsed}</Text>
-                </label>
-              </Stack>
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
-      </div>
-
-      {/* Profile Button at the bottom */}
-      <div className="p-2" onClick={(e) => e.stopPropagation()}>
-        <ProfileButton section="chat" onClearConversations={removeAllChats.mutate} />
-      </div>
-    </div>
-  );
 }
 
 export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, minRating, sortBy }: PromptLibraryProps) {
-  const api = useApi();
   const [selectedPromptId, setSelectedPromptId] = useState<number | null>(null);
   const [detailsModalOpened, setDetailsModalOpened] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(12);
-
-  // Reset to page 1 when filters change
-  const resetPage = () => setCurrentPage(1);
 
   // Fetch prompts with search, category and rating filters
-  const { data: promptsData, isLoading } = useQuery({
-    queryKey: ['prompts-library', searchTerm, selectedCategory, minRating, sortBy, currentPage],
-    queryFn: () => {
-      const getSortParams = (sortBy: string) => {
-        switch (sortBy) {
-          case 'rating':
-            return { sortBy: 'averageRating' as const, sortOrder: 'DESC' as const };
-          case 'usage':
-            return { sortBy: 'usageCount' as const, sortOrder: 'DESC' as const };
-          case 'newest':
-          default:
-            return { sortBy: 'createdAt' as const, sortOrder: 'DESC' as const };
-        }
-      };
+  const { data: promptsData, isLoading } = useQuery<{ items: PromptResponseDto[]; total: number }>({
+    queryKey: ['prompts-library', searchTerm, selectedCategory, minRating, sortBy],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (selectedCategory && selectedCategory !== 'all') params.append('categoryId', selectedCategory);
+      if (minRating > 0) params.append('minRating', minRating.toString());
+      params.append('page', '1');
+      params.append('limit', '50');
 
-      const { sortBy: apiSortBy, sortOrder } = getSortParams(sortBy);
+      // Set sort parameters
+      switch (sortBy) {
+        case 'rating':
+          params.append('sortBy', 'averageRating');
+          params.append('sortOrder', 'DESC');
+          break;
+        case 'usage':
+          params.append('sortBy', 'usageCount');
+          params.append('sortOrder', 'DESC');
+          break;
+        case 'newest':
+        default:
+          params.append('sortBy', 'createdAt');
+          params.append('sortOrder', 'DESC');
+          break;
+      }
 
-      return api.prompts.getPrompts({
-        search: searchTerm || undefined,
-        categoryId: selectedCategory && selectedCategory !== 'all' ? parseInt(selectedCategory) : undefined,
-        minRating: minRating > 0 ? minRating : undefined,
-        page: currentPage,
-        limit: pageSize,
-        sortBy: apiSortBy,
-        sortOrder,
-      });
+      const response = await fetch(`/api/prompts?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch prompts');
+      }
+      const result: unknown = await response.json();
+      return result as { items: PromptResponseDto[]; total: number };
     },
   });
-
-  // Reset page when filters change
-  useEffect(() => {
-    resetPage();
-  }, [searchTerm, selectedCategory, minRating, sortBy]);
-
-  // Calculate pagination info
-  const totalPages = promptsData ? Math.ceil(promptsData.total / pageSize) : 0;
-  const showPagination = totalPages > 1;
 
   // Utility function to get prompt preview
   const getPromptPreview = (content: string, maxLength: number = 150): string => {
@@ -356,9 +63,9 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
     return content.substring(0, maxLength).trim() + '...';
   };
 
-  const handlePromptUse = async (prompt: Prompt) => {
+  const handlePromptUse = async (prompt: PromptResponseDto) => {
     try {
-      await api.prompts.usePrompt(prompt.id);
+      await fetch(`/api/prompts/${prompt.id}/use`, { method: 'POST' });
       onPromptSelect(prompt);
     } catch (error) {
       console.error('Failed to use prompt:', error);
@@ -377,13 +84,12 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
 
   return (
     <div className="flex h-full w-full flex-col bg-white">
-      {/* Content - nur die Prompt-Karten */}
       <ScrollArea className="flex-1 p-6">
         {isLoading ? (
           <Text size="sm" c="dimmed" ta="center" py="xl">
             {texts.chat.prompts.messages.loading}
           </Text>
-        ) : promptsData?.items.length === 0 ? (
+        ) : !promptsData?.items || promptsData.items.length === 0 ? (
           <Box ta="center" py="xl">
             <Text size="sm" c="dimmed" mb="xs">
               {texts.chat.prompts.noResults}
@@ -394,8 +100,7 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
           </Box>
         ) : (
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
-            {/* All prompts from API */}
-            {promptsData?.items.map((prompt) => (
+            {promptsData.items.map((prompt) => (
               <Card
                 key={prompt.id}
                 p="lg"
@@ -403,7 +108,7 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                 className="flex h-full min-h-[320px] flex-col transition-shadow hover:shadow-lg"
                 style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
               >
-                {/* Header - Fixed height section */}
+                {/* Header */}
                 <div className="mb-4">
                   <Group justify="space-between" align="flex-start" mb="sm">
                     <div className="min-w-0 flex-1">
@@ -419,8 +124,8 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                       </div>
                       <Group gap="xs" mt="xs">
                         {prompt.category && (
-                          <Badge size="xs" variant="light" color={prompt.category.color || 'blue'}>
-                            {prompt.category.name}
+                          <Badge size="xs" variant="light" color={(prompt.category as { color?: string })?.color || 'blue'}>
+                            {(prompt.category as { name?: string })?.name}
                           </Badge>
                         )}
                         <Badge
@@ -433,21 +138,10 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                         </Badge>
                       </Group>
                     </div>
-                    <Tooltip label={texts.chat.prompts.tooltips.copyPrompt} position="top" withArrow>
-                      <button
-                        type="button"
-                        className="rounded p-1 hover:bg-gray-100"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      >
-                        <IconCopy size={14} />
-                      </button>
-                    </Tooltip>
                   </Group>
                 </div>
 
-                {/* Content - Flexible height section */}
+                {/* Content */}
                 <div className="mb-4 flex-1">
                   {prompt.content && (
                     <Box p="xs" className="rounded border-l-2 border-blue-200 bg-gray-50">
@@ -461,16 +155,13 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                   )}
                 </div>
 
-                {/* Footer - Fixed height section at bottom */}
+                {/* Footer */}
                 <div className="mt-auto">
                   {/* Stats */}
                   <Group justify="space-between" align="center" mb="sm">
                     <Group gap="xs">
                       <Tooltip
-                        label={texts.chat.prompts.messages.averageRating(
-                          Number(prompt.averageRating) || 0,
-                          prompt.ratingCount || 0,
-                        )}
+                        label={`Rating: ${(Number(prompt.averageRating) || 0).toFixed(1)} (${prompt.ratingCount || 0} ratings)`}
                         position="top"
                         withArrow
                       >
@@ -478,16 +169,11 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                           <Rating value={prompt.averageRating || 0} readOnly size="xs" />
                         </Group>
                       </Tooltip>
-                      <Tooltip label={texts.chat.prompts.tooltips.currentVersion} position="top" withArrow>
-                        <Text size="xs" c="dimmed">
-                          v{prompt.currentVersion}
-                        </Text>
-                      </Tooltip>
-                      <Tooltip label={texts.chat.prompts.tooltips.usageCount} position="top" withArrow>
+                      <Tooltip label="Usage count" position="top" withArrow>
                         <Group gap={2}>
                           <IconEye size={12} className="text-gray-500" />
                           <Text size="xs" c="dimmed">
-                            {texts.chat.prompts.usageCount(prompt.usageCount)}
+                            {prompt.usageCount || 0}
                           </Text>
                         </Group>
                       </Tooltip>
@@ -497,16 +183,16 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                   {/* Author and Date */}
                   <Group justify="space-between" align="center" mb="md">
                     <Text size="xs" c="dimmed">
-                      {texts.chat.prompts.author(prompt.author.name)}
+                      {(prompt.author as { name?: string })?.name || 'Unknown'}
                     </Text>
                     <Text size="xs" c="dimmed">
-                      {texts.chat.prompts.createdAt(new Date(prompt.createdAt).toLocaleDateString('de-DE'))}
+                      {new Date(prompt.createdAt).toLocaleDateString('de-DE')}
                     </Text>
                   </Group>
 
-                  {/* Actions - always at bottom */}
+                  {/* Actions */}
                   <Group gap="xs">
-                    <Tooltip label={texts.chat.prompts.tooltips.showDetails} position="top" withArrow>
+                    <Tooltip label="Show details" position="top" withArrow>
                       <Button
                         variant="light"
                         size="sm"
@@ -514,10 +200,10 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                         flex={1}
                         onClick={() => handleShowDetails(prompt.id)}
                       >
-                        {texts.chat.prompts.buttons.details}
+                        Details
                       </Button>
                     </Tooltip>
-                    <Tooltip label={texts.chat.prompts.tooltips.useInChat} position="top" withArrow>
+                    <Tooltip label="Use in chat" position="top" withArrow>
                       <Button
                         size="sm"
                         leftSection={<IconPlayerPlay size={14} />}
@@ -525,7 +211,7 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                         onClick={() => handlePromptUse(prompt)}
                         className="bg-blue-600 hover:bg-blue-700"
                       >
-                        {texts.chat.prompts.buttons.execute}
+                        Use
                       </Button>
                     </Tooltip>
                   </Group>
@@ -533,24 +219,6 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
               </Card>
             ))}
           </SimpleGrid>
-        )}
-
-        {/* Pagination Controls */}
-        {showPagination && (
-          <Group justify="center" mt="xl" mb="md">
-            <Pagination
-              value={currentPage}
-              onChange={setCurrentPage}
-              total={totalPages}
-              size="sm"
-              withEdges
-              siblings={1}
-              boundaries={1}
-            />
-            <Text size="xs" c="dimmed" ml="md">
-              Page {currentPage} of {totalPages} ({promptsData?.total || 0} prompts total)
-            </Text>
-          </Group>
         )}
       </ScrollArea>
 
@@ -561,6 +229,20 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
         promptId={selectedPromptId}
         onPromptSelect={onPromptSelect}
       />
+    </div>
+  );
+}
+
+// Simplified sidebar component
+export function PromptSidebar() {
+  return (
+    <div className="flex h-full flex-col p-4">
+      <Text size="xl" fw={700} mb="md" className="text-gray-900">
+        {texts.chat.prompts.library}
+      </Text>
+      <Text size="sm" c="dimmed">
+        Simplified sidebar - filters will be added later
+      </Text>
     </div>
   );
 }
