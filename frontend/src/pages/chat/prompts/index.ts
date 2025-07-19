@@ -4,3 +4,6 @@ export { PromptCard } from './PromptCard';
 export { PromptGrid } from './PromptGrid';
 export { PromptDetailsModal } from './PromptDetailsModal';
 export { CreatePromptModal } from './CreatePromptModal';
+export { PromptDetailsSection } from './PromptDetailsSection';
+export { PromptRatingSection } from './PromptRatingSection';
+export { PromptVersionSection } from './PromptVersionSection';

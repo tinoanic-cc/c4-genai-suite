@@ -19,15 +19,22 @@ export function NewChatRedirect() {
         // If there's an initial prompt, create a new chat and navigate with the prompt
         void createNewConversation.mutate(undefined, {
           onSuccess: (chat) => {
-            navigate(`/chat/${chat.id}`, {
+            void navigate(`/chat/${chat.id}`, {
               state: { initialPrompt },
               replace: true,
             });
           },
+          onError: () => {
+            // Handle error silently
+          },
         });
       } else {
         // If no initial prompt, just create a new chat normally
-        void createNewConversation.mutate();
+        void createNewConversation.mutate(undefined, {
+          onError: () => {
+            // Handle error silently
+          },
+        });
       }
     }
   }, [createNewConversation, location.state, navigate]);

@@ -88,11 +88,11 @@ export class PromptsController {
   @ApiResponse({ status: 200, description: 'Paginated list of prompts', type: PaginatedPromptsResponseDto })
   async findAll(
     @Req() req: Request,
-    @Query('categoryId') categoryId?: number,
+    @Query('categoryId', new ParseIntPipe({ optional: true })) categoryId?: number,
     @Query('search') search?: string,
-    @Query('minRating') minRating?: number,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
+    @Query('minRating', new ParseIntPipe({ optional: true })) minRating?: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('sortBy') sortBy?: 'createdAt' | 'updatedAt' | 'averageRating' | 'usageCount' | 'title',
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
   ): Promise<PaginatedPromptsResponseDto> {
@@ -128,8 +128,8 @@ export class PromptsController {
   @ApiResponse({ status: 200, description: 'Paginated list of user prompts', type: PaginatedPromptsResponseDto })
   async findMy(
     @Req() req: Request,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('sortBy') sortBy?: 'createdAt' | 'updatedAt' | 'averageRating' | 'usageCount' | 'title',
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
   ): Promise<PaginatedPromptsResponseDto> {
@@ -156,7 +156,7 @@ export class PromptsController {
   @Get('popular')
   @ApiOperation({ summary: 'Get popular prompts' })
   @ApiResponse({ status: 200, description: 'List of popular prompts', type: [PromptResponseDto] })
-  async getPopular(@Query('limit') limit?: number): Promise<PromptResponseDto[]> {
+  async getPopular(@Query('limit', new ParseIntPipe({ optional: true })) limit?: number): Promise<PromptResponseDto[]> {
     const prompts = await this.promptsService.getPopularPrompts(limit);
     return prompts.map((prompt) => this.transformToPromptResponseDto(prompt));
   }
@@ -164,7 +164,7 @@ export class PromptsController {
   @Get('recent')
   @ApiOperation({ summary: 'Get recent prompts' })
   @ApiResponse({ status: 200, description: 'List of recent prompts', type: [PromptResponseDto] })
-  async getRecent(@Query('limit') limit?: number): Promise<PromptResponseDto[]> {
+  async getRecent(@Query('limit', new ParseIntPipe({ optional: true })) limit?: number): Promise<PromptResponseDto[]> {
     const prompts = await this.promptsService.getRecentPrompts(limit);
     return prompts.map((prompt) => this.transformToPromptResponseDto(prompt));
   }

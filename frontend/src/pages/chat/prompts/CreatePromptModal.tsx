@@ -19,11 +19,12 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
   // Fetch categories for the select - using mock data for now to avoid TypeScript issues
   const { data: categories = [] } = useQuery<PromptCategoryResponseDto[]>({
     queryKey: ['prompt-categories'],
-    queryFn: () => Promise.resolve([
-      { id: 1, name: 'Code Review', color: '#3B82F6', createdAt: new Date(), updatedAt: new Date() },
-      { id: 2, name: 'Documentation', color: '#10B981', createdAt: new Date(), updatedAt: new Date() },
-      { id: 3, name: 'Testing', color: '#F59E0B', createdAt: new Date(), updatedAt: new Date() },
-    ]),
+    queryFn: () =>
+      Promise.resolve([
+        { id: 1, name: 'Code Review', color: '#3B82F6', createdAt: new Date(), updatedAt: new Date() },
+        { id: 2, name: 'Documentation', color: '#10B981', createdAt: new Date(), updatedAt: new Date() },
+        { id: 3, name: 'Testing', color: '#F59E0B', createdAt: new Date(), updatedAt: new Date() },
+      ]),
   });
 
   const form = useForm<CreatePromptDto>({

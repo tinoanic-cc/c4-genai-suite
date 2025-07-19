@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method, @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -62,8 +63,10 @@ describe('TaskCategoriesService', () => {
 
       const result = await service.create(createDto);
 
-      expect(repository.create).toHaveBeenCalledWith(createDto);
-      expect(repository.save).toHaveBeenCalledWith(mockTaskCategory);
+      const createSpy = repository.create;
+      const saveSpy = repository.save;
+      expect(createSpy).toHaveBeenCalledWith(createDto);
+      expect(saveSpy).toHaveBeenCalledWith(mockTaskCategory);
       expect(result).toEqual(mockTaskCategory);
     });
   });
@@ -165,7 +168,7 @@ describe('TaskCategoriesService', () => {
         }),
       };
 
-      repository.createQueryBuilder.mockReturnValue(mockQueryBuilder as any);
+      repository.createQueryBuilder.mockReturnValue(mockQueryBuilder as unknown as any);
 
       const result = await service.getCategoriesWithTaskCount();
 

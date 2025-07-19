@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PromptCategoryEntity } from '../database';
@@ -42,7 +42,7 @@ export class PromptCategoriesService {
     });
 
     if (!category) {
-      throw new Error('Category not found');
+      throw new NotFoundException('Category not found');
     }
 
     Object.assign(category, updatePromptCategoryDto);
@@ -53,7 +53,7 @@ export class PromptCategoriesService {
     const result = await this.promptCategoryRepository.delete(id);
 
     if (result.affected === 0) {
-      throw new Error('Category not found');
+      throw new NotFoundException('Category not found');
     }
   }
 
