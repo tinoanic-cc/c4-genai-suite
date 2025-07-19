@@ -17,25 +17,31 @@
 import * as runtime from '../runtime';
 import type {
   CreatePromptCategoryDto,
+  PromptCategoryResponseDto,
+  PromptCategoryWithCountResponseDto,
 } from '../models/index';
 import {
     CreatePromptCategoryDtoFromJSON,
     CreatePromptCategoryDtoToJSON,
+    PromptCategoryResponseDtoFromJSON,
+    PromptCategoryResponseDtoToJSON,
+    PromptCategoryWithCountResponseDtoFromJSON,
+    PromptCategoryWithCountResponseDtoToJSON,
 } from '../models/index';
 
-export interface TaskCategoriesControllerCreateRequest {
+export interface PromptCategoriesControllerCreateRequest {
     createPromptCategoryDto: CreatePromptCategoryDto;
 }
 
-export interface TaskCategoriesControllerDeleteRequest {
+export interface PromptCategoriesControllerDeleteRequest {
     id: number;
 }
 
-export interface TaskCategoriesControllerFindOneRequest {
+export interface PromptCategoriesControllerFindOneRequest {
     id: number;
 }
 
-export interface TaskCategoriesControllerUpdateRequest {
+export interface PromptCategoriesControllerUpdateRequest {
     id: number;
 }
 
@@ -47,11 +53,11 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
     /**
      * Create a new prompt category
      */
-    async taskCategoriesControllerCreateRaw(requestParameters: TaskCategoriesControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptCategoriesControllerCreateRaw(requestParameters: PromptCategoriesControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptCategoryResponseDto>> {
         if (requestParameters['createPromptCategoryDto'] == null) {
             throw new runtime.RequiredError(
                 'createPromptCategoryDto',
-                'Required parameter "createPromptCategoryDto" was null or undefined when calling taskCategoriesControllerCreate().'
+                'Required parameter "createPromptCategoryDto" was null or undefined when calling promptCategoriesControllerCreate().'
             );
         }
 
@@ -69,24 +75,25 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
             body: CreatePromptCategoryDtoToJSON(requestParameters['createPromptCategoryDto']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptCategoryResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Create a new prompt category
      */
-    async taskCategoriesControllerCreate(createPromptCategoryDto: CreatePromptCategoryDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.taskCategoriesControllerCreateRaw({ createPromptCategoryDto: createPromptCategoryDto }, initOverrides);
+    async promptCategoriesControllerCreate(createPromptCategoryDto: CreatePromptCategoryDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptCategoryResponseDto> {
+        const response = await this.promptCategoriesControllerCreateRaw({ createPromptCategoryDto: createPromptCategoryDto }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Delete category
      */
-    async taskCategoriesControllerDeleteRaw(requestParameters: TaskCategoriesControllerDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptCategoriesControllerDeleteRaw(requestParameters: PromptCategoriesControllerDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling taskCategoriesControllerDelete().'
+                'Required parameter "id" was null or undefined when calling promptCategoriesControllerDelete().'
             );
         }
 
@@ -107,14 +114,14 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
     /**
      * Delete category
      */
-    async taskCategoriesControllerDelete(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.taskCategoriesControllerDeleteRaw({ id: id }, initOverrides);
+    async promptCategoriesControllerDelete(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.promptCategoriesControllerDeleteRaw({ id: id }, initOverrides);
     }
 
     /**
      * Get all prompt categories
      */
-    async taskCategoriesControllerFindAllRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptCategoriesControllerFindAllRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PromptCategoryResponseDto>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -126,20 +133,21 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PromptCategoryResponseDtoFromJSON));
     }
 
     /**
      * Get all prompt categories
      */
-    async taskCategoriesControllerFindAll(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.taskCategoriesControllerFindAllRaw(initOverrides);
+    async promptCategoriesControllerFindAll(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PromptCategoryResponseDto>> {
+        const response = await this.promptCategoriesControllerFindAllRaw(initOverrides);
+        return await response.value();
     }
 
     /**
      * Get all categories with prompt counts
      */
-    async taskCategoriesControllerFindAllWithCountsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptCategoriesControllerFindAllWithCountsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PromptCategoryWithCountResponseDto>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -151,24 +159,25 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PromptCategoryWithCountResponseDtoFromJSON));
     }
 
     /**
      * Get all categories with prompt counts
      */
-    async taskCategoriesControllerFindAllWithCounts(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.taskCategoriesControllerFindAllWithCountsRaw(initOverrides);
+    async promptCategoriesControllerFindAllWithCounts(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PromptCategoryWithCountResponseDto>> {
+        const response = await this.promptCategoriesControllerFindAllWithCountsRaw(initOverrides);
+        return await response.value();
     }
 
     /**
      * Get category by ID
      */
-    async taskCategoriesControllerFindOneRaw(requestParameters: TaskCategoriesControllerFindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptCategoriesControllerFindOneRaw(requestParameters: PromptCategoriesControllerFindOneRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptCategoryResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling taskCategoriesControllerFindOne().'
+                'Required parameter "id" was null or undefined when calling promptCategoriesControllerFindOne().'
             );
         }
 
@@ -183,24 +192,25 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptCategoryResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Get category by ID
      */
-    async taskCategoriesControllerFindOne(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.taskCategoriesControllerFindOneRaw({ id: id }, initOverrides);
+    async promptCategoriesControllerFindOne(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptCategoryResponseDto> {
+        const response = await this.promptCategoriesControllerFindOneRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
     /**
      * Update category
      */
-    async taskCategoriesControllerUpdateRaw(requestParameters: TaskCategoriesControllerUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async promptCategoriesControllerUpdateRaw(requestParameters: PromptCategoriesControllerUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromptCategoryResponseDto>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling taskCategoriesControllerUpdate().'
+                'Required parameter "id" was null or undefined when calling promptCategoriesControllerUpdate().'
             );
         }
 
@@ -215,14 +225,15 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromptCategoryResponseDtoFromJSON(jsonValue));
     }
 
     /**
      * Update category
      */
-    async taskCategoriesControllerUpdate(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.taskCategoriesControllerUpdateRaw({ id: id }, initOverrides);
+    async promptCategoriesControllerUpdate(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptCategoryResponseDto> {
+        const response = await this.promptCategoriesControllerUpdateRaw({ id: id }, initOverrides);
+        return await response.value();
     }
 
 }

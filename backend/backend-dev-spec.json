@@ -1141,53 +1141,85 @@
     },
     "/api/prompt-categories": {
       "post": {
-        "operationId": "TaskCategoriesController_create",
+        "operationId": "PromptCategoriesController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePromptCategoryDto" } } }
         },
-        "responses": { "201": { "description": "Category created successfully" } },
+        "responses": {
+          "201": {
+            "description": "Category created successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptCategoryResponseDto" } } }
+          }
+        },
         "summary": "Create a new prompt category",
         "tags": ["prompt-categories"]
       },
       "get": {
-        "operationId": "TaskCategoriesController_findAll",
+        "operationId": "PromptCategoriesController_findAll",
         "parameters": [],
-        "responses": { "200": { "description": "List of categories" } },
+        "responses": {
+          "200": {
+            "description": "List of categories",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PromptCategoryResponseDto" } }
+              }
+            }
+          }
+        },
         "summary": "Get all prompt categories",
         "tags": ["prompt-categories"]
       }
     },
     "/api/prompt-categories/with-counts": {
       "get": {
-        "operationId": "TaskCategoriesController_findAllWithCounts",
+        "operationId": "PromptCategoriesController_findAllWithCounts",
         "parameters": [],
-        "responses": { "200": { "description": "List of categories with prompt counts" } },
+        "responses": {
+          "200": {
+            "description": "List of categories with prompt counts",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PromptCategoryWithCountResponseDto" } }
+              }
+            }
+          }
+        },
         "summary": "Get all categories with prompt counts",
         "tags": ["prompt-categories"]
       }
     },
     "/api/prompt-categories/{id}": {
       "get": {
-        "operationId": "TaskCategoriesController_findOne",
+        "operationId": "PromptCategoriesController_findOne",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
-        "responses": { "200": { "description": "Category details" }, "404": { "description": "Category not found" } },
+        "responses": {
+          "200": {
+            "description": "Category details",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptCategoryResponseDto" } } }
+          },
+          "404": { "description": "Category not found" }
+        },
         "summary": "Get category by ID",
         "tags": ["prompt-categories"]
       },
       "put": {
-        "operationId": "TaskCategoriesController_update",
+        "operationId": "PromptCategoriesController_update",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
         "responses": {
-          "200": { "description": "Category updated successfully" },
+          "200": {
+            "description": "Category updated successfully",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PromptCategoryResponseDto" } } }
+          },
           "404": { "description": "Category not found" }
         },
         "summary": "Update category",
         "tags": ["prompt-categories"]
       },
       "delete": {
-        "operationId": "TaskCategoriesController_delete",
+        "operationId": "PromptCategoriesController_delete",
         "parameters": [{ "name": "id", "required": true, "in": "path", "schema": { "type": "number" } }],
         "responses": {
           "200": { "description": "Category deleted successfully" },
