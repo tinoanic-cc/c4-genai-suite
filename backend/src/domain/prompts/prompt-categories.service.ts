@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PromptCategoryEntity } from '../database';
+import { PromptCategoryResponseDto, PromptCategoryWithCountResponseDto } from './dtos/prompt-response.dto';
 import { CreatePromptCategoryDto, UpdatePromptCategoryDto } from './interfaces';
 
 @Injectable()
@@ -92,5 +93,54 @@ export class PromptCategoriesService {
     );
 
     return categoriesWithCounts;
+  }
+
+  // DTO methods for Admin API
+  async createDto(createPromptCategoryDto: CreatePromptCategoryDto): Promise<PromptCategoryResponseDto> {
+    const category = await this.create(createPromptCategoryDto);
+    return this.toDto(category);
+  }
+
+  async findAllDto(): Promise<PromptCategoryResponseDto[]> {
+    const categories = await this.promptCategoryRepository.find({
+      order: { sortOrder: 'ASC', name: 'ASC' },
+    });
+    return categories.map((category) => this.toDto(category));
+  }
+
+  async findAllWithCountsDto(currentUserId?: string): Promise<PromptCategoryWithCountResponseDto[]> {
+    const categoriesWithCounts = await this.getCategoriesWithPromptCount(currentUserId);
+    return categoriesWithCounts.map((category) => this.toWithCountDto(category));
+  }
+
+  async findOneDto(id: number): Promise<PromptCategoryResponseDto | null> {
+    const category = await this.promptCategoryRepository.findOne({
+      where: { id },
+    });
+    return category ? this.toDto(category) : null;
+  }
+
+  async updateDto(id: number, updatePromptCategoryDto: UpdatePromptCategoryDto): Promise<PromptCategoryResponseDto> {
+    const category = await this.update(id, updatePromptCategoryDto);
+    return this.toDto(category);
+  }
+
+  private toDto(entity: PromptCategoryEntity): PromptCategoryResponseDto {
+    return {
+      id: entity.id,
+      name: entity.name,
+      description: entity.description,
+      color: entity.color,
+      sortOrder: entity.sortOrder,
+      createdAt: entity.createdAt.toISOString(),
+      updatedAt: entity.updatedAt.toISOString(),
+    };
+  }
+
+  private toWithCountDto(entity: PromptCategoryEntity & { promptCount: number }): PromptCategoryWithCountResponseDto {
+    return {
+      ...this.toDto(entity),
+      promptCount: entity.promptCount,
+    };
   }
 }
