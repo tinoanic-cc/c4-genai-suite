@@ -4,7 +4,7 @@ import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { CreatePromptCategoryDto, PromptCategory } from 'src/api/generated/temp-types';
+import { CreatePromptCategoryDto, PromptCategoryResponseDto } from 'src/api/generated/models';
 
 // Temporary interface until UpdatePromptCategoryDto is generated
 interface UpdatePromptCategoryDto {
@@ -26,17 +26,17 @@ interface CategoryFormData {
 export function PromptCategoriesPage() {
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<PromptCategory | null>(null);
+  const [editingCategory, setEditingCategory] = useState<PromptCategoryResponseDto | null>(null);
 
   // Fetch categories
-  const { data: categories = [], isLoading } = useQuery<PromptCategory[]>({
+  const { data: categories = [], isLoading } = useQuery<PromptCategoryResponseDto[]>({
     queryKey: ['prompt-categories'],
-    queryFn: async (): Promise<PromptCategory[]> => {
+    queryFn: async (): Promise<PromptCategoryResponseDto[]> => {
       const response = await fetch('/api/admin/prompt-categories/with-counts');
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
       }
-      return response.json() as Promise<PromptCategory[]>;
+      return response.json() as Promise<PromptCategoryResponseDto[]>;
     },
   });
 
@@ -55,7 +55,7 @@ export function PromptCategoriesPage() {
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: async (data: CreatePromptCategoryDto): Promise<PromptCategory> => {
+    mutationFn: async (data: CreatePromptCategoryDto): Promise<PromptCategoryResponseDto> => {
       const response = await fetch('/api/admin/prompt-categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,7 +64,7 @@ export function PromptCategoriesPage() {
       if (!response.ok) {
         throw new Error('Failed to create category');
       }
-      return response.json() as Promise<PromptCategory>;
+      return response.json() as Promise<PromptCategoryResponseDto>;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['prompt-categories'] });

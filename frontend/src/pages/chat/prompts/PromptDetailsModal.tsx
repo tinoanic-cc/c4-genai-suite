@@ -38,7 +38,22 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
-import { CreatePromptRatingDto, Prompt, PromptVersion } from 'src/api/generated/temp-types';
+import { CreatePromptRatingDto, PromptResponseDto } from 'src/api/generated/models';
+
+// Temporary interface for PromptVersion until it's generated
+interface PromptVersion {
+  id: number;
+  content: string;
+  createdAt: string;
+  versionNumber: number;
+  isCurrent: boolean;
+  versionComment: string;
+  title: string;
+  author: {
+    id: number;
+    name: string;
+  };
+}
 import { texts } from 'src/texts';
 import { VersionCommentModal } from './VersionCommentModal';
 
@@ -46,7 +61,7 @@ interface PromptDetailsModalProps {
   opened: boolean;
   onClose: () => void;
   promptId: number | null;
-  onPromptSelect?: (prompt: Prompt) => void;
+  onPromptSelect?: (prompt: PromptResponseDto) => void;
 }
 
 export function PromptDetailsModal({ opened, onClose, promptId, onPromptSelect }: PromptDetailsModalProps) {

@@ -3,7 +3,7 @@ import { IconBulb, IconEdit, IconMessageCircle } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { Prompt } from 'src/api/generated/temp-types';
+import { PromptResponseDto } from 'src/api/generated/models';
 import { CollapseButton, ProfileButton } from 'src/components';
 import { NavigationBar } from 'src/components/NavigationBar';
 import { useSidebarState, useTheme } from 'src/hooks';
@@ -178,7 +178,7 @@ export function ChatPage() {
               ></div>
             ) : leftSidebarTab === 'prompts' ? (
               <PromptLibrary
-                onPromptSelect={(prompt: Prompt) => {
+                onPromptSelect={(prompt: PromptResponseDto) => {
                   // Navigate to new chat with the selected prompt
                   void navigate('/chat/new', { state: { initialPrompt: prompt.content } });
                   setLeftSidebarTab('conversations');
