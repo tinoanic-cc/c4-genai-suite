@@ -71,7 +71,7 @@ export function PromptSidebar({
   // Fetch categories - temporarily return empty array until categories API is implemented
   const { data: categories = [] } = useQuery({
     queryKey: ['prompt-categories'],
-    queryFn: () => Promise.resolve([]),
+    queryFn: () => Promise.resolve([] as Array<{ id: number; name: string; promptCount: number }>),
   });
 
   // Fetch prompts for count
