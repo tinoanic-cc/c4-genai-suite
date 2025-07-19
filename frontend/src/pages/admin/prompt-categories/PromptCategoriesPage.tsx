@@ -4,15 +4,8 @@ import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { CreatePromptCategoryDto, PromptCategoryResponseDto, PromptCategoryWithCountResponseDto } from 'src/api/generated/models';
-
-// Temporary interface until UpdatePromptCategoryDto is generated
-interface UpdatePromptCategoryDto {
-  name?: string;
-  description?: string;
-  color?: string;
-  sortOrder?: number;
-}
+import { useApi } from 'src/api';
+import { CreatePromptCategoryDto, PromptCategoryWithCountResponseDto, UpdatePromptCategoryDto } from 'src/api/generated/models';
 import { buildError } from 'src/lib';
 import { texts } from 'src/texts';
 
@@ -24,6 +17,7 @@ interface CategoryFormData {
 }
 
 export function PromptCategoriesPage() {
+  const api = useApi();
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<PromptCategoryWithCountResponseDto | null>(null);
@@ -31,13 +25,7 @@ export function PromptCategoriesPage() {
   // Fetch categories
   const { data: categories = [], isLoading } = useQuery<PromptCategoryWithCountResponseDto[]>({
     queryKey: ['prompt-categories'],
-    queryFn: async (): Promise<PromptCategoryWithCountResponseDto[]> => {
-      const response = await fetch('/api/admin/prompt-categories/with-counts');
-      if (!response.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-      return response.json() as Promise<PromptCategoryWithCountResponseDto[]>;
-    },
+    queryFn: () => api.promptCategories.promptCategoriesControllerFindAllWithCounts(),
   });
 
   // Form for create/edit
@@ -55,17 +43,7 @@ export function PromptCategoriesPage() {
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: async (data: CreatePromptCategoryDto): Promise<PromptCategoryResponseDto> => {
-      const response = await fetch('/api/admin/prompt-categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to create category');
-      }
-      return response.json() as Promise<PromptCategoryResponseDto>;
-    },
+    mutationFn: (data: CreatePromptCategoryDto) => api.promptCategories.promptCategoriesControllerCreate(data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['prompt-categories'] });
       toast.success(texts.admin.promptCategories.createSuccess);
@@ -79,17 +57,8 @@ export function PromptCategoriesPage() {
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: UpdatePromptCategoryDto }): Promise<PromptCategoryResponseDto> => {
-      const response = await fetch(`/api/admin/prompt-categories/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update category');
-      }
-      return response.json() as Promise<PromptCategoryResponseDto>;
-    },
+    mutationFn: ({ id, data }: { id: number; data: UpdatePromptCategoryDto }) =>
+      api.promptCategories.promptCategoriesControllerUpdate(id, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['prompt-categories'] });
       toast.success(texts.admin.promptCategories.updateSuccess);
@@ -103,14 +72,7 @@ export function PromptCategoriesPage() {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/admin/prompt-categories/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        throw new Error('Failed to delete category');
-      }
-    },
+    mutationFn: (id: number) => api.promptCategories.promptCategoriesControllerDelete(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['prompt-categories'] });
       toast.success(texts.admin.promptCategories.deleteSuccess);

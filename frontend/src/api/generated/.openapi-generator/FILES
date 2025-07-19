@@ -92,6 +92,7 @@ models/TestBucketDto.ts
 models/TestExtensionDto.ts
 models/UpdateConversationDto.ts
 models/UpdateExtensionDto.ts
+models/UpdatePromptCategoryDto.ts
 models/UpdatePromptDto.ts
 models/UpsertBucketDto.ts
 models/UpsertConfigurationDto.ts

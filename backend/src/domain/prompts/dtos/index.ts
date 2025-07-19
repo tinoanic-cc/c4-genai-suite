@@ -2,6 +2,7 @@ export { CreatePromptDto } from './create-prompt.dto';
 export { UpdatePromptDto } from './update-prompt.dto';
 export { CreatePromptRatingDto } from './create-prompt-rating.dto';
 export { CreatePromptCategoryDto } from './create-prompt-category.dto';
+export { UpdatePromptCategoryDto } from './update-prompt-category.dto';
 export { PromptSortBy, SortOrder } from './prompt-sort.enum';
 
 // Import enums for use in interfaces
@@ -22,13 +23,6 @@ export {
 export interface UpdatePromptRatingDto {
   rating?: number;
   comment?: string;
-}
-
-export interface UpdatePromptCategoryDto {
-  name?: string;
-  description?: string;
-  color?: string;
-  sortOrder?: number;
 }
 
 export interface PromptFilters {

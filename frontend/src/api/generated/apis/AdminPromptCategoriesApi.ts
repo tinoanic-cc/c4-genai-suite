@@ -17,10 +17,13 @@
 import * as runtime from '../runtime';
 import type {
   CreatePromptCategoryDto,
+  UpdatePromptCategoryDto,
 } from '../models/index';
 import {
     CreatePromptCategoryDtoFromJSON,
     CreatePromptCategoryDtoToJSON,
+    UpdatePromptCategoryDtoFromJSON,
+    UpdatePromptCategoryDtoToJSON,
 } from '../models/index';
 
 export interface AdminPromptCategoriesControllerCreateRequest {
@@ -37,6 +40,7 @@ export interface AdminPromptCategoriesControllerFindOneRequest {
 
 export interface AdminPromptCategoriesControllerUpdateRequest {
     id: number;
+    updatePromptCategoryDto: UpdatePromptCategoryDto;
 }
 
 /**
@@ -204,15 +208,25 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['updatePromptCategoryDto'] == null) {
+            throw new runtime.RequiredError(
+                'updatePromptCategoryDto',
+                'Required parameter "updatePromptCategoryDto" was null or undefined when calling adminPromptCategoriesControllerUpdate().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
             path: `/api/admin/prompt-categories/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
+            body: UpdatePromptCategoryDtoToJSON(requestParameters['updatePromptCategoryDto']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -221,8 +235,8 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
     /**
      * Update category
      */
-    async adminPromptCategoriesControllerUpdate(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.adminPromptCategoriesControllerUpdateRaw({ id: id }, initOverrides);
+    async adminPromptCategoriesControllerUpdate(id: number, updatePromptCategoryDto: UpdatePromptCategoryDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.adminPromptCategoriesControllerUpdateRaw({ id: id, updatePromptCategoryDto: updatePromptCategoryDto }, initOverrides);
     }
 
 }

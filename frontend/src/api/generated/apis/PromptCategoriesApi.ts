@@ -19,6 +19,7 @@ import type {
   CreatePromptCategoryDto,
   PromptCategoryResponseDto,
   PromptCategoryWithCountResponseDto,
+  UpdatePromptCategoryDto,
 } from '../models/index';
 import {
     CreatePromptCategoryDtoFromJSON,
@@ -27,6 +28,8 @@ import {
     PromptCategoryResponseDtoToJSON,
     PromptCategoryWithCountResponseDtoFromJSON,
     PromptCategoryWithCountResponseDtoToJSON,
+    UpdatePromptCategoryDtoFromJSON,
+    UpdatePromptCategoryDtoToJSON,
 } from '../models/index';
 
 export interface PromptCategoriesControllerCreateRequest {
@@ -43,6 +46,7 @@ export interface PromptCategoriesControllerFindOneRequest {
 
 export interface PromptCategoriesControllerUpdateRequest {
     id: number;
+    updatePromptCategoryDto: UpdatePromptCategoryDto;
 }
 
 /**
@@ -214,15 +218,25 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
             );
         }
 
+        if (requestParameters['updatePromptCategoryDto'] == null) {
+            throw new runtime.RequiredError(
+                'updatePromptCategoryDto',
+                'Required parameter "updatePromptCategoryDto" was null or undefined when calling promptCategoriesControllerUpdate().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
             path: `/api/prompt-categories/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
+            body: UpdatePromptCategoryDtoToJSON(requestParameters['updatePromptCategoryDto']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PromptCategoryResponseDtoFromJSON(jsonValue));
@@ -231,8 +245,8 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
     /**
      * Update category
      */
-    async promptCategoriesControllerUpdate(id: number, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptCategoryResponseDto> {
-        const response = await this.promptCategoriesControllerUpdateRaw({ id: id }, initOverrides);
+    async promptCategoriesControllerUpdate(id: number, updatePromptCategoryDto: UpdatePromptCategoryDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromptCategoryResponseDto> {
+        const response = await this.promptCategoriesControllerUpdateRaw({ id: id, updatePromptCategoryDto: updatePromptCategoryDto }, initOverrides);
         return await response.value();
     }
 

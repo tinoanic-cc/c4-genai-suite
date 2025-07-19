@@ -81,6 +81,7 @@ export * from './TestBucketDto';
 export * from './TestExtensionDto';
 export * from './UpdateConversationDto';
 export * from './UpdateExtensionDto';
+export * from './UpdatePromptCategoryDto';
 export * from './UpdatePromptDto';
 export * from './UpsertBucketDto';
 export * from './UpsertConfigurationDto';
