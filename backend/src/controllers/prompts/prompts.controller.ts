@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth';
@@ -163,7 +176,7 @@ export class PromptsController {
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<PromptResponseDto> {
     const prompt = await this.promptsService.findOne(id);
     if (!prompt) {
-      throw new Error('Prompt not found');
+      throw new NotFoundException('Prompt not found');
     }
     return this.transformToPromptResponseDto(prompt);
   }
@@ -248,7 +261,7 @@ export class PromptsController {
   ): Promise<PromptVersionResponseDto> {
     const promptVersion = await this.promptsService.getVersion(id, version);
     if (!promptVersion) {
-      throw new Error('Version not found');
+      throw new NotFoundException('Version not found');
     }
     return this.transformToPromptVersionResponseDto(promptVersion);
   }

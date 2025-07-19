@@ -1,6 +1,7 @@
 node_modules
 dist
 bin
+root
 
 .idea
 .env
@@ -18,3 +19,6 @@ backend/dev/local-dev.pem
 # Outputs of `npm run test` and `npm run dev` etc.
 output/*.log
 /reports/
+
+# Cline rules (local development guidelines)
+.clinerules/

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/unbound-method, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,7 +10,6 @@ describe('PromptsService', () => {
   let service: PromptsService;
   let promptRepository: jest.Mocked<Repository<PromptEntity>>;
   let promptUsageRepository: jest.Mocked<Repository<PromptUsageEntity>>;
-  let promptRatingRepository: jest.Mocked<Repository<PromptRatingEntity>>;
   let promptVersionRepository: jest.Mocked<Repository<PromptVersionEntity>>;
 
   const mockPrompt = {
@@ -93,7 +92,6 @@ describe('PromptsService', () => {
     service = module.get<PromptsService>(PromptsService);
     promptRepository = module.get(getRepositoryToken(PromptEntity));
     promptUsageRepository = module.get(getRepositoryToken(PromptUsageEntity));
-    promptRatingRepository = module.get(getRepositoryToken(PromptRatingEntity));
     promptVersionRepository = module.get(getRepositoryToken(PromptVersionEntity));
   });
 

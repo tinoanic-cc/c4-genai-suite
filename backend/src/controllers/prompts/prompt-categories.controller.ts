@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { LocalAuthGuard } from '../../domain/auth';
@@ -49,7 +49,7 @@ export class PromptCategoriesController {
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<PromptCategoryResponseDto> {
     const category = await this.promptCategoriesService.findOne(id);
     if (!category) {
-      throw new Error('Category not found');
+      throw new NotFoundException('Category not found');
     }
     return this.transformToPromptCategoryResponseDto(category);
   }
