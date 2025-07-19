@@ -622,15 +622,15 @@ export function PromptLibrary({ onPromptSelect, searchTerm, selectedCategory, mi
                       </Button>
                     </Tooltip>
                     <Tooltip label={texts.chat.prompts.tooltips.useInChat} position="top" withArrow>
-                      <Button
-                        size="sm"
-                        leftSection={<IconPlayerPlay size={14} />}
-                        flex={1}
-                        onClick={() => handlePromptUse(prompt)}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        {texts.chat.prompts.buttons.execute}
-                      </Button>
+                        <Button
+                          size="sm"
+                          leftSection={<IconPlayerPlay size={14} />}
+                          flex={1}
+                          onClick={() => handlePromptUse(prompt as PromptResponseDto)}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          {texts.chat.prompts.buttons.execute}
+                        </Button>
                     </Tooltip>
                   </Group>
                 </div>
