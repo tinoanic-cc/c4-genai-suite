@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useApi } from 'src/api';
-import { CreatePromptDto } from 'src/api/prompts';
+import { CreatePromptDto, PromptCategory } from 'src/api/generated/temp-types';
 import { texts } from 'src/texts';
 
 interface CreatePromptModalProps {
@@ -17,7 +17,7 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
   const queryClient = useQueryClient();
 
   // Fetch categories for the select
-  const { data: categories = [] } = useQuery({
+  const { data: categories = [] } = useQuery<PromptCategory[]>({
     queryKey: ['prompt-categories'],
     queryFn: () => api.prompts.getCategories(),
   });
@@ -31,8 +31,8 @@ export function CreatePromptModal({ opened, onClose, initialContent = '' }: Crea
       isPublic: true,
     },
     validate: {
-      title: (value) => (value.trim().length < 3 ? texts.chat.prompts.create.titleValidation : null),
-      content: (value) => (value.trim().length < 10 ? texts.chat.prompts.create.contentValidation : null),
+      title: (value: string) => (value.trim().length < 3 ? texts.chat.prompts.create.titleValidation : null),
+      content: (value: string) => (value.trim().length < 10 ? texts.chat.prompts.create.contentValidation : null),
     },
   });
 

@@ -15,10 +15,17 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  CreatePromptRatingDto,
+} from '../models/index';
+import {
+    CreatePromptRatingDtoFromJSON,
+    CreatePromptRatingDtoToJSON,
+} from '../models/index';
 
 export interface PromptRatingsControllerCreateRequest {
     promptId: number;
-    body: object;
+    createPromptRatingDto: CreatePromptRatingDto;
 }
 
 export interface PromptRatingsControllerDeleteRequest {
@@ -57,10 +64,10 @@ export class PromptRatingsApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['body'] == null) {
+        if (requestParameters['createPromptRatingDto'] == null) {
             throw new runtime.RequiredError(
-                'body',
-                'Required parameter "body" was null or undefined when calling promptRatingsControllerCreate().'
+                'createPromptRatingDto',
+                'Required parameter "createPromptRatingDto" was null or undefined when calling promptRatingsControllerCreate().'
             );
         }
 
@@ -75,7 +82,7 @@ export class PromptRatingsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters['body'] as any,
+            body: CreatePromptRatingDtoToJSON(requestParameters['createPromptRatingDto']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -84,8 +91,8 @@ export class PromptRatingsApi extends runtime.BaseAPI {
     /**
      * Rate a prompt
      */
-    async promptRatingsControllerCreate(promptId: number, body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptRatingsControllerCreateRaw({ promptId: promptId, body: body }, initOverrides);
+    async promptRatingsControllerCreate(promptId: number, createPromptRatingDto: CreatePromptRatingDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.promptRatingsControllerCreateRaw({ promptId: promptId, createPromptRatingDto: createPromptRatingDto }, initOverrides);
     }
 
     /**

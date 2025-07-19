@@ -15,13 +15,23 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  CreatePromptDto,
+  UpdatePromptDto,
+} from '../models/index';
+import {
+    CreatePromptDtoFromJSON,
+    CreatePromptDtoToJSON,
+    UpdatePromptDtoFromJSON,
+    UpdatePromptDtoToJSON,
+} from '../models/index';
 
 export interface PromptsControllerCloneRequest {
     id: number;
 }
 
 export interface PromptsControllerCreateRequest {
-    body: object;
+    createPromptDto: CreatePromptDto;
 }
 
 export interface PromptsControllerDeleteRequest {
@@ -81,7 +91,7 @@ export interface PromptsControllerToggleVisibilityRequest {
 
 export interface PromptsControllerUpdateRequest {
     id: number;
-    body: object;
+    updatePromptDto: UpdatePromptDto;
 }
 
 /**
@@ -125,10 +135,10 @@ export class PromptsApi extends runtime.BaseAPI {
      * Create a new prompt
      */
     async promptsControllerCreateRaw(requestParameters: PromptsControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['body'] == null) {
+        if (requestParameters['createPromptDto'] == null) {
             throw new runtime.RequiredError(
-                'body',
-                'Required parameter "body" was null or undefined when calling promptsControllerCreate().'
+                'createPromptDto',
+                'Required parameter "createPromptDto" was null or undefined when calling promptsControllerCreate().'
             );
         }
 
@@ -143,7 +153,7 @@ export class PromptsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters['body'] as any,
+            body: CreatePromptDtoToJSON(requestParameters['createPromptDto']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -152,8 +162,8 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Create a new prompt
      */
-    async promptsControllerCreate(body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerCreateRaw({ body: body }, initOverrides);
+    async promptsControllerCreate(createPromptDto: CreatePromptDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.promptsControllerCreateRaw({ createPromptDto: createPromptDto }, initOverrides);
     }
 
     /**
@@ -648,10 +658,10 @@ export class PromptsApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['body'] == null) {
+        if (requestParameters['updatePromptDto'] == null) {
             throw new runtime.RequiredError(
-                'body',
-                'Required parameter "body" was null or undefined when calling promptsControllerUpdate().'
+                'updatePromptDto',
+                'Required parameter "updatePromptDto" was null or undefined when calling promptsControllerUpdate().'
             );
         }
 
@@ -666,7 +676,7 @@ export class PromptsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters['body'] as any,
+            body: UpdatePromptDtoToJSON(requestParameters['updatePromptDto']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -675,8 +685,8 @@ export class PromptsApi extends runtime.BaseAPI {
     /**
      * Update prompt (creates new version)
      */
-    async promptsControllerUpdate(id: number, body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.promptsControllerUpdateRaw({ id: id, body: body }, initOverrides);
+    async promptsControllerUpdate(id: number, updatePromptDto: UpdatePromptDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.promptsControllerUpdateRaw({ id: id, updatePromptDto: updatePromptDto }, initOverrides);
     }
 
 }

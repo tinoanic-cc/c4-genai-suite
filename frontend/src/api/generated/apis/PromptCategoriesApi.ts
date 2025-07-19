@@ -15,9 +15,16 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  CreatePromptCategoryDto,
+} from '../models/index';
+import {
+    CreatePromptCategoryDtoFromJSON,
+    CreatePromptCategoryDtoToJSON,
+} from '../models/index';
 
 export interface TaskCategoriesControllerCreateRequest {
-    body: object;
+    createPromptCategoryDto: CreatePromptCategoryDto;
 }
 
 export interface TaskCategoriesControllerDeleteRequest {
@@ -41,10 +48,10 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
      * Create a new prompt category
      */
     async taskCategoriesControllerCreateRaw(requestParameters: TaskCategoriesControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['body'] == null) {
+        if (requestParameters['createPromptCategoryDto'] == null) {
             throw new runtime.RequiredError(
-                'body',
-                'Required parameter "body" was null or undefined when calling taskCategoriesControllerCreate().'
+                'createPromptCategoryDto',
+                'Required parameter "createPromptCategoryDto" was null or undefined when calling taskCategoriesControllerCreate().'
             );
         }
 
@@ -59,7 +66,7 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters['body'] as any,
+            body: CreatePromptCategoryDtoToJSON(requestParameters['createPromptCategoryDto']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -68,8 +75,8 @@ export class PromptCategoriesApi extends runtime.BaseAPI {
     /**
      * Create a new prompt category
      */
-    async taskCategoriesControllerCreate(body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.taskCategoriesControllerCreateRaw({ body: body }, initOverrides);
+    async taskCategoriesControllerCreate(createPromptCategoryDto: CreatePromptCategoryDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.taskCategoriesControllerCreateRaw({ createPromptCategoryDto: createPromptCategoryDto }, initOverrides);
     }
 
     /**

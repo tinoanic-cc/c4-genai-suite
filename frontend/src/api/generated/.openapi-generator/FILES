@@ -28,6 +28,9 @@ models/ConversationDto.ts
 models/ConversationsDto.ts
 models/CreateConversationDto.ts
 models/CreateExtensionDto.ts
+models/CreatePromptCategoryDto.ts
+models/CreatePromptDto.ts
+models/CreatePromptRatingDto.ts
 models/DocumentDto.ts
 models/ExtensionArgumentArraySpecDto.ts
 models/ExtensionArgumentArraySpecDtoItems.ts
@@ -83,6 +86,7 @@ models/TestBucketDto.ts
 models/TestExtensionDto.ts
 models/UpdateConversationDto.ts
 models/UpdateExtensionDto.ts
+models/UpdatePromptDto.ts
 models/UpsertBucketDto.ts
 models/UpsertConfigurationDto.ts
 models/UpsertUserDto.ts

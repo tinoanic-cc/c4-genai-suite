@@ -1620,7 +1620,32 @@
   "servers": [],
   "components": {
     "schemas": {
-      "CreatePromptCategoryDto": { "type": "object", "properties": {} },
+      "CreatePromptCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the prompt category",
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "Code Review"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of the category",
+            "maxLength": 500,
+            "example": "Templates for code review and analysis"
+          },
+          "color": {
+            "type": "string",
+            "description": "Hex color code for the category",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "example": "#3B82F6"
+          },
+          "sortOrder": { "type": "integer", "description": "Sort order for displaying categories", "example": 1 }
+        },
+        "required": ["name"]
+      },
       "AuthProviderDto": {
         "type": "object",
         "properties": {
@@ -2523,9 +2548,92 @@
         },
         "required": ["items", "total"]
       },
-      "CreatePromptDto": { "type": "object", "properties": {} },
-      "UpdatePromptDto": { "type": "object", "properties": {} },
-      "CreatePromptRatingDto": { "type": "object", "properties": {} },
+      "CreatePromptDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title of the prompt",
+            "minLength": 1,
+            "maxLength": 200,
+            "example": "Code Review Assistant"
+          },
+          "content": {
+            "type": "string",
+            "description": "The content/template of the prompt",
+            "minLength": 1,
+            "maxLength": 10000,
+            "example": "Please review the following code and provide feedback on..."
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of what the prompt does",
+            "maxLength": 1000,
+            "example": "A prompt template for conducting thorough code reviews"
+          },
+          "categoryId": { "type": "integer", "description": "ID of the category this prompt belongs to", "example": 1 },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Whether the prompt is publicly visible",
+            "default": false,
+            "example": true
+          }
+        },
+        "required": ["title", "content"]
+      },
+      "UpdatePromptDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Updated title of the prompt",
+            "minLength": 1,
+            "maxLength": 200,
+            "example": "Enhanced Code Review Assistant"
+          },
+          "content": {
+            "type": "string",
+            "description": "Updated content/template of the prompt",
+            "minLength": 1,
+            "maxLength": 10000,
+            "example": "Please review the following code and provide detailed feedback on..."
+          },
+          "description": {
+            "type": "string",
+            "description": "Updated description of what the prompt does",
+            "maxLength": 1000,
+            "example": "An enhanced prompt template for conducting comprehensive code reviews"
+          },
+          "categoryId": { "type": "integer", "description": "Updated category ID for the prompt", "example": 2 },
+          "isPublic": { "type": "boolean", "description": "Updated visibility setting for the prompt", "example": true },
+          "versionComment": {
+            "type": "string",
+            "description": "Comment describing the changes made in this version",
+            "minLength": 1,
+            "maxLength": 500,
+            "example": "Added more detailed feedback criteria"
+          }
+        }
+      },
+      "CreatePromptRatingDto": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "integer",
+            "description": "Rating value from 1 to 5 stars",
+            "minimum": 1,
+            "maximum": 5,
+            "example": 4
+          },
+          "comment": {
+            "type": "string",
+            "description": "Optional comment about the prompt",
+            "maxLength": 1000,
+            "example": "This prompt helped me write better code reviews"
+          }
+        },
+        "required": ["rating"]
+      },
       "SiteLinkDto": {
         "type": "object",
         "properties": {

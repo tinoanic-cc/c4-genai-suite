@@ -3,6 +3,16 @@ export { UpdatePromptDto } from './update-prompt.dto';
 export { CreatePromptRatingDto } from './create-prompt-rating.dto';
 export { CreatePromptCategoryDto } from './create-prompt-category.dto';
 
+// Export response DTOs
+export {
+  PromptResponseDto,
+  PromptCategoryResponseDto,
+  PromptCategoryWithCountResponseDto,
+  PromptVersionResponseDto,
+  PromptRatingResponseDto,
+  PromptAuthorResponseDto,
+} from './prompt-response.dto';
+
 // Re-export interfaces that are still used
 export interface UpdatePromptRatingDto {
   rating?: number;

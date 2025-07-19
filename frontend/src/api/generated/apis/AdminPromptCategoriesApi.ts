@@ -15,9 +15,16 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  CreatePromptCategoryDto,
+} from '../models/index';
+import {
+    CreatePromptCategoryDtoFromJSON,
+    CreatePromptCategoryDtoToJSON,
+} from '../models/index';
 
 export interface AdminPromptCategoriesControllerCreateRequest {
-    body: object;
+    createPromptCategoryDto: CreatePromptCategoryDto;
 }
 
 export interface AdminPromptCategoriesControllerDeleteRequest {
@@ -41,10 +48,10 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
      * Create a new prompt category
      */
     async adminPromptCategoriesControllerCreateRaw(requestParameters: AdminPromptCategoriesControllerCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['body'] == null) {
+        if (requestParameters['createPromptCategoryDto'] == null) {
             throw new runtime.RequiredError(
-                'body',
-                'Required parameter "body" was null or undefined when calling adminPromptCategoriesControllerCreate().'
+                'createPromptCategoryDto',
+                'Required parameter "createPromptCategoryDto" was null or undefined when calling adminPromptCategoriesControllerCreate().'
             );
         }
 
@@ -59,7 +66,7 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters['body'] as any,
+            body: CreatePromptCategoryDtoToJSON(requestParameters['createPromptCategoryDto']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -68,8 +75,8 @@ export class AdminPromptCategoriesApi extends runtime.BaseAPI {
     /**
      * Create a new prompt category
      */
-    async adminPromptCategoriesControllerCreate(body: object, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.adminPromptCategoriesControllerCreateRaw({ body: body }, initOverrides);
+    async adminPromptCategoriesControllerCreate(createPromptCategoryDto: CreatePromptCategoryDto, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.adminPromptCategoriesControllerCreateRaw({ createPromptCategoryDto: createPromptCategoryDto }, initOverrides);
     }
 
     /**
